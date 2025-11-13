@@ -12,7 +12,7 @@ import Footer from "../components/UI/Footer";
 const Accueil = () => {
   return (
     <div>
-      <Header logoSrc="/images/logo.png" />
+      <Header logoSrc="/images/logo2.png" />
       <main className="pt-16">
         {/* HeroBanner en full width */}
         <HeroBanner whatsappNumber="2290154142255" />

@@ -47,7 +47,9 @@ const FeatureCards = () => {
               <h3 className="mb-3 text-2xl font-bold text-gray-800">
                 {card.title}
               </h3>
-              <p className="leading-relaxed text-gray-600">{card.description}</p>
+              <p className="leading-relaxed text-gray-600">
+                {card.description}
+              </p>
             </div>
           </div>
         ))}

@@ -37,32 +37,35 @@ const Header = ({ logoSrc }) => {
         scrolled ? "bg-white/95 shadow-md backdrop-blur-md" : "bg-transparent"
       }`}
     >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between py-4">
+      <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Logo */}
         <a href="/" className="flex items-center">
-          <img src={logoSrc} alt="Reine d'Afrique" className="h-10 md:h-12 object-contain" />
+          <img
+            src={logoSrc}
+            alt="Reine d'Afrique"
+            className="object-contain h-10 md:h-12"
+          />
         </a>
 
         {/* Menu desktop */}
-        <div className="hidden md:flex items-center space-x-6">
+        <div className="items-center hidden space-x-6 md:flex">
           {navLinks.map((link) => (
             <a
               key={link.name}
               href={link.path}
-              className="font-medium text-gray-700 hover:text-amber-600 transition"
+              className="font-medium text-gray-700 transition hover:text-amber-600"
             >
               {link.name}
             </a>
           ))}
           <a
-  href="https://wa.me/2290154142255"
-  target="_blank"
-  rel="noopener noreferrer"
-  className="ml-4 px-6 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-300"
->
-  Nous rejoindre
-</a>
-
+            href="https://wa.me/2290154142255"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-6 py-2 ml-4 font-semibold text-white transition-transform duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:scale-105"
+          >
+            Nous rejoindre
+          </a>
         </div>
 
         {/* Menu mobile toggle */}
@@ -78,7 +81,7 @@ const Header = ({ logoSrc }) => {
       <AnimatePresence>
         {menuOpen && (
           <motion.div
-            className="md:hidden bg-white shadow-lg border-t border-amber-100"
+            className="bg-white border-t shadow-lg md:hidden border-amber-100"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -102,16 +105,15 @@ const Header = ({ logoSrc }) => {
                 </motion.a>
               ))}
               <motion.a
-  href="https://wa.me/2290154142255"
-  target="_blank"
-  rel="noopener noreferrer"
-  onClick={() => setMenuOpen(false)}
-  className="mt-2 px-6 py-2 rounded-full bg-gradient-to-r from-amber-500 to-amber-400 text-white font-semibold shadow-lg hover:scale-105 transition-transform duration-300"
-  variants={itemVariants}
->
-  Nous rejoindre
-</motion.a>
-
+                href="https://wa.me/2290154142255"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setMenuOpen(false)}
+                className="px-6 py-2 mt-2 font-semibold text-white transition-transform duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:scale-105"
+                variants={itemVariants}
+              >
+                Nous rejoindre
+              </motion.a>
             </motion.ul>
           </motion.div>
         )}

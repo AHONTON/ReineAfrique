@@ -4,11 +4,11 @@ import { motion } from "framer-motion";
 import { Globe2, Users, Star, HandHeart, Sparkles, ArrowRight } from "lucide-react";
 
 // 🖼️ Import local images
-import vision1 from "../assets/images/vision1.jpg";
-import vision2 from "../assets/images/vision2.jpg";
-import vision3 from "../assets/images/vision3.jpg";
-import vision4 from "../assets/images/vision4.jpg";
-import vision5 from "../assets/images/vision5.jpg";
+import vision1 from "/images/vision1.jpg";
+import vision2 from "/images/vision2.jpg";
+import vision3 from "/images/vision3.jpg";
+import vision4 from "/images/vision4.jpg";
+import vision5 from "/images/vision5.jpg";
 
 export default function NotreVision() {
   const visions = [

@@ -15,33 +15,55 @@ const Footer = () => {
 
   const footerLinks = {
     shop: [
-      { name: "Nouvelle Collection", href: "/boutique/nouvelle-collection" },
-      { name: "Tissus Africains", href: "/boutique/tissus-africains" },
-      { name: "Accessoires", href: "/boutique/accessoires" },
-      { name: "Promotions", href: "/boutique/promotions" },
+      { name: "Nouvelle Collection", href: "/Découverte/nouvelle-collection" },
+      { name: "Tissus Africains", href: "/Découverte/tissus-africains" },
+      { name: "Accessoires", href: "/Découverte/accessoires" },
+      { name: "Promotions", href: "/Découverte/promotions" },
     ],
     about: [
       { name: "Notre Histoire", href: "/a-propos/histoire" },
-      { name: "Notre Mission", href: "/a-propos/mission" },
-      { name: "Artisans Partenaires", href: "/a-propos/artisans" },
+      { name: "Notre engagement", href: "/a-propos/engagement" },
+      { name: "Nos partenaires", href: "/a-propos/partenaires" },
       { name: "Blog", href: "/blog" },
     ],
     support: [
       { name: "Contact", href: "/contact" },
       { name: "FAQ", href: "/faq" },
       { name: "Livraison", href: "/livraison" },
-      { name: "Retours", href: "/retours" },
+      { name: "Info", href: "/Info" },
     ],
   };
 
   const socialLinks = [
-    { icon: Facebook, href: "https://facebook.com/reineafrique", label: "Facebook", color: "hover:bg-blue-600" },
-    { icon: TikTokIcon, href: "https://tiktok.com/@reineafrique", label: "TikTok", color: "hover:bg-black", isCustom: true },
-    { icon: Phone, href: "https://wa.me/22997123456", label: "WhatsApp", color: "hover:bg-green-600" },
+    {
+      icon: Facebook,
+      href: "https://facebook.com/reineafrique",
+      label: "Facebook",
+      color: "hover:bg-blue-600",
+    },
+    {
+      icon: TikTokIcon,
+      href: "https://tiktok.com/@reineafrique",
+      label: "TikTok",
+      color: "hover:bg-black",
+      isCustom: true,
+    },
+    {
+      icon: Phone,
+      href: "https://wa.me/22997123456",
+      label: "WhatsApp",
+      color: "hover:bg-green-600",
+    },
   ];
 
-  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
-  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0 } };
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
 
   return (
     <footer className="relative w-full overflow-hidden text-white bg-gradient-to-br from-gray-900 via-gray-800 to-black">
@@ -65,23 +87,35 @@ const Footer = () => {
           className="flex flex-col items-start justify-between w-full gap-8 mb-12 lg:flex-row"
         >
           {/* Gauche : Logo + Texte + Réseaux sociaux */}
-          <motion.div variants={itemVariants} className="flex flex-col items-start gap-4 lg:max-w-md">
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col items-start gap-4 lg:max-w-md"
+          >
             <motion.div
               whileHover={{ scale: 1.05 }}
               className="flex items-center gap-4 cursor-pointer"
-              onClick={() => window.open("https://wa.me/22997123456", "_blank")}
+              onClick={() => (window.location.href = "/")} // redirection vers l'accueil
             >
-              <div className="flex items-center justify-center shadow-lg w-14 h-14 bg-gradient-to-br from-orange-500 to-amber-600 rounded-xl">
-                <Sparkles className="w-8 h-8 text-white" />
+              <div className="flex items-center justify-center overflow-hidden shadow-lg w-14 h-14 rounded-xl">
+                <img
+                  src="/images/logo.png"
+                  alt="Reine d'Afrique"
+                  className="object-cover w-full h-full"
+                />
               </div>
               <div>
-                <h3 className="font-serif text-3xl font-bold">Reine d'Afrique</h3>
-                <p className="text-sm text-orange-400">Le tissu qui vous rend unique</p>
+                <h3 className="font-serif text-3xl font-bold">
+                  Reine d'Afrique
+                </h3>
+                <p className="text-sm text-orange-400">
+                  Le tissu qui vous rend unique
+                </p>
               </div>
             </motion.div>
 
             <p className="mt-2 text-sm text-gray-400">
-              Découvrez l'authenticité des tissus africains et plongez dans un univers de couleurs, de motifs et de traditions séculaires.
+              Découvrez l'authenticité des tissus africains et plongez dans un
+              univers de couleurs, de motifs et de traditions séculaires.
             </p>
 
             <div className="flex gap-4 mt-2">
@@ -96,7 +130,11 @@ const Footer = () => {
                     initial={{ opacity: 0, scale: 0 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ delay: index * 0.1, type: "spring", stiffness: 200 }}
+                    transition={{
+                      delay: index * 0.1,
+                      type: "spring",
+                      stiffness: 200,
+                    }}
                     whileHover={{ scale: 1.15, y: -5 }}
                     whileTap={{ scale: 0.95 }}
                     className={`w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center transition-all duration-300 ${social.color} shadow-lg`}
@@ -119,7 +157,11 @@ const Footer = () => {
                 className="p-6 border shadow-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border-white/20 rounded-2xl"
               >
                 <h4 className="mb-4 text-lg font-bold capitalize">
-                  {key === "shop" ? "Boutique" : key === "about" ? "À propos" : "Support"}
+                  {key === "shop"
+                    ? "Découverte"
+                    : key === "about"
+                    ? "Liens utiles"
+                    : "Support"}
                 </h4>
                 <ul className="space-y-2.5">
                   {section.map((link, index) => (
@@ -135,7 +177,9 @@ const Footer = () => {
                       >
                         <ChevronRight
                           className={`w-4 h-4 transition-transform ${
-                            hoveredLink === `${key}-${index}` ? "translate-x-1" : ""
+                            hoveredLink === `${key}-${index}`
+                              ? "translate-x-1"
+                              : ""
                           }`}
                         />
                         {link.name}
@@ -161,14 +205,20 @@ const Footer = () => {
             © {currentYear} Reine d'Afrique. Tous droits réservés.
           </p>
 
-          <p className="text-sm text-gray-400">Janvier 2026</p>
+          <p className="text-sm text-gray-400">L'élégance africaine</p>
 
           <div className="flex gap-4 text-xs">
-            <a href="/confidentialite" className="text-gray-400 transition-colors hover:text-orange-400">
+            <a
+              href="/confidentialite"
+              className="text-gray-400 transition-colors hover:text-orange-400"
+            >
               Politique de confidentialité
             </a>
             <span className="text-gray-600">|</span>
-            <a href="/cgv" className="text-gray-400 transition-colors hover:text-orange-400">
+            <a
+              href="/cgv"
+              className="text-gray-400 transition-colors hover:text-orange-400"
+            >
               Afrique
             </a>
           </div>

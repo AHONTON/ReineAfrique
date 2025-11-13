@@ -44,7 +44,7 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="relative py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section className="relative px-4 py-16 overflow-hidden sm:px-6 lg:px-8">
       {/* --- Vidéo de fond --- */}
       <motion.video
         autoPlay
@@ -52,7 +52,7 @@ export default function Newsletter() {
         muted
         playsInline
         src="https://www.w3schools.com/howto/rain.mp4"
-        className="absolute inset-0 w-full h-full object-cover z-0 brightness-50"
+        className="absolute inset-0 z-0 object-cover w-full h-full brightness-50"
         initial={{ scale: 1 }}
         animate={{ scale: 1.05 }}
         transition={{
@@ -64,14 +64,14 @@ export default function Newsletter() {
       />
 
       {/* --- Contenu principal --- */}
-      <div className="relative max-w-6xl mx-auto z-10 flex flex-col gap-8">
+      <div className="relative z-10 flex flex-col max-w-6xl gap-8 mx-auto">
         {/* --- Titre --- */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className="text-3xl sm:text-5xl font-extrabold text-center text-white drop-shadow-lg"
+          className="text-3xl font-extrabold text-center text-white sm:text-5xl drop-shadow-lg"
         >
           <motion.span
             animate={{ opacity: [0.8, 1, 0.8] }}
@@ -84,7 +84,7 @@ export default function Newsletter() {
 
         {/* --- Carte principale --- */}
         <motion.div
-          className="relative grid grid-cols-1 md:grid-cols-2 gap-8 items-center backdrop-blur-sm bg-white/10 border border-white/20 p-8 rounded-2xl shadow-2xl overflow-hidden"
+          className="relative grid items-center grid-cols-1 gap-8 p-8 overflow-hidden border shadow-2xl md:grid-cols-2 backdrop-blur-sm bg-white/10 border-white/20 rounded-2xl"
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
@@ -96,8 +96,8 @@ export default function Newsletter() {
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 via-pink-500/10 to-transparent opacity-30 blur-3xl"></div>
 
           {/* --- Colonne gauche : bénéfices --- */}
-          <motion.div className="flex flex-col gap-4 text-white relative z-10">
-            <p className="text-base sm:text-lg leading-relaxed text-gray-100">
+          <motion.div className="relative z-10 flex flex-col gap-4 text-white">
+            <p className="text-base leading-relaxed text-gray-100 sm:text-lg">
               Soyez les premiers à découvrir nos créations et profitez d’offres
               exclusives réservées à notre communauté d’abonnés.
             </p>
@@ -108,10 +108,10 @@ export default function Newsletter() {
                 return (
                   <motion.div
                     key={index}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    className="flex items-center gap-3 p-2 transition-colors rounded-lg hover:bg-white/10"
                     variants={itemVariants}
                   >
-                    <div className="w-9 h-9 bg-gradient-to-br from-orange-400 to-pink-500 rounded-lg flex items-center justify-center shadow-md">
+                    <div className="flex items-center justify-center rounded-lg shadow-md w-9 h-9 bg-gradient-to-br from-orange-400 to-pink-500">
                       <Icon className="w-4 h-4 text-white" />
                     </div>
                     <span className="text-sm sm:text-base">{benefit.text}</span>
@@ -131,18 +131,18 @@ export default function Newsletter() {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
                   onSubmit={handleSubmit}
-                  className="flex flex-col sm:flex-row gap-4"
+                  className="flex flex-col gap-4 sm:flex-row"
                   layout
                 >
                   <div className="relative flex-1 group">
-                    <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-300 group-focus-within:text-orange-400 transition-colors" />
+                    <Mail className="absolute w-5 h-5 text-gray-300 transition-colors -translate-y-1/2 left-4 top-1/2 group-focus-within:text-orange-400" />
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="votre@email.com"
                       required
-                      className="w-full pl-12 pr-4 py-3 rounded-xl border-2 border-white/30 bg-black/30 text-white placeholder-gray-300 focus:outline-none focus:border-orange-400 focus:bg-white/10 transition-all"
+                      className="w-full py-3 pl-12 pr-4 text-white placeholder-gray-300 transition-all border-2 rounded-xl border-white/30 bg-black/30 focus:outline-none focus:border-orange-400 focus:bg-white/10"
                     />
                   </div>
                   <motion.button
@@ -150,10 +150,10 @@ export default function Newsletter() {
                     disabled={isLoading}
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="relative px-6 py-3 bg-gradient-to-r from-orange-500 to-pink-500 text-white font-semibold rounded-xl shadow-md hover:shadow-orange-500/40 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden"
+                    className="relative flex items-center justify-center gap-2 px-6 py-3 overflow-hidden font-semibold text-white shadow-md bg-gradient-to-r from-orange-500 to-pink-500 rounded-xl hover:shadow-orange-500/40 disabled:opacity-70 disabled:cursor-not-allowed"
                   >
                     <motion.div
-                      className="absolute inset-0 bg-gradient-to-r from-yellow-400/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute inset-0 transition-opacity opacity-0 bg-gradient-to-r from-yellow-400/30 to-transparent group-hover:opacity-100"
                     />
                     {isLoading ? (
                       <motion.div
@@ -163,7 +163,7 @@ export default function Newsletter() {
                           repeat: Infinity,
                           ease: "linear",
                         }}
-                        className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
+                        className="w-5 h-5 border-2 border-white rounded-full border-t-transparent"
                       />
                     ) : (
                       <>
@@ -182,9 +182,9 @@ export default function Newsletter() {
                   transition={{ type: "spring", stiffness: 120 }}
                   className="flex flex-col items-center justify-center py-10 text-white"
                 >
-                  <CheckCircle2 className="w-14 h-14 text-green-400 mb-3 animate-bounce" />
-                  <h3 className="text-xl font-bold mb-1">
-                    Merci pour votre inscription 🎉
+                  <CheckCircle2 className="mb-3 text-green-400 w-14 h-14 animate-bounce" />
+                  <h3 className="mb-1 text-xl font-bold">
+                    Merci pour votre inscription
                   </h3>
                   <p className="text-center text-gray-200">
                     Vérifiez votre boîte mail pour confirmer votre abonnement.

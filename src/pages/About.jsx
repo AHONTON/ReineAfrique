@@ -1,15 +1,10 @@
 import React from "react";
 import Header from "../components/UI/Header";
 import HeroBanner from "../components/Accueil/HeroBanner";
-import FeatureCards from "../components/Accueil/FeatureCards";
 import Wrapper from "../components/UI/Wrapper";
-import ValeursSection from "../components/Accueil/ValeursSection";
-import NotreMission from "../components/Accueil/NotreMission";
-import NotreVision from "../components/Accueil/NotreVision";
-import Newsletter from "../components/Accueil/Newsletter";
 import Footer from "../components/UI/Footer";
 
-const Accueil = () => {
+const About = () => {
   return (
     <div>
       <Header logoSrc="/images/logo.png" />
@@ -19,11 +14,6 @@ const Accueil = () => {
 
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
-          <FeatureCards />
-          <ValeursSection />
-          <NotreMission />
-          <NotreVision />
-          <Newsletter />
           <Footer />
         </Wrapper>
       </main>
@@ -31,4 +21,4 @@ const Accueil = () => {
   );
 };
 
-export default Accueil;
+export default About;

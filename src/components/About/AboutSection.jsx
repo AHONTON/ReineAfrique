@@ -23,22 +23,22 @@ const AboutSection = () => {
   };
 
   return (
-    <section className="py-16 md:py-24 bg-gradient-to-b from-white to-amber-50/30">
+    <section className="py-4 md:py-6 bg-gradient-to-b from-white to-amber-50/30">
       <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={fadeInUp}
-          className="text-center mb-12 md:mb-16"
+          className="text-center mb-4 md:mb-6"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
             Qui sommes-nous ?
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto rounded-full"></div>
         </motion.div>
 
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 lg:gap-10">
           {/* Logo à gauche */}
           <motion.div
             initial="hidden"
@@ -64,8 +64,8 @@ const AboutSection = () => {
             variants={fadeInUp}
             className="flex-1 max-w-2xl"
           >
-            <div className="bg-white p-8 md:p-10 rounded-3xl shadow-xl">
-              <div className="space-y-6">
+            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl">
+              <div className="space-y-4">
                 <p className="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
                   <span className="font-bold text-amber-600 text-xl md:text-2xl">
                     Reine d'Afrique
@@ -90,7 +90,7 @@ const AboutSection = () => {
               <motion.div
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="mt-8"
+                className="mt-4"
               >
                 <a
                   href="/collection"

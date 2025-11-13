@@ -2,6 +2,7 @@ import React from "react";
 import Header from "../components/UI/Header";
 import AboutHeroBanner from "../components/About/AboutHeroBanner";
 import AboutSection from "../components/About/AboutSection";
+import HistoryImpactSection from "../components/About/HistoryImpactSection";
 import Wrapper from "../components/UI/Wrapper";
 import Footer from "../components/UI/Footer";
 
@@ -15,6 +16,7 @@ const About = () => {
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
           <AboutSection />
+          <HistoryImpactSection />
           <Footer />
         </Wrapper>
       </main>

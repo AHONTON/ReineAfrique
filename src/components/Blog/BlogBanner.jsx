@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion';
+import { motion } from "framer-motion";
 
 const BlogBanner = () => {
   return (
@@ -25,9 +25,23 @@ const BlogBanner = () => {
       {/* Motifs géométriques africains */}
       <div className="absolute inset-0 opacity-5">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <pattern id="pattern" x="0" y="0" width="100" height="100" patternUnits="userSpaceOnUse">
+          <pattern
+            id="pattern"
+            x="0"
+            y="0"
+            width="100"
+            height="100"
+            patternUnits="userSpaceOnUse"
+          >
             <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white" />
-            <circle cx="50" cy="50" r="20" fill="none" stroke="white" strokeWidth="2" />
+            <circle
+              cx="50"
+              cy="50"
+              r="20"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+            />
           </pattern>
           <rect width="100%" height="100%" fill="url(#pattern)" />
         </svg>
@@ -54,7 +68,8 @@ const BlogBanner = () => {
             transition={{ duration: 0.7, delay: 0.4 }}
             className="max-w‑3xl px-4 mx-auto mb-8 text-base leading‑relaxed text-orange‑100 sm:text-lg md:text-xl"
           >
-            Tendances, conseils de style, histoires culturelles et tout ce qui fait la richesse de l’artisanat africain authentique.
+            Tendances, conseils de style, histoires culturelles et tout ce qui
+            fait la richesse de l’artisanat africain authentique.
           </motion.p>
 
           <motion.div

@@ -78,18 +78,18 @@ const Footer = () => {
       </div>
 
       {/* Contenu principal */}
-      <div className="relative w-full px-6 pt-16 pb-8 sm:pt-20 md:px-10 lg:px-20">
+      <div className="relative w-full px-6 pt-10 pb-6 sm:pt-14 md:px-10 lg:px-20">
         <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          className="flex flex-col items-start justify-between w-full gap-8 mb-12 lg:flex-row"
+          className="flex flex-col items-center justify-between w-full gap-8 mb-12 lg:items-start lg:flex-row"
         >
           {/* Gauche : Logo + Texte + Réseaux sociaux */}
           <motion.div
             variants={itemVariants}
-            className="flex flex-col items-start gap-4 lg:max-w-md"
+            className="flex flex-col items-center gap-4 text-center lg:items-start lg:text-left lg:max-w-md"
           >
             <motion.div
               whileHover={{ scale: 1.05 }}
@@ -148,13 +148,13 @@ const Footer = () => {
           </motion.div>
 
           {/* Droite : cartes de liens */}
-          <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-3">
+          <div className="grid flex-1 grid-cols-1 gap-6 sm:grid-cols-3 place-items-center">
             {Object.entries(footerLinks).map(([key, section]) => (
               <motion.div
                 key={key}
                 variants={itemVariants}
                 whileHover={{ y: -5, scale: 1.02 }}
-                className="p-6 border shadow-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border-white/20 rounded-2xl"
+                className="w-full max-w-sm p-6 border shadow-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border-white/20 rounded-2xl"
               >
                 <h4 className="mb-4 text-lg font-bold capitalize">
                   {key === "shop"

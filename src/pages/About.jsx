@@ -3,6 +3,7 @@ import Header from "../components/UI/Header";
 import AboutHeroBanner from "../components/About/AboutHeroBanner";
 import AboutSection from "../components/About/AboutSection";
 import HistoryImpactSection from "../components/About/HistoryImpactSection";
+import Choix from "../components/About/Choix";
 import Wrapper from "../components/UI/Wrapper";
 import Footer from "../components/UI/Footer";
 
@@ -17,6 +18,7 @@ const About = () => {
         <Wrapper>
           <AboutSection />
           <HistoryImpactSection />
+          <Choix />
           <Footer />
         </Wrapper>
       </main>

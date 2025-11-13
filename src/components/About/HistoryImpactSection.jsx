@@ -99,8 +99,8 @@ const HistoryImpactSection = () => {
   const IconComponent = currentSlide.icon;
 
   return (
-    <section className="py-4 md:py-6 relative overflow-hidden">
-      <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-7xl">
+    <section className="relative py-4 overflow-hidden md:py-6">
+      <div className="container px-4 mx-auto md:px-6 lg:px-8 max-w-7xl">
         {/* Slider Container */}
         <div className="relative min-h-[450px] md:min-h-[350px]">
           <AnimatePresence initial={false} custom={direction} mode="wait">
@@ -115,12 +115,12 @@ const HistoryImpactSection = () => {
             >
               <div className="max-w-4xl mx-auto">
                 {/* Title */}
-                <div className="flex flex-col items-center text-center mb-6">
+                <div className="flex flex-col items-center mb-6 text-center">
                   <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.2 }}
-                    className="text-2xl md:text-3xl lg:text-4xl font-bold text-black mb-3"
+                    className="mb-3 text-2xl font-bold text-black md:text-3xl lg:text-4xl"
                   >
                     {currentSlide.title}
                   </motion.h2>
@@ -142,10 +142,10 @@ const HistoryImpactSection = () => {
                 >
                   {currentSlide.values ? (
                     <div className="space-y-5">
-                      <p className="text-black text-base md:text-lg leading-relaxed max-w-2xl mx-auto mb-6">
+                      <p className="max-w-2xl mx-auto mb-6 text-base leading-relaxed text-black md:text-lg">
                         Nous croyons en une mode porteuse de sens :
                       </p>
-                      <div className="grid md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                      <div className="grid max-w-4xl gap-4 mx-auto md:grid-cols-3">
                         {currentSlide.values.map((value, idx) => (
                           <motion.div
                             key={idx}
@@ -155,12 +155,12 @@ const HistoryImpactSection = () => {
                               duration: 0.5,
                               delay: 0.5 + idx * 0.1,
                             }}
-                            className="bg-white rounded-2xl p-4 border border-amber-100 hover:border-amber-300 transition-all"
+                            className="p-4 transition-all bg-white border rounded-2xl border-amber-100 hover:border-amber-300"
                           >
-                            <h3 className="text-lg font-bold text-amber-700 mb-1">
+                            <h3 className="mb-1 text-lg font-bold text-amber-700">
                               {value.label}
                             </h3>
-                            <p className="text-black text-sm">
+                            <p className="text-sm text-black">
                               {value.description}
                             </p>
                           </motion.div>
@@ -170,7 +170,7 @@ const HistoryImpactSection = () => {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.8 }}
-                        className="text-black text-base md:text-lg font-semibold leading-relaxed max-w-3xl mx-auto mt-6"
+                        className="max-w-3xl mx-auto mt-6 text-base font-semibold leading-relaxed text-black md:text-lg"
                       >
                         Notre engagement est clair : faire vivre la culture
                         textile africaine, tout en créant des opportunités
@@ -178,7 +178,7 @@ const HistoryImpactSection = () => {
                       </motion.p>
                     </div>
                   ) : (
-                    <p className="text-black text-base md:text-lg lg:text-xl leading-relaxed max-w-3xl mx-auto">
+                    <p className="max-w-3xl mx-auto text-base leading-relaxed text-black md:text-lg lg:text-xl">
                       {currentSlide.content}
                     </p>
                   )}
@@ -191,7 +191,7 @@ const HistoryImpactSection = () => {
           <button
             onClick={handlePrev}
             aria-label="Slide précédent"
-            className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white hover:bg-amber-50 text-amber-600 rounded-full p-3 md:p-4 transition-all z-10 border border-amber-200 shadow"
+            className="absolute z-10 p-3 transition-all -translate-y-1/2 bg-white border rounded-full shadow left-2 md:left-4 top-1/2 hover:bg-amber-50 text-amber-600 md:p-4 border-amber-200"
           >
             <ChevronLeft size={24} />
           </button>
@@ -199,7 +199,7 @@ const HistoryImpactSection = () => {
           <button
             onClick={handleNext}
             aria-label="Slide suivant"
-            className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white hover:bg-amber-50 text-amber-600 rounded-full p-3 md:p-4 transition-all z-10 border border-amber-200 shadow"
+            className="absolute z-10 p-3 transition-all -translate-y-1/2 bg-white border rounded-full shadow right-2 md:right-4 top-1/2 hover:bg-amber-50 text-amber-600 md:p-4 border-amber-200"
           >
             <ChevronRight size={24} />
           </button>
@@ -225,7 +225,7 @@ const HistoryImpactSection = () => {
         </div>
 
         {/* Tab Navigation */}
-        <div className="mt-8 flex flex-col sm:flex-row gap-3 justify-center">
+        <div className="flex flex-col items-center justify-center gap-3 mt-6 sm:flex-row">
           {slides.map((slide, index) => {
             const Icon = slide.icon;
             return (

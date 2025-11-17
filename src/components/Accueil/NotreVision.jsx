@@ -1,7 +1,14 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Globe2, Users, Star, HandHeart, Sparkles, ArrowRight } from "lucide-react";
+import {
+  Globe2,
+  Users,
+  Star,
+  HandHeart,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
 
 // 🖼️ Import local images
 import vision1 from "/images/vision1.jpg";
@@ -75,8 +82,12 @@ export default function NotreVision() {
             Notre Vision
           </h2>
           <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
-            Chez <span className="font-semibold text-orange-700">Reine d’Afrique</span>, 
-            nous croyons en la force du tissu africain comme symbole d’identité, de beauté et de culture.
+            Chez{" "}
+            <span className="font-semibold text-orange-700">
+              Reine d’Afrique
+            </span>
+            , nous croyons en la force du tissu africain comme symbole
+            d’identité, de beauté et de culture.
           </p>
         </motion.div>
 
@@ -143,7 +154,7 @@ export default function NotreVision() {
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link
-              to="/nos-articles"
+              to="/blog"
               className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300"
             >
               <span>Découvrir nos collections</span>

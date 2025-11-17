@@ -93,7 +93,7 @@ const AboutSection = () => {
                 className="mt-4"
               >
                 <a
-                  href="/collection"
+                  href="/blog"
                   className="inline-block w-full sm:w-auto text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white font-semibold px-8 py-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300"
                   aria-label="Découvrir nos collections de tissus africains"
                 >

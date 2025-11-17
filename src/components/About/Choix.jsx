@@ -139,7 +139,7 @@ const Choix = () => {
         >
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <a
-              href="/article"
+              href="/blog"
               className="inline-block w-full px-8 py-4 font-semibold text-center text-white transition-all duration-300 rounded-full shadow-lg sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-xl"
               aria-label="Découvrir nos tissus africains"
             >

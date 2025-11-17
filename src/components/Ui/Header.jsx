@@ -16,7 +16,6 @@ const Header = ({ logoSrc }) => {
     { name: "Accueil", path: "/" },
     { name: "À propos", path: "/about" },
     { name: "Blog", path: "/blog" },
-    { name: "Nos articles", path: "/articles" },
     { name: "Contact", path: "/contact" },
   ];
 

@@ -4,10 +4,10 @@ import { useState, useEffect } from "react";
 
 const BlogBanner = () => {
   const images = [
-    "/images/tissu1.jpg",
-    "/images/tissu2.jpg",
-    "/images/tissu3.jpg",
-    "/images/tissu4.jpg",
+    "/images/r1.jpg",
+    "/images/r2.jpg",
+    "/images/r3.jpg",
+    "/images/r4.jpg",
   ];
 
   const [currentIndex, setCurrentIndex] = useState(0);

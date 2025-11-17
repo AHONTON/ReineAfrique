@@ -1,100 +1,122 @@
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
 
 const BlogBanner = () => {
+  const images = [
+    "/images/tissu1.jpg",
+    "/images/tissu2.jpg",
+    "/images/tissu3.jpg",
+    "/images/tissu4.jpg",
+  ];
+
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % images.length);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-amber-950 via-orange-900 to-red-900">
-      {/* Vidéo en arrière‑plan */}
-      <video
-        className="absolute inset-0 object-cover w-full h-full opacity-30"
-        src="https://www.pexels.com/video/video-of-couple-wearing-traditional-clothes-6200792/download?force=true"
-        autoPlay
-        muted
-        loop
-      />
-
-      {/* Overlay pour lisibilité */}
-      <div className="absolute inset-0 bg-black/30"></div>
-
-      {/* Motifs décoratifs */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 left-0 w-64 h-64 bg-orange-500 rounded-full filter blur-3xl"></div>
-        <div className="absolute bottom-0 right-0 bg-red-600 rounded-full w-96 h-96 filter blur-3xl"></div>
-        <div className="absolute transform -translate-x-1/2 -translate-y-1/2 rounded-full top-1/2 left-1/2 w-80 h-80 bg-amber-600 filter blur-3xl"></div>
+    <section className="relative overflow-hidden bg-neutral-950 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
+      {/* Images animées en arrière-plan */}
+      <div className="absolute inset-0">
+        {images.map((img, index) => (
+          <motion.img
+            key={index}
+            src={img}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{
+              opacity: currentIndex === index ? 0.5 : 0,
+              scale: currentIndex === index ? 1 : 1.1,
+            }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+          />
+        ))}
       </div>
 
-      {/* Motifs géométriques africains */}
-      <div className="absolute inset-0 opacity-5">
-        <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-          <pattern
-            id="pattern"
-            x="0"
-            y="0"
-            width="100"
-            height="100"
-            patternUnits="userSpaceOnUse"
-          >
-            <path d="M50 0 L100 50 L50 100 L0 50 Z" fill="white" />
-            <circle
-              cx="50"
-              cy="50"
-              r="20"
-              fill="none"
-              stroke="white"
-              strokeWidth="2"
-            />
-          </pattern>
-          <rect width="100%" height="100%" fill="url(#pattern)" />
-        </svg>
-      </div>
+      {/* Overlay gradient moderne */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
-      {/* Contenu */}
-      <div className="relative px-4 py-12 sm:px-6 lg:px-8 sm:py-16 md:py-20">
-        <div className="text-center">
+      {/* Contenu principal */}
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+        <div className="max-w-4xl text-center">
+          {/* Titre principal */}
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="mb-4 text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-4"
           >
-            Découvrez l’univers des
-            <span className="block mt-2 text-transparent bg-gradient-to-r from-orange-400 via-amber-400 to-yellow-400 bg-clip-text">
+            L'univers des{" "}
+            <span className="block sm:inline text-orange-400 mt-2 sm:mt-0">
               Tissus Africains
             </span>
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.4 }}
-            className="max-w‑3xl px-4 mx-auto mb-8 text-base leading‑relaxed text-orange‑100 sm:text-lg md:text-xl"
-          >
-            Tendances, conseils de style, histoires culturelles et tout ce qui
-            fait la richesse de l’artisanat africain authentique.
-          </motion.p>
-
+          {/* Ligne décorative */}
           <motion.div
             initial={{ scaleX: 0 }}
             animate={{ scaleX: 1 }}
-            transition={{ duration: 0.8, delay: 0.6 }}
-            className="w‑24 h‑1 mx-auto mb‑8 rounded-full sm:w‑32 bg-gradient-to-r from-orange-500 via-red-500 to-amber-500 md:mb‑10"
-          ></motion.div>
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="w-16 sm:w-20 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto mb-4 sm:mb-6"
+          />
 
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.5 }}
+            className="text-sm sm:text-base lg:text-lg text-gray-300 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-4"
+          >
+            Tendances, conseils de style et histoires culturelles de l'artisanat
+            africain authentique.
+          </motion.p>
+
+          {/* CTA Button */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.8 }}
-            className="mt‑6"
+            transition={{ duration: 0.7, delay: 0.7 }}
           >
-            <a
+            <motion.a
               href="/contact"
-              className="inline-block px-6 py-3 text-base font-semibold text-orange‑700 transition-all duration-300 bg-white border-2 rounded-xl hover:bg-orange‑50 md:px‑8 md:py‑4 md:text-lg border-amber‑800"
+              className="inline-flex items-center gap-2 px-5 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold text-white bg-gradient-to-r from-orange-500 to-amber-600 rounded-lg shadow-lg hover:shadow-xl transition-all"
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.98 }}
             >
-              Contactez‑nous
-            </a>
+              Contactez-nous
+              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            </motion.a>
+          </motion.div>
+
+          {/* Indicateurs de slide */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="flex justify-center gap-2 mt-8 sm:mt-12"
+          >
+            {images.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentIndex(index)}
+                className={`h-1.5 rounded-full transition-all duration-300 ${
+                  currentIndex === index
+                    ? "w-8 bg-orange-500"
+                    : "w-1.5 bg-gray-600 hover:bg-gray-500"
+                }`}
+                aria-label={`Image ${index + 1}`}
+              />
+            ))}
           </motion.div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 

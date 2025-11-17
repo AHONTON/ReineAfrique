@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../components/UI/Header";
 import BlogBanner from "../components/Blog/BlogBanner";
+import CategoryCard from "../components/Blog/CategoryCard";
 import Wrapper from "../components/UI/Wrapper";
 import Footer from "../components/UI/Footer";
 
@@ -13,6 +14,8 @@ const Blog = () => {
         <BlogBanner whatsappNumber="2290154142255" />
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
+          {/* Sections du blog */}
+          <CategoryCard />
           <Footer />
         </Wrapper>
       </main>

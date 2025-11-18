@@ -1,23 +1,34 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
 
-/**
- * ContactBaner Component
- * Bannière compacte avec overlay vidéo pour Reine d'Afrique
- * Design épuré pour superposition sur vidéo background
- */
 const ContactBaner = () => {
   const phoneNumber = "+22901234567";
 
+  /* --- SLIDER BACKGROUND (3 IMAGES) --- */
+  const images = [
+    "/images/r2.jpg",
+    "/images/c8.jpg",
+    "/images/card4.jpg",
+  ];
+
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % images.length);
+    }, 5000); // change every 5 seconds
+
+    return () => clearInterval(interval);
+  }, []);
+
+  /* --- ANIMATION VARIANTS --- */
   const containerVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
       y: 0,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.15,
-      },
+      transition: { duration: 0.6, staggerChildren: 0.15 },
     },
   };
 
@@ -31,13 +42,26 @@ const ContactBaner = () => {
   };
 
   return (
-    <div className="relative w-full">
-      {/* Overlay sombre pour contraste avec vidéo */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#3A1F0B]/85 via-[#3A1F0B]/70 to-[#3A1F0B]/85 backdrop-blur-sm"></div>
+    <div className="relative w-full overflow-hidden">
 
-      {/* Contenu de la bannière */}
+      {/* --- BACKGROUND IMAGES SLIDER --- */}
+      {images.map((img, i) => (
+        <img
+          key={i}
+          src={img}
+          alt=""
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-[1200ms] ${
+            index === i ? "opacity-100" : "opacity-0"
+          }`}
+        />
+      ))}
+
+      {/* --- OVERLAY SOMBRE --- */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#3A1F0B]/70 via-[#3A1F0B]/55 to-[#3A1F0B]/70 backdrop-blur-[2px]"></div>
+
+      {/* --- CONTENU PRINCIPAL --- */}
       <motion.div
-        className="relative py-12 sm:py-16 px-4 sm:px-6 lg:px-8"
+        className="relative z-10 py-12 sm:py-16 px-4 sm:px-6 lg:px-8"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
@@ -45,14 +69,9 @@ const ContactBaner = () => {
       >
         <div className="max-w-6xl mx-auto">
           <div className="grid md:grid-cols-2 gap-8 items-center">
-            
-            {/* Colonne gauche - Message */}
+
+            {/* TEXTE GAUCHE */}
             <motion.div variants={itemVariants} className="text-left">
-              <div className="inline-block px-4 py-2 rounded-full bg-[#E56A0D]/20 border border-[#E56A0D]/40 mb-4">
-                <span className="text-[#F2B632] text-sm font-semibold uppercase tracking-wide">
-                  Contactez-nous
-                </span>
-              </div>
 
               <h2
                 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
@@ -70,7 +89,7 @@ const ContactBaner = () => {
                 de vos tissus premium. Un simple appel suffit.
               </p>
 
-              {/* Indicateurs de confiance */}
+              {/* Indicateurs */}
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3C7A55] animate-pulse"></div>
@@ -95,15 +114,14 @@ const ContactBaner = () => {
               </div>
             </motion.div>
 
-            {/* Colonne droite - CTA */}
+            {/* CTA DROITE */}
             <motion.div
               variants={itemVariants}
               className="flex flex-col items-center md:items-end"
             >
-              {/* Carte CTA compacte */}
               <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md">
-                
-                {/* Icône téléphone animée */}
+
+                {/* Icone */}
                 <div className="flex justify-center mb-5">
                   <motion.div
                     className="relative"
@@ -113,12 +131,11 @@ const ContactBaner = () => {
                     <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[#E56A0D] to-[#B42C1B] flex items-center justify-center shadow-lg">
                       <Phone className="w-8 h-8 text-white" strokeWidth={2.5} />
                     </div>
-                    {/* Effet de pulsation */}
                     <div className="absolute inset-0 w-16 h-16 rounded-xl bg-[#E56A0D] opacity-30 animate-ping"></div>
                   </motion.div>
                 </div>
 
-                {/* Titre CTA */}
+                {/* Titre */}
                 <h3
                   className="text-2xl font-bold text-[#3A1F0B] text-center mb-3"
                   style={{ fontFamily: "'Playfair Display', serif" }}
@@ -126,7 +143,7 @@ const ContactBaner = () => {
                   Appelez-nous maintenant
                 </h3>
 
-                {/* Numéro visible */}
+                {/* Numéro */}
                 <div className="text-center mb-5">
                   <p className="text-xs text-[#3A1F0B]/60 uppercase tracking-wide mb-1 font-semibold">
                     Téléphone direct
@@ -139,7 +156,7 @@ const ContactBaner = () => {
                   </a>
                 </div>
 
-                {/* Bouton d'appel principal */}
+                {/* Bouton */}
                 <motion.a
                   href={`tel:${phoneNumber}`}
                   whileHover={{ scale: 1.03 }}
@@ -164,12 +181,13 @@ const ContactBaner = () => {
                 </div>
               </div>
             </motion.div>
+
           </div>
         </div>
       </motion.div>
 
-      {/* Bordure décorative africaine en bas */}
-      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3C7A55] via-[#F2B632] via-[#E56A0D] to-[#B42C1B]"></div>
+      {/* Bordure décorative */}
+      <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3C7A55] via-[#F2B632] via-[#E56A0D] to-[#B42C1B] z-20"></div>
     </div>
   );
 };

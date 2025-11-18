@@ -1,576 +1,242 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Mail, Phone, MapPin, Send, CheckCircle, AlertCircle, Loader, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function ContactForm() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    subject: '',
-    message: ''
-  });
-  
+  const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
   const [errors, setErrors] = useState({});
   const [status, setStatus] = useState('idle');
   const [focusedField, setFocusedField] = useState(null);
 
-  const validateEmail = (email) => {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  };
-
-  const validatePhone = (phone) => {
-    return /^[\d\s\-\+\(\)]{8,}$/.test(phone);
-  };
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhone = (phone) => /^[\d\s\-\+\(\)]{8,}$/.test(phone);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
-    
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: '' }));
-    }
+    if (errors[name]) setErrors(prev => ({ ...prev, [name]: '' }));
   };
 
   const validateForm = () => {
     const newErrors = {};
-    
-    if (!formData.name.trim()) {
-      newErrors.name = 'Le nom est requis';
-    } else if (formData.name.trim().length < 2) {
-      newErrors.name = 'Le nom doit contenir au moins 2 caractères';
-    }
-    
-    if (!formData.email.trim()) {
-      newErrors.email = 'L\'email est requis';
-    } else if (!validateEmail(formData.email)) {
-      newErrors.email = 'Email invalide';
-    }
-    
-    if (formData.phone && !validatePhone(formData.phone)) {
-      newErrors.phone = 'Numéro de téléphone invalide';
-    }
-    
-    if (!formData.subject.trim()) {
-      newErrors.subject = 'Le sujet est requis';
-    }
-    
-    if (!formData.message.trim()) {
-      newErrors.message = 'Le message est requis';
-    } else if (formData.message.trim().length < 10) {
-      newErrors.message = 'Le message doit contenir au moins 10 caractères';
-    }
-    
+    if (!formData.name.trim()) newErrors.name = 'Le nom est requis';
+    else if (formData.name.trim().length < 2) newErrors.name = 'Nom trop court';
+    if (!formData.email.trim()) newErrors.email = 'Email requis';
+    else if (!validateEmail(formData.email)) newErrors.email = 'Email invalide';
+    if (formData.phone && !validatePhone(formData.phone)) newErrors.phone = 'Téléphone invalide';
+    if (!formData.subject.trim()) newErrors.subject = 'Sujet requis';
+    if (!formData.message.trim()) newErrors.message = 'Message requis';
+    else if (formData.message.trim().length < 10) newErrors.message = 'Message trop court';
     return newErrors;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validateForm();
-    
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
-    
     setStatus('loading');
-    
-    setTimeout(() => {
+    try {
+      await axios.post('/api/contact/send', formData, { headers: { 'Content-Type': 'application/json' } });
       setStatus('success');
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-      });
-      
-      setTimeout(() => {
-        setStatus('idle');
-      }, 5000);
-    }, 2000);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && e.target.tagName !== 'TEXTAREA') {
-      e.preventDefault();
-      handleSubmit();
+      setFormData({ name: '', email: '', phone: '', subject: '', message: '' });
+      setTimeout(() => setStatus('idle'), 5000);
+    } catch (error) {
+      console.error(error);
+      setStatus('error');
+      setTimeout(() => setStatus('idle'), 5000);
     }
   };
 
   const contactInfo = [
-    {
-      icon: Mail,
-      title: 'Email',
-      content: 'contact@entreprise.com',
-      link: 'mailto:contact@entreprise.com',
-      color: 'from-orange-500 to-orange-600'
-    },
-    {
-      icon: Phone,
-      title: 'Téléphone',
-      content: '+33 1 23 45 67 89',
-      link: 'tel:+33123456789',
-      color: 'from-orange-600 to-red-500'
-    },
-    {
-      icon: MapPin,
-      title: 'Adresse',
-      content: '123 Avenue des Champs-Élysées, 75008 Paris',
-      link: 'https://maps.google.com',
-      color: 'from-red-500 to-orange-500'
-    }
+    { icon: Mail, title: 'Email', content: 'contact@reinedafrique.com', link: 'mailto:contact@reinedafrique.com' },
+    { icon: Phone, title: 'Téléphone', content: '+229 00 00 00 00', link: 'tel:+22900000000' },
+    { icon: MapPin, title: 'Adresse', content: 'Cotonou, Bénin', link: 'https://maps.google.com' }
   ];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.5,
-        ease: "easeOut"
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.4,
-        ease: "easeOut"
-      }
-    }
-  };
+  const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.1 } } };
+  const itemVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5 } } };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div 
-        className="max-w-7xl mx-auto"
-        initial="hidden"
-        animate="visible"
-        variants={containerVariants}
-      >
-        {/* Header */}
-        <motion.div 
-          className="text-center mb-12"
-          variants={itemVariants}
-        >
-          <motion.h1 
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold mb-4"
-            initial={{ opacity: 0, y: -30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-          >
-            <span className="bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 bg-clip-text text-transparent">
-              Contactez-nous
-            </span>
-          </motion.h1>
-          <motion.p 
-            className="text-lg text-gray-700 max-w-2xl mx-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-          >
-            Notre équipe est à votre écoute pour répondre à toutes vos questions. 
-            N'hésitez pas à nous contacter !
-          </motion.p>
+    <div className="min-h-screen py-16 px-4 sm:px-6 lg:px-8 bg-[#F5ECE2]">
+      <motion.div className="max-w-7xl mx-auto" initial="hidden" animate="visible" variants={containerVariants}>
+        
+        {/* HEADER */}
+        <motion.div className="text-center mb-12 sm:mb-16" variants={itemVariants}>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4 text-[#E56A0D] tracking-wide" style={{ fontFamily: "'Playfair Display', serif" }}>
+            Contactez-nous
+          </h1>
+          <p className="text-base sm:text-lg md:text-xl text-[#E56A0D] max-w-2xl mx-auto">
+            Notre équipe est disponible pour vous répondre avec professionnalisme.
+          </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Contact Info Cards */}
-          <motion.div 
-            className="lg:col-span-1 space-y-6"
-            variants={containerVariants}
-          >
+        <div className="grid lg:grid-cols-3 gap-8 lg:gap-10">
+
+          {/* CONTACT LEFT CARDS */}
+          <motion.div className="space-y-6" variants={containerVariants}>
             {contactInfo.map((info, index) => {
               const Icon = info.icon;
               return (
                 <motion.a
                   key={index}
                   href={info.link}
-                  target={info.link.startsWith('http') ? '_blank' : undefined}
-                  rel={info.link.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="block bg-white rounded-2xl shadow-lg p-6 border border-gray-100 group"
-                  variants={cardVariants}
-                  whileHover={{ 
-                    y: -8, 
-                    shadow: "0 20px 40px rgba(0,0,0,0.1)",
-                    transition: { duration: 0.3 }
-                  }}
-                  whileTap={{ scale: 0.98 }}
+                  target="_blank"
+                  className="block bg-white rounded-2xl shadow-md p-5 sm:p-6 border border-[#E56A0D]"
+                  variants={itemVariants}
+                  whileHover={{ y: -5, scale: 1.03 }}
                 >
                   <div className="flex items-start space-x-4">
-                    <div className="flex-shrink-0">
-                      <motion.div 
-                        className={`w-14 h-14 bg-gradient-to-br ${info.color} rounded-xl flex items-center justify-center shadow-lg`}
-                        whileHover={{ 
-                          scale: 1.1,
-                          rotate: 5,
-                          transition: { duration: 0.3 }
-                        }}
-                      >
-                        <Icon className="w-7 h-7 text-white" />
-                      </motion.div>
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#E56A0D] rounded-xl flex items-center justify-center shadow-lg">
+                      <Icon className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                     </div>
-                    <div className="flex-1">
-                      <h3 className="text-sm font-bold text-orange-600 uppercase tracking-wide mb-1">
-                        {info.title}
-                      </h3>
-                      <p className="text-gray-900 font-medium">
-                        {info.content}
-                      </p>
+                    <div>
+                      <h3 className="text-xs sm:text-sm font-extrabold text-[#E56A0D] uppercase tracking-wide">{info.title}</h3>
+                      <p className="text-[#3A1F0B] font-medium text-sm sm:text-base">{info.content}</p>
                     </div>
                   </div>
                 </motion.a>
               );
             })}
 
-            {/* Hours */}
-            <motion.div 
-              className="bg-gradient-to-br from-orange-500 via-red-500 to-orange-600 rounded-2xl shadow-xl p-6 text-white"
-              variants={cardVariants}
-              whileHover={{ 
-                scale: 1.02,
-                transition: { duration: 0.3 }
-              }}
-            >
-              <div className="flex items-center mb-4">
-                <Clock className="w-6 h-6 mr-2" />
-                <h3 className="text-lg font-bold">Heures d'ouverture</h3>
+            {/* HOURS CARD */}
+            <motion.div className="bg-[#E56A0D] text-white rounded-2xl p-5 sm:p-6 shadow-lg" variants={itemVariants}>
+              <div className="flex items-center mb-3 sm:mb-4">
+                <Clock className="w-5 h-5 sm:w-6 sm:h-6 mr-2" />
+                <h3 className="text-base sm:text-lg font-bold">Disponibilité</h3>
               </div>
-              <div className="space-y-3 text-sm">
-                <motion.div 
-                  className="flex justify-between py-2 border-b border-white/20"
-                  whileHover={{ x: 5, transition: { duration: 0.2 } }}
-                >
-                  <span>Lundi - Vendredi</span>
-                  <span className="font-bold">9h - 18h</span>
-                </motion.div>
-                <motion.div 
-                  className="flex justify-between py-2 border-b border-white/20"
-                  whileHover={{ x: 5, transition: { duration: 0.2 } }}
-                >
-                  <span>Samedi</span>
-                  <span className="font-bold">10h - 16h</span>
-                </motion.div>
-                <motion.div 
-                  className="flex justify-between py-2"
-                  whileHover={{ x: 5, transition: { duration: 0.2 } }}
-                >
-                  <span>Dimanche</span>
-                  <span className="font-bold">Fermé</span>
-                </motion.div>
+              <div className="space-y-2 sm:space-y-3 text-xs sm:text-sm">
+                <div className="flex justify-between py-1 border-b border-white/30"><span>Lundi - Vendredi</span><span className="font-bold">9h - 18h</span></div>
+                <div className="flex justify-between py-1 border-b border-white/30"><span>Samedi</span><span className="font-bold">10h - 14h</span></div>
+                <div className="flex justify-between py-1"><span>Dimanche</span><span className="font-bold">Fermé</span></div>
               </div>
             </motion.div>
           </motion.div>
 
-          {/* Contact Form */}
-          <motion.div 
-            className="lg:col-span-2"
-            variants={itemVariants}
-          >
-            <motion.div 
-              className="bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              <div className="space-y-6" onKeyPress={handleKeyPress}>
-                {/* Name and Email */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.4 }}
-                  >
-                    <label 
-                      htmlFor="name" 
-                      className="block text-sm font-bold text-gray-700 mb-2"
-                    >
-                      Nom complet <span className="text-orange-500">*</span>
-                    </label>
-                    <motion.input
-                      type="text"
-                      id="name"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('name')}
-                      onBlur={() => setFocusedField(null)}
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none ${
-                        errors.name 
-                          ? 'border-red-400 bg-red-50' 
-                          : focusedField === 'name'
-                          ? 'border-orange-500 bg-orange-50/30'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
-                      placeholder="Jean Dupont"
-                      aria-invalid={errors.name ? 'true' : 'false'}
-                      aria-describedby={errors.name ? 'name-error' : undefined}
-                      whileFocus={{ scale: 1.01 }}
-                    />
-                    {errors.name && (
-                      <motion.p 
-                        id="name-error" 
-                        className="mt-2 text-sm text-red-600 flex items-center"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.name}
-                      </motion.p>
-                    )}
-                  </motion.div>
+          {/* CONTACT FORM */}
+          <motion.div className="lg:col-span-2 bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10 border border-[#E56A0D]" variants={itemVariants}>
+            <div className="space-y-4 sm:space-y-6">
 
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.35, duration: 0.4 }}
-                  >
-                    <label 
-                      htmlFor="email" 
-                      className="block text-sm font-bold text-gray-700 mb-2"
-                    >
-                      Email <span className="text-orange-500">*</span>
-                    </label>
-                    <motion.input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('email')}
-                      onBlur={() => setFocusedField(null)}
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none ${
-                        errors.email 
-                          ? 'border-red-400 bg-red-50' 
-                          : focusedField === 'email'
-                          ? 'border-orange-500 bg-orange-50/30'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
-                      placeholder="jean.dupont@email.com"
-                      aria-invalid={errors.email ? 'true' : 'false'}
-                      aria-describedby={errors.email ? 'email-error' : undefined}
-                      whileFocus={{ scale: 1.01 }}
-                    />
-                    {errors.email && (
-                      <motion.p 
-                        id="email-error" 
-                        className="mt-2 text-sm text-red-600 flex items-center"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.email}
-                      </motion.p>
-                    )}
-                  </motion.div>
-                </div>
-
-                {/* Phone and Subject */}
-                <div className="grid sm:grid-cols-2 gap-6">
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4, duration: 0.4 }}
-                  >
-                    <label 
-                      htmlFor="phone" 
-                      className="block text-sm font-bold text-gray-700 mb-2"
-                    >
-                      Téléphone (optionnel)
-                    </label>
-                    <motion.input
-                      type="tel"
-                      id="phone"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('phone')}
-                      onBlur={() => setFocusedField(null)}
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none ${
-                        errors.phone 
-                          ? 'border-red-400 bg-red-50' 
-                          : focusedField === 'phone'
-                          ? 'border-orange-500 bg-orange-50/30'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
-                      placeholder="+33 1 23 45 67 89"
-                      aria-invalid={errors.phone ? 'true' : 'false'}
-                      aria-describedby={errors.phone ? 'phone-error' : undefined}
-                      whileFocus={{ scale: 1.01 }}
-                    />
-                    {errors.phone && (
-                      <motion.p 
-                        id="phone-error" 
-                        className="mt-2 text-sm text-red-600 flex items-center"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.phone}
-                      </motion.p>
-                    )}
-                  </motion.div>
-
-                  <motion.div
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.45, duration: 0.4 }}
-                  >
-                    <label 
-                      htmlFor="subject" 
-                      className="block text-sm font-bold text-gray-700 mb-2"
-                    >
-                      Sujet <span className="text-orange-500">*</span>
-                    </label>
-                    <motion.select
-                      id="subject"
-                      name="subject"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      onFocus={() => setFocusedField('subject')}
-                      onBlur={() => setFocusedField(null)}
-                      className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none ${
-                        errors.subject 
-                          ? 'border-red-400 bg-red-50' 
-                          : focusedField === 'subject'
-                          ? 'border-orange-500 bg-orange-50/30'
-                          : 'border-gray-200 hover:border-orange-300'
-                      }`}
-                      aria-invalid={errors.subject ? 'true' : 'false'}
-                      aria-describedby={errors.subject ? 'subject-error' : undefined}
-                      whileFocus={{ scale: 1.01 }}
-                    >
-                      <option value="">Sélectionnez un sujet</option>
-                      <option value="info">Demande d'information</option>
-                      <option value="support">Support technique</option>
-                      <option value="partnership">Partenariat</option>
-                      <option value="feedback">Feedback</option>
-                      <option value="other">Autre</option>
-                    </motion.select>
-                    {errors.subject && (
-                      <motion.p 
-                        id="subject-error" 
-                        className="mt-2 text-sm text-red-600 flex items-center"
-                        initial={{ opacity: 0, y: -10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                      >
-                        <AlertCircle className="w-4 h-4 mr-1" />
-                        {errors.subject}
-                      </motion.p>
-                    )}
-                  </motion.div>
-                </div>
-
-                {/* Message */}
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.5, duration: 0.4 }}
-                >
-                  <label 
-                    htmlFor="message" 
-                    className="block text-sm font-bold text-gray-700 mb-2"
-                  >
-                    Message <span className="text-orange-500">*</span>
-                  </label>
-                  <motion.textarea
-                    id="message"
-                    name="message"
-                    value={formData.message}
+              {/* NAME + EMAIL */}
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="text-sm sm:text-base font-bold text-[#E56A0D]">Nom complet *</label>
+                  <motion.input
+                    type="text"
+                    name="name"
+                    value={formData.name}
                     onChange={handleChange}
-                    onFocus={() => setFocusedField('message')}
+                    onFocus={() => setFocusedField('name')}
                     onBlur={() => setFocusedField(null)}
-                    rows="5"
-                    className={`w-full px-4 py-3 rounded-xl border-2 transition-all duration-200 outline-none resize-none ${
-                      errors.message 
-                        ? 'border-red-400 bg-red-50' 
-                        : focusedField === 'message'
-                        ? 'border-orange-500 bg-orange-50/30'
-                        : 'border-gray-200 hover:border-orange-300'
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 transition-all ${
+                      errors.name ? 'border-red-400' : focusedField === 'name' ? 'border-[#E56A0D]' : 'border-[#E56A0D]'
                     }`}
-                    placeholder="Décrivez votre demande en détail..."
-                    aria-invalid={errors.message ? 'true' : 'false'}
-                    aria-describedby={errors.message ? 'message-error' : undefined}
-                    whileFocus={{ scale: 1.01 }}
+                    placeholder="Ex : Reine d’Afrique Client"
                   />
-                  {errors.message && (
-                    <motion.p 
-                      id="message-error" 
-                      className="mt-2 text-sm text-red-600 flex items-center"
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                    >
-                      <AlertCircle className="w-4 h-4 mr-1" />
-                      {errors.message}
-                    </motion.p>
-                  )}
-                </motion.div>
-
-                {/* Success Message */}
-                {status === 'success' && (
-                  <motion.div 
-                    className="bg-green-50 border-2 border-green-300 rounded-xl p-4 flex items-center space-x-3"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                  >
-                    <CheckCircle className="w-6 h-6 text-green-600 flex-shrink-0" />
-                    <div>
-                      <h4 className="font-bold text-green-900">Message envoyé avec succès !</h4>
-                      <p className="text-sm text-green-700">Nous vous répondrons dans les plus brefs délais.</p>
-                    </div>
-                  </motion.div>
-                )}
-
-                {/* Submit Button */}
-                <motion.button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={status === 'loading'}
-                  className="w-full bg-gradient-to-r from-orange-500 via-red-500 to-orange-600 text-white font-bold py-4 px-6 rounded-xl shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
-                  whileHover={status !== 'loading' ? { 
-                    scale: 1.02,
-                    boxShadow: "0 20px 40px rgba(249, 115, 22, 0.4)"
-                  } : {}}
-                  whileTap={status !== 'loading' ? { scale: 0.98 } : {}}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6, duration: 0.4 }}
-                >
-                  {status === 'loading' ? (
-                    <>
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                      >
-                        <Loader className="w-5 h-5" />
-                      </motion.div>
-                      <span>Envoi en cours...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-5 h-5" />
-                      <span>Envoyer le message</span>
-                    </>
-                  )}
-                </motion.button>
+                  {errors.name && <p className="text-xs sm:text-sm text-red-600 mt-1">{errors.name}</p>}
+                </div>
+                <div>
+                  <label className="text-sm sm:text-base font-bold text-[#E56A0D]">Email *</label>
+                  <motion.input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    onFocus={() => setFocusedField('email')}
+                    onBlur={() => setFocusedField(null)}
+                    className={`w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 transition-all ${
+                      errors.email ? 'border-red-400' : focusedField === 'email' ? 'border-[#E56A0D]' : 'border-[#E56A0D]'
+                    }`}
+                    placeholder="exemple@mail.com"
+                  />
+                  {errors.email && <p className="text-xs sm:text-sm text-red-600 mt-1">{errors.email}</p>}
+                </div>
               </div>
-            </motion.div>
+
+              {/* PHONE + SUBJECT */}
+              <div className="grid sm:grid-cols-2 gap-4 sm:gap-6">
+                <div>
+                  <label className="text-sm sm:text-base font-bold text-[#E56A0D]">Téléphone (optionnel)</label>
+                  <motion.input
+                    type="tel"
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 border-[#E56A0D] focus:border-[#E56A0D] transition-all"
+                    placeholder="+229 XX XX XX XX"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm sm:text-base font-bold text-[#E56A0D]">Sujet *</label>
+                  <select
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
+                    className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 border-[#E56A0D] focus:border-[#E56A0D] transition-all"
+                  >
+                    <option value="">Sélectionnez un sujet</option>
+                    <option value="info">Demande d'information</option>
+                    <option value="support">Support</option>
+                    <option value="partnership">Partenariat</option>
+                    <option value="feedback">Feedback</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* MESSAGE */}
+              <div>
+                <label className="text-sm sm:text-base font-bold text-[#E56A0D]">Message *</label>
+                <textarea
+                  name="message"
+                  rows="4"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full px-3 sm:px-4 py-2 sm:py-3 rounded-xl border-2 border-[#E56A0D] focus:border-[#E56A0D] transition-all resize-none text-sm sm:text-base"
+                  placeholder="Votre message..."
+                />
+                {errors.message && <p className="text-xs sm:text-sm text-red-600 mt-1">{errors.message}</p>}
+              </div>
+
+              {/* SUCCESS / ERROR */}
+              {status === 'success' && (
+                <div className="bg-green-50 border border-green-300 p-3 sm:p-4 rounded-xl text-green-900 flex items-center text-sm sm:text-base">
+                  <CheckCircle className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Message envoyé avec succès !
+                </div>
+              )}
+              {status === 'error' && (
+                <div className="bg-red-50 border border-red-300 p-3 sm:p-4 rounded-xl text-red-900 flex items-center text-sm sm:text-base">
+                  <AlertCircle className="inline w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                  Une erreur s’est produite. Réessayez.
+                </div>
+              )}
+
+              {/* SUBMIT */}
+              <motion.button
+                onClick={handleSubmit}
+                disabled={status === 'loading'}
+                className="w-full bg-[#E56A0D] text-white font-bold py-3 sm:py-4 rounded-xl shadow-md flex items-center justify-center space-x-2 disabled:opacity-50 transition-all"
+                whileHover={status !== 'loading' ? { scale: 1.03 } : {}}
+                whileTap={status !== 'loading' ? { scale: 0.97 } : {}}
+              >
+                {status === 'loading' ? (
+                  <>
+                    <motion.div animate={{ rotate: 360 }} transition={{ duration: 1, repeat: Infinity, ease: "linear" }}>
+                      <Loader className="w-5 h-5" />
+                    </motion.div>
+                    <span>Envoi...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    <span>Envoyer</span>
+                  </>
+                )}
+              </motion.button>
+
+            </div>
           </motion.div>
         </div>
       </motion.div>

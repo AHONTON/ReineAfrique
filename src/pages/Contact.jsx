@@ -1,6 +1,7 @@
 import React from "react";
 import Header from "../components/UI/Header";
-import ContactBanner from "../components/Contact/ContactBanner";
+import ContactBaner from "../components/Contact/ContactBaner";
+import ContactSection from "../components/Contact/ContactSection"
 import Wrapper from "../components/UI/Wrapper";
 import Footer from "../components/UI/Footer";
 
@@ -11,7 +12,8 @@ const About = () => {
       <main className="pt-16">
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
-          <ContactBanner />
+          <ContactBaner />
+          <ContactSection />
           <Footer />
         </Wrapper>
       </main>

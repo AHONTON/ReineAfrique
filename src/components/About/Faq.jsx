@@ -144,7 +144,7 @@ const Faq = () => {
 
         {/* Floating WhatsApp Button */}
         <a
-          href="https://wa.me/22990154142255"
+          href="https://wa.me/22990150035719"
           target="_blank"
           rel="noopener noreferrer"
           className="fixed z-50 flex items-center justify-center text-white transition-transform bg-green-500 rounded-full shadow-lg bottom-6 right-6 w-14 h-14 hover:scale-110"

@@ -7,7 +7,7 @@ import tissu2 from "/images/tissu2.jpg";
 import tissu3 from "/images/tissu3.jpg";
 import tissu4 from "/images/tissu4.jpg";
 
-const HeroBanner = ({ whatsappNumber = "22990154142255" }) => {
+const HeroBanner = ({ whatsappNumber = "22990150035719" }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [

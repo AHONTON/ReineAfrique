@@ -58,7 +58,7 @@ const Header = ({ logoSrc }) => {
             </a>
           ))}
           <a
-            href="https://wa.me/2290154142255"
+            href="https://wa.me/2290150035719"
             target="_blank"
             rel="noopener noreferrer"
             className="px-6 py-2 ml-4 font-semibold text-white transition-transform duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:scale-105"
@@ -104,7 +104,7 @@ const Header = ({ logoSrc }) => {
                 </motion.a>
               ))}
               <motion.a
-                href="https://wa.me/2290154142255"
+                href="https://wa.me/2290150035719"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}

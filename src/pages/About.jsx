@@ -14,7 +14,7 @@ const About = () => {
       <Header logoSrc="/images/logo2.png" />
       <main className="pt-16">
         {/* AboutHeroBanner en full width */}
-        <AboutHeroBanner whatsappNumber="2290154142255" />
+        <AboutHeroBanner whatsappNumber="2290150035719" />
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
           <AboutSection />

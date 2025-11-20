@@ -23,7 +23,7 @@ const AboutSection = () => {
   };
 
   return (
-    <section className="py-4 md:py-6 bg-gradient-to-b from-white to-amber-50/30">
+    <section id="qui_sommes_nous" className="py-4 md:py-6 bg-gradient-to-b from-white to-amber-50/30">
       <div className="container mx-auto px-4 md:px-6 lg:px-8 max-w-6xl">
         <motion.div
           initial="hidden"

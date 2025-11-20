@@ -21,7 +21,10 @@ export default function NotreMission() {
   ];
 
   return (
-    <section className="relative bg-gradient-to-br from-white via-orange-50/30 to-amber-50/40 py-16 px-4 sm:px-6 lg:px-12 overflow-hidden">
+    <section
+      id="mission"
+      className="relative bg-gradient-to-br from-white via-orange-50/30 to-amber-50/40 py-16 px-4 sm:px-6 lg:px-12 overflow-hidden"
+    >
       {/* Fonds doux */}
       <div className="absolute inset-0 opacity-25 pointer-events-none">
         <div className="absolute top-32 right-4 w-64 h-64 sm:w-80 sm:h-80 bg-gradient-to-br from-amber-200 to-transparent rounded-full blur-3xl" />
@@ -49,8 +52,11 @@ export default function NotreMission() {
           className="max-w-3xl mx-auto mb-12"
         >
           <p className="text-base sm:text-lg md:text-xl text-black leading-relaxed font-light text-center">
-            Chez <span className="font-semibold text-orange-700">Reine d’Afrique</span>,
-            nous croyons à une mode qui relie les traditions ancestrales à
+            Chez{" "}
+            <span className="font-semibold text-orange-700">
+              Reine d’Afrique
+            </span>
+            , nous croyons à une mode qui relie les traditions ancestrales à
             l’élégance contemporaine. Chaque pagne, chaque tissu raconte une
             histoire : celle du patrimoine africain.
           </p>

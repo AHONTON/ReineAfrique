@@ -62,7 +62,10 @@ export default function NotreVision() {
   ];
 
   return (
-    <section className="relative bg-gradient-to-br from-white via-orange-50/20 to-amber-50/40 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden">
+    <section
+      id="vision"
+      className="relative bg-gradient-to-br from-white via-orange-50/20 to-amber-50/40 py-16 px-4 sm:px-6 lg:px-8 overflow-hidden"
+    >
       {/* 🌸 Effet décoratif de fond */}
       <div className="absolute inset-0 opacity-20 pointer-events-none">
         <div className="absolute top-20 right-10 w-60 h-60 bg-gradient-to-br from-orange-300 to-transparent rounded-full blur-3xl" />

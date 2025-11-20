@@ -99,7 +99,7 @@ const HistoryImpactSection = () => {
   const IconComponent = currentSlide.icon;
 
   return (
-    <section className="relative py-4 overflow-hidden md:py-6">
+    <section id="histoire" className="relative py-4 overflow-hidden md:py-6">
       <div className="container px-4 mx-auto md:px-6 lg:px-8 max-w-7xl">
         {/* Slider Container */}
         <div className="relative min-h-[450px] md:min-h-[350px]">

@@ -15,22 +15,22 @@ const Footer = () => {
 
   const footerLinks = {
     shop: [
-      { name: "Accueil", href: "/Découverte/accueil" },
+      { name: "Accueil", href: "/accueil" },
       { name: "Nos Valeurs", href: "/#valeurs" },
-      { name: "Notre Mission", href: "/Découverte/notre-mission" },
-      { name: "Notre Vision", href: "/Découverte/notre-vision" },
+      { name: "Notre Mission", href: "/#mission" },
+      { name: "Notre Vision", href: "/#vision" },
     ],
     about: [
-      { name: "A propos", href: "/a-propos/a-propos" },
-      { name: "Qui sommes-nous ?", href: "/a-propos/qui-sommes-nous" },
-      { name: "Notre Histoire", href: "/a-propos/histoire" },
-      { name: "Nos Collection", href: "/a-propos/nos-collections" },
+      { name: "A propos", href: "/a_propos" },
+      { name: "Qui sommes-nous ?", href: "/#qui_sommes_nous" },
+      { name: "Notre Histoire", href: "/#histoire" },
+      { name: "Nos Collection", href: "/#nos_collections" },
     ],
     support: [
       { name: "Contact", href: "/contact" },
-      { name: "FAQ", href: "/faq" },
-      { name: "Nous rejoindre", href: "/nous-rejoindre" },
-      { name: "Confidentialité", href: "/confidentialite" },
+      { name: "FAQ", href: "/#faq" },
+      { name: "Nous rejoindre", href: "/#nous_rejoindre" },
+      { name: "Confidentialité", href: "/#confidentialite" },
     ],
   };
 

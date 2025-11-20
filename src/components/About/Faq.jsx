@@ -53,7 +53,10 @@ const Faq = () => {
   };
 
   return (
-    <div className="relative min-h-screen px-4 py-3 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 sm:px-6 md:py-4 lg:px-8">
+    <div
+      id="faq"
+      className="relative min-h-screen px-4 py-3 bg-gradient-to-br from-amber-50 via-orange-50 to-red-50 sm:px-6 md:py-4 lg:px-8"
+    >
       <div className="max-w-5xl mx-auto">
         {/* Header */}
         <motion.div

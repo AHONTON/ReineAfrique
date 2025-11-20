@@ -89,7 +89,7 @@ export default function ContactForm() {
       icon: Phone,
       title: "Téléphone",
       content: "+229 50 03 57 19",
-      link: "tel:+22950035719",
+      link: "tel:+2290150035719",
     },
     {
       icon: MapPin,

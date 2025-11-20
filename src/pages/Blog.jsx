@@ -11,7 +11,7 @@ const Blog = () => {
       <Header logoSrc="/images/logo2.png" />
       <main className="pt-16">
         {/* BlogBanner en full width */}
-        <BlogBanner whatsappNumber="2290150035719" />
+        <BlogBanner whatsappNumber="229010150035719" />
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
           {/* Sections du blog */}

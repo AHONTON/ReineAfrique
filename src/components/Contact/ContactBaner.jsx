@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Phone } from "lucide-react";
 
 const ContactBaner = () => {
-  const phoneNumber = "+22950035719";
+  const phoneNumber = "+2290150035719";
 
   /* --- SLIDER BACKGROUND (3 IMAGES) --- */
   const images = [

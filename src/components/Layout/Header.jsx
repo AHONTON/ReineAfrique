@@ -50,9 +50,9 @@ const Header = ({ logoSrc }) => {
         {/* Menu desktop */}
         <div className="items-center hidden space-x-6 md:flex">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.name}
-              href={link.path}
+              to={link.path}
               className="font-medium text-gray-700 transition hover:text-amber-600"
             >
               {link.name}
@@ -94,15 +94,15 @@ const Header = ({ logoSrc }) => {
               exit="hidden"
             >
               {navLinks.map((link) => (
-                <motion.a
-                  key={link.name}
-                  href={link.path}
-                  onClick={() => setMenuOpen(false)}
-                  className="text-lg font-medium text-gray-700 hover:text-amber-600"
-                  variants={itemVariants}
-                >
-                  {link.name}
-                </motion.a>
+                <motion.div key={link.name} variants={itemVariants}>
+                  <Link
+                    to={link.path}
+                    onClick={() => setMenuOpen(false)}
+                    className="text-lg font-medium text-gray-700 hover:text-amber-600"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
               ))}
               <motion.a
                 href="https://wa.me/2290150035719"

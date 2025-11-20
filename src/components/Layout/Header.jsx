@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Header = ({ logoSrc }) => {
@@ -38,13 +39,13 @@ const Header = ({ logoSrc }) => {
     >
       <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Logo */}
-        <a href="/" className="flex items-center">
+        <Link to="/" className="flex items-center">
           <img
             src={logoSrc}
             alt="Reine d'Afrique"
             className="object-contain h-10 md:h-12"
           />
-        </a>
+        </Link>
 
         {/* Menu desktop */}
         <div className="items-center hidden space-x-6 md:flex">
@@ -55,7 +56,7 @@ const Header = ({ logoSrc }) => {
               className="font-medium text-gray-700 transition hover:text-amber-600"
             >
               {link.name}
-            </a>
+            </Link>
           ))}
           <a
             href="https://wa.me/2290150035719"

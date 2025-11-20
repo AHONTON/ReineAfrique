@@ -25,7 +25,7 @@ const valeurs = [
 
 const ValeursSection = () => {
   return (
-    <section className="relative py-16 bg-gradient-to-b from-[#fff8f3] to-[#fdf3ec] overflow-hidden">
+    <section id="valeurs" className="relative py-16 bg-gradient-to-b from-[#fff8f3] to-[#fdf3ec] overflow-hidden">
       {/* Décor en arrière-plan */}
       <motion.div
         className="absolute -top-20 -right-20 w-64 h-64 bg-rose-200 rounded-full blur-3xl opacity-30"

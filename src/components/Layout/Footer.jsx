@@ -16,7 +16,7 @@ const Footer = () => {
   const footerLinks = {
     shop: [
       { name: "Accueil", href: "/Découverte/accueil" },
-      { name: "Nos Valeurs", href: "/Découverte/nos-valeurs" },
+      { name: "Nos Valeurs", href: "/#valeurs" },
       { name: "Notre Mission", href: "/Découverte/notre-mission" },
       { name: "Notre Vision", href: "/Découverte/notre-vision" },
     ],

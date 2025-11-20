@@ -15,22 +15,22 @@ const Footer = () => {
 
   const footerLinks = {
     shop: [
-      { name: "Nouvelle Collection", href: "/Découverte/nouvelle-collection" },
-      { name: "Tissus Africains", href: "/Découverte/tissus-africains" },
-      { name: "Accessoires", href: "/Découverte/accessoires" },
-      { name: "Promotions", href: "/Découverte/promotions" },
+      { name: "Accueil", href: "/Découverte/accueil" },
+      { name: "Nos Valeurs", href: "/Découverte/nos-valeurs" },
+      { name: "Notre Mission", href: "/Découverte/notre-mission" },
+      { name: "Notre Vision", href: "/Découverte/notre-vision" },
     ],
     about: [
+      { name: "A propos", href: "/a-propos/a-propos" },
+      { name: "Qui sommes-nous ?", href: "/a-propos/qui-sommes-nous" },
       { name: "Notre Histoire", href: "/a-propos/histoire" },
-      { name: "Notre engagement", href: "/a-propos/engagement" },
-      { name: "Nos partenaires", href: "/a-propos/partenaires" },
-      { name: "Blog", href: "/blog" },
+      { name: "Nos Collection", href: "/a-propos/nos-collections" },
     ],
     support: [
       { name: "Contact", href: "/contact" },
       { name: "FAQ", href: "/faq" },
-      { name: "Livraison", href: "/livraison" },
-      { name: "Info", href: "/Info" },
+      { name: "Nous rejoindre", href: "/nous-rejoindre" },
+      { name: "Confidentialité", href: "/confidentialite" },
     ],
   };
 

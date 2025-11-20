@@ -23,7 +23,7 @@ const CategoryCard = ({ category, index }) => {
     const msg = encodeURIComponent(
       `Bonjour, je souhaite commander: ${category.name}`
     );
-    window.open(`https://wa.me/22997000000?text=${msg}`, "_blank");
+    window.open(`https://wa.me/22950035719?text=${msg}`, "_blank");
   };
 
   return (

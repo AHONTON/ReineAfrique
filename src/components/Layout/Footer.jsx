@@ -50,7 +50,7 @@ const Footer = () => {
     },
     {
       icon: Phone,
-      href: "https://wa.me/22997123456",
+      href: "https://wa.me/22950035719",
       label: "WhatsApp",
       color: "hover:bg-green-600",
     },

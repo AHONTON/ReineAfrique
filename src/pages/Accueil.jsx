@@ -1,13 +1,13 @@
 import React from "react";
-import Header from "../components/UI/Header";
+import Header from "../components/Layout/Header";
 import HeroBanner from "../components/Accueil/HeroBanner";
 import FeatureCards from "../components/Accueil/FeatureCards";
-import Wrapper from "../components/UI/Wrapper";
+import Wrapper from "../components/Layout/Wrapper";
 import ValeursSection from "../components/Accueil/ValeursSection";
 import NotreMission from "../components/Accueil/NotreMission";
 import NotreVision from "../components/Accueil/NotreVision";
 import Newsletter from "../components/Accueil/Newsletter";
-import Footer from "../components/UI/Footer";
+import Footer from "../components/Layout/Footer";
 
 const Accueil = () => {
   return (

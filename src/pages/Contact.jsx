@@ -1,9 +1,9 @@
 import React from "react";
-import Header from "../components/UI/Header";
+import Header from "../components/Layout/Header";
 import ContactBaner from "../components/Contact/ContactBaner";
-import ContactSection from "../components/Contact/ContactSection"
-import Wrapper from "../components/UI/Wrapper";
-import Footer from "../components/UI/Footer";
+import ContactSection from "../components/Contact/ContactSection";
+import Wrapper from "../components/Layout/Wrapper";
+import Footer from "../components/Layout/Footer";
 
 const About = () => {
   return (

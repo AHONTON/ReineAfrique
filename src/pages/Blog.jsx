@@ -1,9 +1,9 @@
 import React from "react";
-import Header from "../components/UI/Header";
+import Header from "../components/Layout/Header";
 import BlogBanner from "../components/Blog/BlogBanner";
 import CategoryCard from "../components/Blog/CategoryCard";
-import Wrapper from "../components/UI/Wrapper";
-import Footer from "../components/UI/Footer";
+import Wrapper from "../components/Layout/Wrapper";
+import Footer from "../components/Layout/Footer";
 
 const Blog = () => {
   return (

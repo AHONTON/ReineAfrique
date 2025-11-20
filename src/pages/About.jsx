@@ -1,12 +1,12 @@
 import React from "react";
-import Header from "../components/UI/Header";
+import Header from "../components/Layout/Header";
 import AboutHeroBanner from "../components/About/AboutHeroBanner";
 import AboutSection from "../components/About/AboutSection";
 import HistoryImpactSection from "../components/About/HistoryImpactSection";
 import Choix from "../components/About/Choix";
 import Faq from "../components/About/Faq";
-import Wrapper from "../components/UI/Wrapper";
-import Footer from "../components/UI/Footer";
+import Wrapper from "../components/Layout/Wrapper";
+import Footer from "../components/Layout/Footer";
 
 const About = () => {
   return (

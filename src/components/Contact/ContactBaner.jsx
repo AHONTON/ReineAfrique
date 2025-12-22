@@ -6,11 +6,7 @@ const ContactBaner = () => {
   const phoneNumber = "+2290150035719";
 
   /* --- SLIDER BACKGROUND (3 IMAGES) --- */
-  const images = [
-    "/images/r2.jpg",
-    "/images/c8.jpg",
-    "/images/card4.jpg",
-  ];
+  const images = ["/images/r2.jpg", "/images/c8.jpg", "/images/card4.jpg"];
 
   const [index, setIndex] = useState(0);
 
@@ -43,7 +39,6 @@ const ContactBaner = () => {
 
   return (
     <div className="relative w-full overflow-hidden">
-
       {/* --- BACKGROUND IMAGES SLIDER --- */}
       {images.map((img, i) => (
         <img
@@ -61,20 +56,18 @@ const ContactBaner = () => {
 
       {/* --- CONTENU PRINCIPAL --- */}
       <motion.div
-        className="relative z-10 py-12 sm:py-16 px-4 sm:px-6 lg:px-8"
+        className="relative z-10 px-4 py-12 sm:py-16 sm:px-6 lg:px-8"
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true }}
         variants={containerVariants}
       >
         <div className="max-w-6xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 items-center">
-
+          <div className="grid items-center gap-8 md:grid-cols-2">
             {/* TEXTE GAUCHE */}
             <motion.div variants={itemVariants} className="text-left">
-
               <h2
-                className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight"
+                className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl"
                 style={{ fontFamily: "'Playfair Display', serif" }}
               >
                 Besoin de tissus africains{" "}
@@ -93,21 +86,21 @@ const ContactBaner = () => {
               <div className="flex flex-wrap items-center gap-4 sm:gap-6">
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#3C7A55] animate-pulse"></div>
-                  <span className="text-white/80 text-sm font-medium">
+                  <span className="text-sm font-medium text-white/80">
                     Réponse immédiate
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#F2B632] animate-pulse"></div>
-                  <span className="text-white/80 text-sm font-medium">
+                  <span className="text-sm font-medium text-white/80">
                     Conseil gratuit
                   </span>
                 </div>
 
                 <div className="flex items-center gap-2">
                   <div className="w-2.5 h-2.5 rounded-full bg-[#E56A0D] animate-pulse"></div>
-                  <span className="text-white/80 text-sm font-medium">
+                  <span className="text-sm font-medium text-white/80">
                     500+ clients satisfaits
                   </span>
                 </div>
@@ -119,8 +112,7 @@ const ContactBaner = () => {
               variants={itemVariants}
               className="flex flex-col items-center md:items-end"
             >
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl p-6 sm:p-8 w-full max-w-md">
-
+              <div className="w-full max-w-md p-6 shadow-2xl bg-white/95 backdrop-blur-md rounded-2xl sm:p-8">
                 {/* Icone */}
                 <div className="flex justify-center mb-5">
                   <motion.div
@@ -144,7 +136,7 @@ const ContactBaner = () => {
                 </h3>
 
                 {/* Numéro */}
-                <div className="text-center mb-5">
+                <div className="mb-5 text-center">
                   <p className="text-xs text-[#3A1F0B]/60 uppercase tracking-wide mb-1 font-semibold">
                     Téléphone direct
                   </p>
@@ -167,7 +159,7 @@ const ContactBaner = () => {
                   style={{ fontFamily: "'Poppins', sans-serif" }}
                 >
                   <Phone
-                    className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300"
+                    className="w-5 h-5 transition-transform duration-300 group-hover:rotate-12"
                     strokeWidth={2.5}
                   />
                   Lancer l'appel
@@ -181,7 +173,6 @@ const ContactBaner = () => {
                 </div>
               </div>
             </motion.div>
-
           </div>
         </div>
       </motion.div>

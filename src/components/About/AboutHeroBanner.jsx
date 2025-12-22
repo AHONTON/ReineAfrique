@@ -132,16 +132,16 @@ const AboutHeroBanner = () => {
       </button>
 
       {/* Indicateurs de diapositives */}
-      <div className="absolute flex gap-2 -translate-x-1/2 bottom-6 left-1/2">
+      <div className="absolute flex gap-1.5 -translate-x-1/2 bottom-2 md:bottom-6 left-1/2">
         {slides.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentSlide(index)}
             aria-label={`Aller à la diapositive ${index + 1}`}
-            className={`h-3 rounded-full transition-all duration-300 ${
+            className={`h-2 rounded-full transition-all duration-300 ${
               index === currentSlide
-                ? "bg-amber-400 w-8 shadow-lg"
-                : "bg-white/50 w-3 hover:bg-white/70"
+                ? "bg-amber-400 w-6 shadow-lg"
+                : "bg-white/50 w-2 hover:bg-white/70"
             }`}
           />
         ))}

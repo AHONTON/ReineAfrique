@@ -36,7 +36,7 @@ const ValeursSection = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
         {/* Titre principal */}
         <motion.h2
-          className="text-3xl sm:text-4xl font-bold text-gray-800 mb-3"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-4 font-serif"
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
@@ -45,13 +45,13 @@ const ValeursSection = () => {
         </motion.h2>
 
         <motion.p
-          className="text-gray-600 max-w-2xl mx-auto mb-12"
+          className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto mb-12 leading-relaxed"
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          Chez <span className="text-rose-500 font-semibold">Reine d’Afrique</span>, chaque tissu est une
-          histoire, chaque motif un symbole, et chaque couleur une célébration de l’élégance africaine.
+          Chez <span className="text-rose-500 font-semibold">Reine d'Afrique</span>, chaque tissu est une
+          histoire, chaque motif un symbole, et chaque couleur une célébration de l'élégance africaine.
         </motion.p>
 
         {/* Cartes des valeurs */}
@@ -66,10 +66,10 @@ const ValeursSection = () => {
               transition={{ delay: index * 0.2 }}
             >
               <div className="mb-4">{item.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-800 mb-2">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-800 mb-3 font-serif">
                 {item.titre}
               </h3>
-              <p className="text-gray-600 text-sm">{item.texte}</p>
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{item.texte}</p>
             </motion.div>
           ))}
         </div>

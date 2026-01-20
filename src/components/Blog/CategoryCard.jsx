@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 
@@ -15,15 +15,21 @@ const categories = [
 
 const CategoryCard = ({ category, index }) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
-  const isMobile = window.innerWidth < 768;
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const handleWhatsAppClick = (e) => {
     e.stopPropagation();
     const msg = encodeURIComponent(
       `Bonjour, je souhaite commander: ${category.name}`
     );
-    window.open(`https://wa.me/2290150035719?text=${msg}`, "_blank");
+    window.open(`https://wa.me/+2290150035719?text=${msg}`, "_blank");
   };
 
   return (
@@ -61,7 +67,7 @@ const CategoryCard = ({ category, index }) => {
         {/* CONTENT */}
         <div className="absolute inset-0 flex flex-col justify-end p-4 text-center">
           <motion.h3
-            className="text-white font-serif text-lg sm:text-xl md:text-2xl mb-3"
+            className="text-white font-serif text-base sm:text-lg md:text-xl mb-3 font-semibold"
             animate={{ y: isHovered ? -4 : 0 }}
             transition={{ duration: 0.25 }}
           >
@@ -71,15 +77,20 @@ const CategoryCard = ({ category, index }) => {
           {/* CTA */}
           <motion.button
             onClick={handleWhatsAppClick}
-            className="mx-auto w-11 h-11 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg"
+            className="mx-auto w-12 h-12 rounded-full bg-gradient-to-br from-orange-500 to-amber-600 flex items-center justify-center shadow-lg hover:shadow-xl relative overflow-hidden group"
             animate={{
-              scale: isHovered ? 1.18 : 1,
-              y: isHovered ? 0 : 4,
+              scale: isHovered ? 1.2 : 1,
+              y: isHovered ? -2 : 4,
             }}
-            whileTap={{ scale: 0.9 }}
+            whileTap={{ scale: 0.85 }}
+            whileHover={{ rotate: 5 }}
             transition={{ duration: 0.3 }}
           >
-            <ShoppingCart className="w-5 h-5 text-white" />
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-br from-amber-400 to-orange-400 opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.3 }}
+            />
+            <ShoppingCart className="w-5 h-5 text-white relative z-10" />
           </motion.button>
         </div>
 
@@ -120,7 +131,7 @@ export default function CategoriesSection() {
             Nos Tissus
           </h2>
 
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mt-3">
+          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mt-3 leading-relaxed">
             Découvrez notre collection raffinée de tissus africains.
           </p>
         </motion.header>

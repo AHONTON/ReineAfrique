@@ -16,7 +16,7 @@ const ContactBaner = () => {
     }, 5000); // change every 5 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   /* --- ANIMATION VARIANTS --- */
   const containerVariants = {
@@ -63,20 +63,18 @@ const ContactBaner = () => {
         variants={containerVariants}
       >
         <div className="max-w-6xl mx-auto">
-          <div className="grid items-center gap-8 md:grid-cols-2">
+          <div className="grid items-center gap-8 lg:grid-cols-2">
             {/* TEXTE GAUCHE */}
             <motion.div variants={itemVariants} className="text-left">
               <h2
-                className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl"
-                style={{ fontFamily: "'Playfair Display', serif" }}
+                className="mb-4 text-3xl font-bold leading-tight text-white sm:text-4xl lg:text-5xl font-serif"
               >
                 Besoin de tissus africains{" "}
                 <span className="text-[#F2B632]">authentiques ?</span>
               </h2>
 
               <p
-                className="text-base sm:text-lg text-[#F5E9D3]/90 leading-relaxed mb-6"
-                style={{ fontFamily: "'Inter', sans-serif" }}
+                className="text-base sm:text-lg md:text-xl text-[#F5E9D3]/90 leading-relaxed mb-6"
               >
                 Nos experts vous conseillent et vous accompagnent dans le choix
                 de vos tissus premium. Un simple appel suffit.
@@ -110,7 +108,7 @@ const ContactBaner = () => {
             {/* CTA DROITE */}
             <motion.div
               variants={itemVariants}
-              className="flex flex-col items-center md:items-end"
+              className="flex flex-col items-center lg:items-end"
             >
               <div className="w-full max-w-md p-6 shadow-2xl bg-white/95 backdrop-blur-md rounded-2xl sm:p-8">
                 {/* Icone */}
@@ -129,20 +127,19 @@ const ContactBaner = () => {
 
                 {/* Titre */}
                 <h3
-                  className="text-2xl font-bold text-[#3A1F0B] text-center mb-3"
-                  style={{ fontFamily: "'Playfair Display', serif" }}
+                  className="text-xl sm:text-2xl font-bold text-[#3A1F0B] text-center mb-3 font-serif"
                 >
                   Appelez-nous maintenant
                 </h3>
 
                 {/* Numéro */}
                 <div className="mb-5 text-center">
-                  <p className="text-xs text-[#3A1F0B]/60 uppercase tracking-wide mb-1 font-semibold">
+                  <p className="text-xs sm:text-sm text-[#3A1F0B]/60 uppercase tracking-wide mb-1 font-semibold">
                     Téléphone direct
                   </p>
                   <a
                     href={`tel:${phoneNumber}`}
-                    className="text-[#E56A0D] text-xl font-bold hover:text-[#3A1F0B] transition-colors"
+                    className="text-[#E56A0D] text-lg sm:text-xl font-bold hover:text-[#3A1F0B] transition-colors"
                   >
                     {phoneNumber}
                   </a>

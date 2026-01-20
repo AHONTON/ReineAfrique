@@ -17,7 +17,7 @@ const BlogBanner = () => {
       setCurrentIndex((prev) => (prev + 1) % images.length);
     }, 4000);
     return () => clearInterval(interval);
-  }, []);
+  }, [images.length]);
 
   return (
     <section className="relative overflow-hidden bg-neutral-950 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
@@ -50,7 +50,7 @@ const BlogBanner = () => {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-4"
+            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold text-white mb-4 sm:mb-6 leading-tight px-4 font-serif"
           >
             L'univers des{" "}
             <span className="block sm:inline text-orange-400 mt-2 sm:mt-0">
@@ -71,7 +71,7 @@ const BlogBanner = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.5 }}
-            className="text-sm sm:text-base lg:text-lg text-gray-300 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-4"
+            className="text-base sm:text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed px-4 font-light"
           >
             Tendances, conseils de style et histoires culturelles de l'artisanat
             africain authentique.

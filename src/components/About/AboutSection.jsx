@@ -32,7 +32,7 @@ const AboutSection = () => {
           variants={fadeInUp}
           className="text-center mb-4 md:mb-6"
         >
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 font-serif">
             Qui sommes-nous ?
           </h2>
           <div className="w-20 h-1 bg-gradient-to-r from-amber-400 to-amber-600 mx-auto rounded-full"></div>
@@ -67,7 +67,7 @@ const AboutSection = () => {
             <div className="bg-white p-6 md:p-8 rounded-3xl shadow-xl">
               <div className="space-y-4">
                 <p className="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
-                  <span className="font-bold text-amber-600 text-xl md:text-2xl">
+                  <span className="font-bold text-amber-600 text-lg md:text-xl font-serif">
                     Reine d'Afrique
                   </span>{" "}
                   est une marque moderne et engagée dédiée à la promotion et à
@@ -77,7 +77,7 @@ const AboutSection = () => {
                   de créateurs locaux.
                 </p>
 
-                <p className="text-gray-700 text-base md:text-lg leading-relaxed text-justify">
+                <p className="text-gray-700 text-base md:text-lg leading-relaxed text-justify mt-4">
                   Notre mission :{" "}
                   <span className="font-semibold text-amber-700">
                     faire rayonner la beauté authentique des tissus africains

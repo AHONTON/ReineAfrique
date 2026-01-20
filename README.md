@@ -1,16 +1,116 @@
-# React + Vite
+# Reine d'Afrique 🌍
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Site web moderne et interactif pour la promotion et la vente de tissus africains authentiques.
 
-Currently, two official plugins are available:
+## 🚀 Technologies utilisées
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 19** - Bibliothèque UI moderne
+- **Vite** - Build tool rapide
+- **React Router DOM** - Navigation SPA
+- **Framer Motion** - Animations fluides
+- **Tailwind CSS** - Framework CSS utilitaire
+- **Lucide React** - Icônes modernes
+- **Axios** - Client HTTP
 
-## React Compiler
+## ✨ Fonctionnalités
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 🎨 Interface utilisateur
+- Design moderne et responsive
+- Animations fluides avec Framer Motion
+- Typographie optimisée (Inter, Playfair Display, Poppins)
+- Thème cohérent avec couleurs africaines (amber, orange, red)
 
-## Expanding the ESLint configuration
+### 📱 Responsive Design
+- Adapté mobile, tablette et desktop
+- Navigation mobile optimisée
+- Images et contenus adaptatifs
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### ⚡ Performance
+- Chargement dynamique avec écran de chargement (5s minimum)
+- Détection de l'état de connexion (en ligne/hors ligne)
+- Lazy loading des images
+- Transitions de page fluides
+
+### 🎯 Pages disponibles
+- **Accueil** (`/`) - Page d'accueil avec hero banner, valeurs, mission, vision
+- **À propos** (`/about`) - Histoire, impact, choix, FAQ
+- **Blog** (`/blog`) - Collections de tissus africains
+- **Contact** (`/contact`) - Formulaire de contact et coordonnées
+
+## 📦 Installation
+
+```bash
+# Installer les dépendances
+pnpm install
+
+# Lancer le serveur de développement
+pnpm dev
+
+# Build pour la production
+pnpm build
+
+# Prévisualiser le build
+pnpm preview
+```
+
+## 🏗️ Structure du projet
+
+```
+src/
+├── components/          # Composants réutilisables
+│   ├── Layout/         # Header, Footer, LoadingScreen, etc.
+│   ├── Accueil/        # Composants de la page d'accueil
+│   ├── About/          # Composants de la page À propos
+│   ├── Blog/           # Composants de la page Blog
+│   └── Contact/        # Composants de la page Contact
+├── contexts/           # Contextes React (LoadingContext)
+├── pages/              # Pages principales
+└── styles/             # Styles globaux
+```
+
+## 🎨 Personnalisation
+
+### Couleurs principales
+- Amber/Orange : `#F59E0B`, `#F97316`
+- Red : `#EF4444`, `#DC2626`
+- Gray : `#1F2937`, `#374151`
+
+### Polices
+- **Sans-serif** : Inter (corps de texte)
+- **Serif** : Playfair Display (titres)
+- **Display** : Poppins (éléments spéciaux)
+
+## 📞 Contact
+
+- **Téléphone** : +229 01 50 03 57 19
+- **WhatsApp** : [https://wa.me/+2290150035719](https://wa.me/+2290150035719)
+
+## 🔧 Configuration
+
+### Variables d'environnement
+Créer un fichier `.env` si nécessaire pour les variables d'API.
+
+### Build
+Le projet utilise Vite pour le build. Les fichiers de production sont générés dans le dossier `dist/`.
+
+## 📝 Notes
+
+- Le formulaire de contact utilise actuellement une simulation. Remplacer par une vraie API dans `ContactSection.jsx`.
+- Les images doivent être placées dans le dossier `public/images/`.
+- Le système de chargement s'affiche automatiquement à chaque accès au site.
+
+## 🐛 Résolution de problèmes
+
+### Erreurs de build
+```bash
+# Nettoyer et réinstaller
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+```
+
+### Problèmes de styles
+Vérifier que Tailwind CSS est correctement configuré dans `tailwind.config.js`.
+
+## 📄 Licence
+
+Propriétaire - Reine d'Afrique

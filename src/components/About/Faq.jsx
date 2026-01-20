@@ -65,11 +65,11 @@ const Faq = () => {
           transition={{ duration: 0.7 }}
           className="mb-10 text-center md:mb-16"
         >
-          <h1 className="mb-3 text-2xl font-bold text-gray-800 sm:text-3xl md:text-4xl lg:text-5xl">
+          <h1 className="mb-3 text-3xl font-bold text-gray-800 sm:text-4xl md:text-5xl lg:text-6xl font-serif">
             FAQ
           </h1>
           <div className="w-16 h-1 mx-auto mb-3 bg-gradient-to-r from-orange-500 via-red-600 to-amber-600 md:mb-4" />
-          <p className="max-w-3xl mx-auto text-sm leading-relaxed text-gray-600 sm:text-base md:text-lg">
+          <p className="max-w-3xl mx-auto text-base leading-relaxed text-gray-600 sm:text-lg md:text-xl">
             Questions fréquentes sur Reine d'Afrique
           </p>
         </motion.div>
@@ -87,7 +87,7 @@ const Faq = () => {
             >
               {/* Question */}
               <div className="flex items-center justify-between px-5 py-4 md:py-5 md:px-6">
-                <h3 className="text-sm font-semibold text-gray-800 md:text-base lg:text-base">
+                <h3 className="text-sm sm:text-base font-semibold text-gray-800 md:text-lg font-serif">
                   {item.question}
                 </h3>
                 <span
@@ -109,7 +109,7 @@ const Faq = () => {
                     transition={{ duration: 0.3, ease: "easeInOut" }}
                     className="px-5 pb-4 overflow-hidden md:px-6 md:pb-5"
                   >
-                    <p className="text-xs leading-relaxed text-gray-700 md:text-sm lg:text-sm">
+                    <p className="text-sm leading-relaxed text-gray-700 md:text-base">
                       {item.answer}
                     </p>
                   </motion.div>
@@ -128,10 +128,10 @@ const Faq = () => {
         >
           <div className="overflow-hidden text-white border-2 shadow-xl bg-gradient-to-r from-orange-500 via-red-600 to-amber-600 rounded-2xl border-amber-700">
             <div className="p-6 text-center md:p-10">
-              <h2 className="mb-2 text-lg font-bold md:text-xl lg:text-2xl">
+              <h2 className="mb-2 text-xl font-bold md:text-2xl lg:text-3xl font-serif">
                 Vous avez une autre question ?
               </h2>
-              <p className="max-w-2xl mx-auto mb-4 text-xs leading-relaxed md:text-sm lg:text-base text-orange-50 md:mb-6">
+              <p className="max-w-2xl mx-auto mb-4 text-sm leading-relaxed md:text-base lg:text-lg text-orange-50 md:mb-6">
                 Notre équipe est à votre disposition pour répondre à toutes vos
                 questions sur nos tissus africains.
               </p>
@@ -147,7 +147,7 @@ const Faq = () => {
 
         {/* Floating WhatsApp Button */}
         <a
-          href="https://wa.me/2290150035719"
+          href="https://wa.me/+2290150035719"
           target="_blank"
           rel="noopener noreferrer"
           className="fixed z-50 flex items-center justify-center text-white transition-transform bg-green-500 rounded-full shadow-lg bottom-6 right-6 w-14 h-14 hover:scale-110"

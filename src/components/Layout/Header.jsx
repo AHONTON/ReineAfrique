@@ -39,42 +39,81 @@ const Header = ({ logoSrc }) => {
     >
       <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
-          <img
-            src={logoSrc}
-            alt="Reine d'Afrique"
-            className="object-contain h-10 md:h-12"
-          />
-        </Link>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+          <Link to="/" className="flex items-center">
+            <motion.img
+              src={logoSrc}
+              alt="Reine d'Afrique"
+              className="object-contain h-10 md:h-12"
+              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
+            />
+          </Link>
+        </motion.div>
 
         {/* Menu desktop */}
         <div className="items-center hidden space-x-6 md:flex">
           {navLinks.map((link) => (
-            <Link
-              key={link.name}
-              to={link.path}
-              className="font-medium text-gray-700 transition hover:text-amber-600"
-            >
-              {link.name}
-            </Link>
+            <motion.div key={link.name} whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
+              <Link
+                to={link.path}
+                className="relative font-medium text-base text-gray-700 transition-colors duration-300 hover:text-amber-600 group"
+              >
+                {link.name}
+                <motion.span
+                  className="absolute bottom-0 left-0 w-0 h-0.5 bg-amber-600 group-hover:w-full"
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                />
+              </Link>
+            </motion.div>
           ))}
-          <a
-            href="https://wa.me/2290150035719"
+          <motion.a
+            href="https://wa.me/+2290150035719"
             target="_blank"
             rel="noopener noreferrer"
-            className="px-6 py-2 ml-4 font-semibold text-white transition-transform duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:scale-105"
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="relative px-6 py-2.5 ml-4 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl overflow-hidden group"
           >
-            Nous rejoindre
-          </a>
+            <span className="relative z-10">Nous rejoindre</span>
+            <motion.div
+              className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-500 opacity-0 group-hover:opacity-100"
+              transition={{ duration: 0.3 }}
+            />
+          </motion.a>
         </div>
 
         {/* Menu mobile toggle */}
-        <button
-          className="md:hidden text-amber-700 focus:outline-none"
+        <motion.button
+          className="md:hidden text-amber-700 focus:outline-none p-2 rounded-lg hover:bg-amber-50 transition-colors"
           onClick={() => setMenuOpen(!menuOpen)}
+          whileTap={{ scale: 0.9 }}
+          whileHover={{ scale: 1.1 }}
         >
-          {menuOpen ? <X size={28} /> : <Menu size={28} />}
-        </button>
+          <AnimatePresence mode="wait">
+            {menuOpen ? (
+              <motion.div
+                key="close"
+                initial={{ rotate: -90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: 90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <X size={28} />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="menu"
+                initial={{ rotate: 90, opacity: 0 }}
+                animate={{ rotate: 0, opacity: 1 }}
+                exit={{ rotate: -90, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+              >
+                <Menu size={28} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.button>
       </div>
 
       {/* Dropdown mobile animé */}
@@ -98,18 +137,20 @@ const Header = ({ logoSrc }) => {
                   <Link
                     to={link.path}
                     onClick={() => setMenuOpen(false)}
-                    className="text-lg font-medium text-gray-700 hover:text-amber-600"
+                    className="relative text-lg font-medium text-gray-700 hover:text-amber-600 transition-colors duration-300 py-2 px-4 rounded-lg hover:bg-amber-50 block"
                   >
                     {link.name}
                   </Link>
                 </motion.div>
               ))}
               <motion.a
-                href="https://wa.me/2290150035719"
+                href="https://wa.me/+2290150035719"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="px-6 py-2 mt-2 font-semibold text-white transition-transform duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:scale-105"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="px-6 py-3 mt-2 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl"
                 variants={itemVariants}
               >
                 Nous rejoindre

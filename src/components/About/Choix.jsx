@@ -137,14 +137,19 @@ const Choix = () => {
           transition={{ delay: 0.6, duration: 0.5 }}
           className="mt-10 text-center"
         >
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <a
+          <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+            <motion.a
               href="/blog"
-              className="inline-block w-full px-8 py-4 font-semibold text-center text-white transition-all duration-300 rounded-full shadow-lg sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-xl"
+              className="relative inline-block w-full px-8 py-4 font-semibold text-center text-white transition-all duration-300 rounded-full shadow-lg sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:shadow-xl overflow-hidden group"
               aria-label="Découvrir nos tissus africains"
+              whileHover={{ boxShadow: "0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)" }}
             >
-              Découvrir nos tissus africains
-            </a>
+              <motion.span
+                className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 opacity-0 group-hover:opacity-100"
+                transition={{ duration: 0.3 }}
+              />
+              <span className="relative z-10">Découvrir nos tissus africains</span>
+            </motion.a>
           </motion.div>
         </motion.div>
       </div>

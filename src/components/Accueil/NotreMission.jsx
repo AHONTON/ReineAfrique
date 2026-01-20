@@ -38,7 +38,7 @@ export default function NotreMission() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-3xl sm:text-4xl font-bold text-center text-black mb-8"
+          className="text-3xl sm:text-4xl md:text-5xl font-bold text-center text-black mb-8 font-serif"
         >
           Notre Mission
         </motion.h2>
@@ -51,7 +51,7 @@ export default function NotreMission() {
           transition={{ duration: 0.8 }}
           className="max-w-3xl mx-auto mb-12"
         >
-          <p className="text-base sm:text-lg md:text-xl text-black leading-relaxed font-light text-center">
+          <p className="text-base sm:text-lg md:text-lg text-black leading-relaxed font-normal text-center">
             Chez{" "}
             <span className="font-semibold text-orange-700">
               Reine d’Afrique
@@ -81,7 +81,7 @@ export default function NotreMission() {
                   >
                     <Icon className="text-white w-6 h-6 sm:w-7 sm:h-7" />
                   </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-semibold text-black">
+                  <h3 className="text-lg sm:text-xl md:text-2xl font-serif font-semibold text-black mb-2">
                     {valeur.title}
                   </h3>
                   <p className="text-sm sm:text-base text-stone-600 leading-relaxed">

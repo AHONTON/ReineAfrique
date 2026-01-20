@@ -81,10 +81,10 @@ export default function NotreVision() {
           transition={{ duration: 0.6 }}
           className="text-center mb-12"
         >
-          <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-900 mb-4 font-serif">
             Notre Vision
           </h2>
-          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto">
+          <p className="text-base sm:text-lg text-gray-600 max-w-3xl mx-auto leading-relaxed">
             Chez{" "}
             <span className="font-semibold text-orange-700">
               Reine d’Afrique
@@ -126,11 +126,11 @@ export default function NotreVision() {
                     <Icon className="text-white w-5 h-5" />
                   </div>
 
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-900 mb-2 font-serif">
                     {vision.title}
                   </h3>
 
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
                     {vision.description}
                   </p>
 
@@ -155,14 +155,29 @@ export default function NotreVision() {
           transition={{ delay: 0.4, duration: 0.7, ease: "easeOut" }}
           className="text-center mt-14"
         >
-          <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-            <Link
-              to="/blog"
-              className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium rounded-full shadow-md hover:shadow-lg transition-all duration-300"
+          <motion.div whileHover={{ scale: 1.05, y: -2 }} whileTap={{ scale: 0.95 }}>
+            <motion.div
+              whileHover={{ x: 5 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
             >
-              <span>Découvrir nos collections</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+              <Link
+                to="/blog"
+                className="relative inline-flex items-center gap-2 px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-600 text-white font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-700 opacity-0 group-hover:opacity-100"
+                  transition={{ duration: 0.3 }}
+                />
+                <span className="relative z-10">Découvrir nos collections</span>
+                <motion.span
+                  className="relative z-10"
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <ArrowRight className="w-4 h-4" />
+                </motion.span>
+              </Link>
+            </motion.div>
           </motion.div>
         </motion.div>
       </div>

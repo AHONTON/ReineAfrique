@@ -1,4 +1,5 @@
 import React from "react";
+import { motion } from "framer-motion";
 import Header from "../components/Layout/Header";
 import HeroBanner from "../components/Accueil/HeroBanner";
 import FeatureCards from "../components/Accueil/FeatureCards";
@@ -11,7 +12,12 @@ import Footer from "../components/Layout/Footer";
 
 const Accueil = () => {
   return (
-    <div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.3 }}
+    >
       <Header logoSrc="/images/logo2.png" />
       <main className="pt-16">
         {/* HeroBanner en full width */}
@@ -27,7 +33,7 @@ const Accueil = () => {
           <Footer />
         </Wrapper>
       </main>
-    </div>
+    </motion.div>
   );
 };
 

@@ -45,23 +45,35 @@ export default function Newsletter() {
 
   return (
     <section className="relative px-4 py-16 overflow-hidden sm:px-6 lg:px-8">
-      {/* --- Vidéo de fond --- */}
-      <motion.video
-        autoPlay
-        loop
-        muted
-        playsInline
-        src="https://www.w3schools.com/howto/rain.mp4"
-        className="absolute inset-0 z-0 object-cover w-full h-full brightness-50"
+      {/* --- Fond animé --- */}
+      <motion.div
+        className="absolute inset-0 z-0 w-full h-full bg-gradient-to-br from-orange-900 via-amber-900 to-red-900"
         initial={{ scale: 1 }}
         animate={{ scale: 1.05 }}
         transition={{
           duration: 25,
           repeat: Infinity,
-          repeatType: "mirror",
+          repeatType: "reverse",
           ease: "linear",
         }}
-      />
+      >
+        <motion.div
+          className="absolute inset-0 opacity-20"
+          animate={{
+            backgroundPosition: ["0% 0%", "100% 100%"],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            repeatType: "reverse",
+          }}
+          style={{
+            backgroundImage:
+              "radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.4) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.4) 0%, transparent 50%)",
+            backgroundSize: "200% 200%",
+          }}
+        />
+      </motion.div>
 
       {/* --- Contenu principal --- */}
       <div className="relative z-10 flex flex-col max-w-6xl gap-8 mx-auto">
@@ -136,13 +148,14 @@ export default function Newsletter() {
                 >
                   <div className="relative flex-1 group">
                     <Mail className="absolute w-5 h-5 text-gray-300 transition-colors -translate-y-1/2 left-4 top-1/2 group-focus-within:text-orange-400" />
-                    <input
+                    <motion.input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="votre@email.com"
                       required
-                      className="w-full py-3 pl-12 pr-4 text-white placeholder-gray-300 transition-all border-2 rounded-xl border-white/30 bg-black/30 focus:outline-none focus:border-orange-400 focus:bg-white/10"
+                      whileFocus={{ scale: 1.02 }}
+                      className="w-full py-3 pl-12 pr-4 text-white placeholder-gray-300 transition-all border-2 rounded-xl border-white/30 bg-black/30 focus:outline-none focus:border-orange-400 focus:bg-white/10 focus:ring-2 focus:ring-orange-400/50"
                     />
                   </div>
                   <motion.button

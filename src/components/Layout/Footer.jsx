@@ -15,22 +15,22 @@ const Footer = () => {
 
   const footerLinks = {
     shop: [
-      { name: "Accueil", href: "/accueil" },
+      { name: "Accueil", href: "/" },
       { name: "Nos Valeurs", href: "/#valeurs" },
       { name: "Notre Mission", href: "/#mission" },
       { name: "Notre Vision", href: "/#vision" },
     ],
     about: [
-      { name: "A propos", href: "/a_propos" },
-      { name: "Qui sommes-nous ?", href: "/#qui_sommes_nous" },
-      { name: "Notre Histoire", href: "/#histoire" },
-      { name: "Nos Collection", href: "/#nos_collections" },
+      { name: "À propos", href: "/about" },
+      { name: "Qui sommes-nous ?", href: "/about#qui_sommes_nous" },
+      { name: "Notre Histoire", href: "/about#histoire" },
+      { name: "Nos Collections", href: "/blog#nos_collections" },
     ],
     support: [
       { name: "Contact", href: "/contact" },
-      { name: "FAQ", href: "/#faq" },
-      { name: "Nous rejoindre", href: "/#nous_rejoindre" },
-      { name: "Confidentialité", href: "/#confidentialite" },
+      { name: "FAQ", href: "/about#faq" },
+      { name: "Blog", href: "/blog" },
+      { name: "Nous rejoindre", href: "https://wa.me/+2290150035719" },
     ],
   };
 
@@ -50,7 +50,7 @@ const Footer = () => {
     },
     {
       icon: Phone,
-      href: "https://wa.me/2290150035719",
+      href: "https://wa.me/+2290150035719",
       label: "WhatsApp",
       color: "hover:bg-green-600",
     },
@@ -104,16 +104,16 @@ const Footer = () => {
                 />
               </div>
               <div>
-                <h3 className="font-serif text-3xl font-bold">
+                <h3 className="font-serif text-2xl sm:text-3xl font-bold">
                   Reine d'Afrique
                 </h3>
-                <p className="text-sm text-orange-400">
+                <p className="text-xs sm:text-sm text-orange-400 font-medium">
                   Le tissu qui vous rend unique
                 </p>
               </div>
             </motion.div>
 
-            <p className="mt-2 text-sm text-gray-400">
+            <p className="mt-2 text-sm sm:text-base text-gray-400 leading-relaxed">
               Découvrez l'authenticité des tissus africains et plongez dans un
               univers de couleurs, de motifs et de traditions séculaires.
             </p>
@@ -156,7 +156,7 @@ const Footer = () => {
                 whileHover={{ y: -5, scale: 1.02 }}
                 className="w-full max-w-sm p-6 border shadow-xl bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-md border-white/20 rounded-2xl"
               >
-                <h4 className="mb-4 text-lg font-bold capitalize">
+                <h4 className="mb-4 text-base sm:text-lg font-bold capitalize font-serif">
                   {key === "shop"
                     ? "Découverte"
                     : key === "about"
@@ -173,7 +173,8 @@ const Footer = () => {
                     >
                       <a
                         href={link.href}
-                        className="flex items-center gap-2 text-sm text-gray-300 transition-colors hover:text-orange-400"
+                        {...(link.href.startsWith('http') ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                        className="flex items-center gap-2 text-sm sm:text-base text-gray-300 transition-colors hover:text-orange-400 font-normal"
                       >
                         <ChevronRight
                           className={`w-4 h-4 transition-transform ${

@@ -4,8 +4,8 @@ Site web moderne et interactif pour la promotion et la vente de tissus africains
 
 ## 🚀 Technologies utilisées
 
-- **React 19** - Bibliothèque UI moderne
-- **Vite** - Build tool rapide
+- **React 18.3** - Bibliothèque UI moderne (compatible Node 18 LTS)
+- **Vite 5.4** - Build tool rapide (compatible Node 18 LTS)
 - **React Router DOM** - Navigation SPA
 - **Framer Motion** - Animations fluides
 - **Tailwind CSS** - Framework CSS utilitaire
@@ -39,7 +39,14 @@ Site web moderne et interactif pour la promotion et la vente de tissus africains
 
 ## 📦 Installation
 
+**Prérequis :**
+- Node.js 18.x LTS
+- npm >= 9.0.0 ou pnpm
+
 ```bash
+# Vérifier la version de Node.js (doit être 18.x)
+node --version
+
 # Installer les dépendances
 pnpm install
 

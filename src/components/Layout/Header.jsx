@@ -40,7 +40,7 @@ const Header = memo(({ logoSrc }) => {
     >
       <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
         {/* Logo */}
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1 min-w-0">
           <Link to="/" className="flex items-center">
             <motion.img
               src={logoSrc}
@@ -52,13 +52,15 @@ const Header = memo(({ logoSrc }) => {
           </Link>
         </motion.div>
 
-        {/* Horloge - Centrée et responsive */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10">
-          <Clock isScrolled={scrolled} />
+        {/* Horloge et Date - Centrées et responsive avec espacement pour éviter le menu */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10 pointer-events-none">
+          <div className="w-auto max-w-[140px] xs:max-w-[180px] sm:max-w-[240px] md:max-w-[300px] lg:max-w-[360px] xl:max-w-[400px] pointer-events-auto px-1 sm:px-2">
+            <Clock isScrolled={scrolled} showDate={true} />
+          </div>
         </div>
 
         {/* Menu desktop */}
-        <div className="items-center hidden space-x-6 md:flex flex-1 justify-end">
+        <div className="items-center hidden space-x-4 lg:space-x-6 md:flex flex-1 justify-end min-w-0 ml-2">
           {navLinks.map((link) => (
             <motion.div key={link.name} whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link
@@ -98,7 +100,7 @@ const Header = memo(({ logoSrc }) => {
 
         {/* Menu mobile toggle */}
         <motion.button
-          className="md:hidden text-amber-700 focus:outline-none p-2 rounded-lg hover:bg-amber-50 transition-colors"
+          className="md:hidden text-amber-700 focus:outline-none p-2 rounded-lg hover:bg-amber-50 transition-colors flex-shrink-0 ml-2 z-20 relative"
           onClick={() => setMenuOpen(!menuOpen)}
           whileTap={{ scale: 0.9 }}
           whileHover={{ scale: 1.1 }}

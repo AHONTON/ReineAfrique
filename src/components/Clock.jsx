@@ -60,20 +60,16 @@ const Clock = memo(({ isScrolled = false, className = "", showDate = true }) => 
         <span className={`font-semibold whitespace-nowrap ${textColor} ${textShadow}`}>{formatTime(time)}</span>
       </div>
       
-      {/* Date à droite - responsive avec gestion des espacements */}
+      {/* Date à droite - responsive avec gestion des espacements - cachée sur desktop */}
       {showDate && (
         <>
           {/* Version mobile très courte - visible seulement si assez d'espace */}
-          <span className={`text-[9px] xs:text-[10px] font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden xs:inline sm:hidden`}>
+          <span className={`text-[9px] xs:text-[10px] font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden xs:inline md:hidden`}>
             {formatDateMobile(time)}
           </span>
-          {/* Version courte pour tablette */}
-          <span className={`text-[10px] sm:text-xs font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden sm:inline xl:hidden`}>
+          {/* Version courte pour tablette - cachée sur desktop (md+) */}
+          <span className={`text-[10px] sm:text-xs font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden sm:inline md:hidden`}>
             {formatDateShort(time)}
-          </span>
-          {/* Version complète pour desktop très large */}
-          <span className={`text-xs xl:text-sm font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden xl:inline`}>
-            {formatDate(time)}
           </span>
         </>
       )}

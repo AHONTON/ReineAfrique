@@ -65,9 +65,9 @@ const PrivacyPolicyModal = () => {
                       })}
                     </p>
                     <p className="text-gray-700 leading-relaxed">
-                      Reine d'Afrique ("nous", "notre", "nos") s'engage à protéger et respecter votre vie privée. 
-                      Cette politique de confidentialité explique comment nous collectons, utilisons, stockons et 
-                      protégeons vos informations personnelles conformément au Règlement Général sur la Protection 
+                      Reine d'Afrique s'engage à protéger et respecter votre vie privée. 
+                      Cette politique de confidentialité explique comment les données sont collectées, utilisées, stockées et 
+                      protégées conformément au Règlement Général sur la Protection 
                       des Données (RGPD) et aux lois applicables.
                     </p>
                   </section>
@@ -77,7 +77,7 @@ const PrivacyPolicyModal = () => {
                     <div className="flex items-center gap-3 mb-4">
                       <FileText className="w-6 h-6 text-amber-600" />
                       <h3 className="text-xl font-bold text-gray-900 font-serif">
-                        1. Données que nous collectons
+                        1. Données collectées
                       </h3>
                     </div>
                     <div className="bg-amber-50 rounded-lg p-4 mb-4">
@@ -111,7 +111,7 @@ const PrivacyPolicyModal = () => {
                       </h3>
                     </div>
                     <p className="text-gray-700 leading-relaxed mb-3">
-                      Nous utilisons vos données personnelles pour :
+                      Les données personnelles sont utilisées pour :
                     </p>
                     <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                       <li>Traiter et gérer vos commandes</li>
@@ -132,7 +132,7 @@ const PrivacyPolicyModal = () => {
                       </h3>
                     </div>
                     <p className="text-gray-700 leading-relaxed mb-3">
-                      Nous utilisons différents types de cookies :
+                      Différents types de cookies sont utilisés :
                     </p>
                     <div className="space-y-3">
                       <div className="bg-blue-50 rounded-lg p-4">
@@ -144,7 +144,7 @@ const PrivacyPolicyModal = () => {
                       <div className="bg-green-50 rounded-lg p-4">
                         <h4 className="font-semibold text-gray-900 mb-2">Cookies analytiques :</h4>
                         <p className="text-gray-700 text-sm">
-                          Nous aident à comprendre comment vous utilisez notre site pour l'améliorer.
+                          Aident à comprendre comment le site est utilisé pour l'améliorer.
                         </p>
                       </div>
                       <div className="bg-purple-50 rounded-lg p-4">
@@ -169,7 +169,7 @@ const PrivacyPolicyModal = () => {
                       </h3>
                     </div>
                     <p className="text-gray-700 leading-relaxed mb-3">
-                      Nous ne vendons jamais vos données personnelles. Nous pouvons partager vos informations avec :
+                      Les données personnelles ne sont jamais vendues. Les informations peuvent être partagées avec :
                     </p>
                     <ul className="list-disc list-inside space-y-2 text-gray-700 ml-4">
                       <li><strong>Prestataires de services :</strong> pour le traitement des paiements, la livraison, etc.</li>
@@ -177,7 +177,7 @@ const PrivacyPolicyModal = () => {
                       <li><strong>Partenaires de confiance :</strong> uniquement avec votre consentement explicite</li>
                     </ul>
                     <p className="text-gray-700 leading-relaxed mt-3 text-sm">
-                      Tous nos partenaires sont tenus de respecter la confidentialité de vos données.
+                      Tous les partenaires sont tenus de respecter la confidentialité de vos données.
                     </p>
                   </section>
 
@@ -190,7 +190,7 @@ const PrivacyPolicyModal = () => {
                       </h3>
                     </div>
                     <p className="text-gray-700 leading-relaxed">
-                      Nous mettons en œuvre des mesures de sécurité techniques et organisationnelles appropriées pour 
+                      Des mesures de sécurité techniques et organisationnelles appropriées sont mises en œuvre pour 
                       protéger vos données personnelles contre tout accès non autorisé, perte, destruction ou altération. 
                       Cela inclut le chiffrement SSL/TLS, des contrôles d'accès stricts et des audits de sécurité réguliers.
                     </p>
@@ -247,10 +247,10 @@ const PrivacyPolicyModal = () => {
                       7. Durée de conservation
                     </h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Nous conservons vos données personnelles uniquement aussi longtemps que nécessaire pour les 
+                      Les données personnelles sont conservées uniquement aussi longtemps que nécessaire pour les 
                       finalités pour lesquelles elles ont été collectées, ou conformément aux obligations légales. 
                       Les données de commande sont conservées pendant 10 ans (obligation comptable), tandis que les 
-                      données de marketing sont conservées jusqu'à ce que vous retiriez votre consentement.
+                      données de marketing sont conservées jusqu'à ce que le consentement soit retiré.
                     </p>
                   </section>
 
@@ -261,7 +261,7 @@ const PrivacyPolicyModal = () => {
                     </h3>
                     <p className="text-gray-700 leading-relaxed mb-3">
                       Pour toute question concernant cette politique de confidentialité ou pour exercer vos droits, 
-                      vous pouvez nous contacter :
+                      contactez :
                     </p>
                     <div className="space-y-2 text-gray-700">
                       <p><strong>Email :</strong> contact@reineafrique.com</p>
@@ -276,9 +276,9 @@ const PrivacyPolicyModal = () => {
                       9. Modifications de cette politique
                     </h3>
                     <p className="text-gray-700 leading-relaxed">
-                      Nous nous réservons le droit de modifier cette politique de confidentialité à tout moment. 
+                      Le droit de modifier cette politique de confidentialité à tout moment est réservé. 
                       Toute modification sera publiée sur cette page avec une date de mise à jour révisée. 
-                      Nous vous encourageons à consulter régulièrement cette page pour rester informé de nos pratiques.
+                      Il est recommandé de consulter régulièrement cette page pour rester informé des pratiques.
                     </p>
                   </section>
                 </div>
@@ -287,7 +287,7 @@ const PrivacyPolicyModal = () => {
               {/* Footer avec bouton d'acceptation */}
               <div className="sticky bottom-0 bg-gray-50 px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <p className="text-sm text-gray-600 text-center sm:text-left">
-                  En continuant, vous acceptez notre politique de confidentialité
+                  En continuant, vous acceptez la politique de confidentialité
                 </p>
                 <motion.button
                   onClick={handleAccept}

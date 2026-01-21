@@ -204,6 +204,11 @@ Vite utilisera automatiquement le prochain port disponible, ou modifier dans `vi
 
 ## 🚀 Déploiement
 
+### Vérification avant déploiement
+```bash
+npm run deploy:check
+```
+
 ### Build de production
 ```bash
 npm run build
@@ -216,10 +221,20 @@ Les fichiers optimisés seront générés dans le dossier `dist/`.
 npm run preview
 ```
 
+### Scripts de déploiement disponibles
+- `npm run predeploy` : Linting + nettoyage + build complet
+- `npm run deploy:check` : Vérification avant déploiement
+- `npm run build:preview` : Build + prévisualisation
+
 ### Recommandations de déploiement
-- **Vercel** : Déploiement automatique depuis Git
-- **Netlify** : Déploiement avec drag & drop ou Git
+- **Vercel** : Déploiement automatique depuis Git (fichier `vercel.json` inclus)
+- **Netlify** : Déploiement avec drag & drop ou Git (fichier `public/_redirects` inclus)
 - **GitHub Pages** : Configurer le base path dans `vite.config.js`
+
+**📖 Guides détaillés** :
+- `DEPLOY_QUICK_START.md` : Guide rapide de déploiement
+- `DEPLOYMENT.md` : Guide complet avec toutes les options
+- `PREDEPLOYMENT_CHECKLIST.md` : Checklist de vérification
 
 ## 📄 Licence
 

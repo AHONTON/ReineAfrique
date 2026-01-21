@@ -37,7 +37,7 @@ const Clock = memo(({ isScrolled = false, className = "" }) => {
   return (
     <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${textColor} ${className}`}>
       <ClockIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 ${iconColor}`} />
-      <div className="flex flex-col items-center sm:items-start">
+      <div className="flex flex-row items-center gap-2">
         <span className={`font-semibold whitespace-nowrap ${textColor}`}>{formatTime(time)}</span>
         <span className={`hidden xl:inline text-xs ${dateColor}`}>
           {formatDate(time)}

@@ -12,12 +12,20 @@ export default defineConfig({
           'animation-vendor': ['framer-motion'],
           'icons-vendor': ['lucide-react'],
         },
+        // Optimisation des noms de fichiers pour le cache
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
       },
     },
     chunkSizeWarningLimit: 1000,
     minify: 'esbuild',
     sourcemap: false,
     target: 'esnext',
+    // Optimisations supplémentaires pour la production
+    cssCodeSplit: true,
+    reportCompressedSize: true,
+    emptyOutDir: true,
   },
   optimizeDeps: {
     include: ['react', 'react-dom', 'react-router-dom', 'framer-motion', 'lucide-react'],

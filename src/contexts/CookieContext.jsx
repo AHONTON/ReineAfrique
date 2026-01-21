@@ -32,7 +32,6 @@ export const CookieProvider = ({ children }) => {
     } catch (error) {
       // Si localStorage n'est pas disponible, afficher la bannière
       if (import.meta.env.DEV) {
-         
         console.warn("localStorage non disponible:", error);
       }
       setShowCookieBanner(true);
@@ -46,7 +45,6 @@ export const CookieProvider = ({ children }) => {
       localStorage.setItem("cookieConsentDate", new Date().toISOString());
     } catch (error) {
       if (import.meta.env.DEV) {
-         
         console.warn("Impossible d'enregistrer le consentement:", error);
       }
     }
@@ -63,7 +61,6 @@ export const CookieProvider = ({ children }) => {
       localStorage.setItem("cookieConsentDate", new Date().toISOString());
     } catch (error) {
       if (import.meta.env.DEV) {
-         
         console.warn("Impossible d'enregistrer le refus:", error);
       }
     }
@@ -81,7 +78,6 @@ export const CookieProvider = ({ children }) => {
       // Les services de tracking peuvent être initialisés ici
       if (import.meta.env.DEV) {
         // Log uniquement en développement
-         
         console.log("Cookies acceptés - Services de tracking initialisés");
       }
     }
@@ -118,7 +114,6 @@ export const CookieProvider = ({ children }) => {
 
       if (import.meta.env.DEV) {
         // Log uniquement en développement
-         
         console.log("Cookies refusés - Services de tracking désactivés");
       }
     }

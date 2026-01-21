@@ -1,7 +1,7 @@
 import { useState, useEffect, memo } from "react";
 import { Clock as ClockIcon } from "lucide-react";
 
-const Clock = memo(() => {
+const Clock = memo(({ isScrolled = false, className = "" }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -29,12 +29,17 @@ const Clock = memo(() => {
     });
   };
 
+  // Couleur dynamique : blanc sur fond transparent, foncé sur fond blanc
+  const textColor = isScrolled ? "text-gray-800" : "text-white";
+  const iconColor = isScrolled ? "text-amber-600" : "text-white";
+  const dateColor = isScrolled ? "text-gray-600" : "text-white/90";
+
   return (
-    <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-white">
-      <ClockIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 text-white" />
+    <div className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${textColor} ${className}`}>
+      <ClockIcon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 ${iconColor}`} />
       <div className="flex flex-col items-center sm:items-start">
-        <span className="font-semibold whitespace-nowrap text-white">{formatTime(time)}</span>
-        <span className="hidden xl:inline text-xs text-white/90">
+        <span className={`font-semibold whitespace-nowrap ${textColor}`}>{formatTime(time)}</span>
+        <span className={`hidden xl:inline text-xs ${dateColor}`}>
           {formatDate(time)}
         </span>
       </div>

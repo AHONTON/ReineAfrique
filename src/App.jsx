@@ -2,9 +2,12 @@ import { lazy, Suspense } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
+import { CookieProvider } from "./contexts/CookieContext";
 import LoadingScreen from "./components/Layout/LoadingScreen";
 import PageTransition from "./components/Layout/PageTransition";
 import ContactModal from "./components/ContactModal";
+import CookieConsent from "./components/CookieConsent";
+import PrivacyPolicyModal from "./components/PrivacyPolicyModal";
 
 // Lazy loading des pages pour optimiser le chargement initial
 const Accueil = lazy(() => import("./pages/Accueil"));
@@ -42,7 +45,11 @@ function AppContent() {
 function App() {
   return (
     <LoadingProvider>
-      <AppContent />
+      <CookieProvider>
+        <AppContent />
+        <CookieConsent />
+        <PrivacyPolicyModal />
+      </CookieProvider>
     </LoadingProvider>
   );
 }

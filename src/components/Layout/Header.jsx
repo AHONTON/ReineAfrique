@@ -53,8 +53,8 @@ const Header = memo(({ logoSrc }) => {
         </motion.div>
 
         {/* Horloge - Centrée et responsive */}
-        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
-          <Clock />
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10">
+          <Clock isScrolled={scrolled} />
         </div>
 
         {/* Menu desktop */}
@@ -147,7 +147,7 @@ const Header = memo(({ logoSrc }) => {
             >
               {/* Horloge dans le menu mobile */}
               <motion.div variants={itemVariants} className="pb-2 border-b border-amber-100 w-full flex justify-center">
-                <Clock />
+                <Clock isScrolled={true} />
               </motion.div>
               {navLinks.map((link) => (
                 <motion.div key={link.name} variants={itemVariants}>

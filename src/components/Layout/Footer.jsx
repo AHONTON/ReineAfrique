@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Facebook, ChevronRight, Sparkles } from "lucide-react";
 import WhatsAppIcon from "../WhatsAppIcon";
+import { useCookie } from "../../contexts/CookieContext";
 
 // Logo TikTok custom
 const TikTokIcon = () => (
@@ -13,6 +14,7 @@ const TikTokIcon = () => (
 const Footer = () => {
   const [hoveredLink, setHoveredLink] = useState(null);
   const currentYear = new Date().getFullYear();
+  const { openPrivacyModal } = useCookie();
 
   const footerLinks = {
     shop: [
@@ -211,18 +213,18 @@ const Footer = () => {
           <p className="text-sm text-gray-400">L'élégance africaine</p>
 
           <div className="flex gap-4 text-xs">
-            <a
-              href="/confidentialite"
-              className="text-gray-400 transition-colors hover:text-orange-400"
+            <button
+              onClick={openPrivacyModal}
+              className="text-gray-400 transition-colors hover:text-orange-400 cursor-pointer"
             >
               Politique de confidentialité
-            </a>
+            </button>
             <span className="text-gray-600">|</span>
             <a
               href="/cgv"
               className="text-gray-400 transition-colors hover:text-orange-400"
             >
-              Afrique
+              CGV
             </a>
           </div>
         </motion.div>

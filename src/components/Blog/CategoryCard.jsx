@@ -113,7 +113,7 @@ export default function CategoriesSection() {
   return (
     <section
       id="nos_collections"
-      className="py-14 sm:py-18 md:py-22 px-4 sm:px-6 lg:px-8"
+      className="py-14 sm:py-18 md:py-22 px-4 sm:px-6 lg:px-8 bg-white"
     >
       <div className="max-w-7xl mx-auto">
         {/* HEADER */}
@@ -130,11 +130,11 @@ export default function CategoriesSection() {
             transition={{ duration: 0.8 }}
           />
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-gray-800 tracking-tight">
             Nos Tissus
           </h2>
 
-          <p className="text-white text-base sm:text-lg max-w-xl mx-auto mt-3 leading-relaxed">
+          <p className="text-gray-700 text-base sm:text-lg max-w-xl mx-auto mt-3 leading-relaxed">
             Découvrez notre collection raffinée de tissus africains.
           </p>
         </motion.header>

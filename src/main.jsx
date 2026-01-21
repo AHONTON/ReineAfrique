@@ -6,7 +6,11 @@ import App from "./App";
 
 // Marquer pour afficher le loader au chargement
 // Cela fonctionne pour tous les types d'accès : rechargement, navigation directe, recherche
-sessionStorage.setItem('shouldShowLoader', 'true');
+try {
+  sessionStorage.setItem('shouldShowLoader', 'true');
+} catch {
+  // Ignorer si sessionStorage n'est pas disponible (mode privé, etc.)
+}
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>

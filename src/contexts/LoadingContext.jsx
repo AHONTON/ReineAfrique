@@ -20,16 +20,29 @@ export const LoadingProvider = ({ children }) => {
   // Détecter tous les types d'accès au site
   useEffect(() => {
     // Détecter si c'est un nouvel accès (rechargement, navigation directe, recherche)
+    // Utiliser l'API Navigation Timing moderne au lieu de performance.navigation (dépréciée)
+    const navigationEntries = performance.getEntriesByType('navigation');
+    const navigationType = navigationEntries.length > 0 ? navigationEntries[0]?.type : null;
     const isNewAccess = 
       !hasLoadedRef.current ||
-      performance.navigation?.type === 1 || // Reload
-      performance.navigation?.type === 0 || // Navigation normale
+      navigationType === 'reload' || // Rechargement
+      navigationType === 'navigate' || // Navigation normale
       document.referrer === "" || // Accès direct
-      !sessionStorage.getItem('hasVisited');
+      (() => {
+        try {
+          return !sessionStorage.getItem('hasVisited');
+        } catch {
+          return true; // Si sessionStorage n'est pas disponible, considérer comme nouvel accès
+        }
+      })();
 
     if (isNewAccess) {
       setIsLoading(true);
-      sessionStorage.setItem('hasVisited', 'true');
+      try {
+        sessionStorage.setItem('hasVisited', 'true');
+      } catch {
+        // Ignorer si sessionStorage n'est pas disponible
+      }
     }
 
     hasLoadedRef.current = true;
@@ -99,22 +112,30 @@ export const LoadingProvider = ({ children }) => {
 
     const handleBeforeUnload = () => {
       // Marquer pour afficher le loader au prochain chargement
-      sessionStorage.setItem('shouldShowLoader', 'true');
+      try {
+        sessionStorage.setItem('shouldShowLoader', 'true');
+      } catch {
+        // Ignorer si sessionStorage n'est pas disponible
+      }
     };
 
     const handleVisibilityChange = () => {
       // Si l'utilisateur revient après un long moment, réinitialiser
-      if (document.hidden) {
-        const lastActiveTime = Date.now();
-        sessionStorage.setItem('lastActiveTime', lastActiveTime.toString());
-      } else {
-        const lastActiveTime = parseInt(sessionStorage.getItem('lastActiveTime') || '0', 10);
-        const timeSinceLastActive = Date.now() - lastActiveTime;
-        
-        // Si plus de 30 minutes, réinitialiser le loader
-        if (timeSinceLastActive > 30 * 60 * 1000) {
-          sessionStorage.setItem('shouldShowLoader', 'true');
+      try {
+        if (document.hidden) {
+          const lastActiveTime = Date.now();
+          sessionStorage.setItem('lastActiveTime', lastActiveTime.toString());
+        } else {
+          const lastActiveTime = parseInt(sessionStorage.getItem('lastActiveTime') || '0', 10);
+          const timeSinceLastActive = Date.now() - lastActiveTime;
+          
+          // Si plus de 30 minutes, réinitialiser le loader
+          if (timeSinceLastActive > 30 * 60 * 1000) {
+            sessionStorage.setItem('shouldShowLoader', 'true');
+          }
         }
+      } catch {
+        // Ignorer si sessionStorage n'est pas disponible
       }
     };
 
@@ -122,9 +143,13 @@ export const LoadingProvider = ({ children }) => {
     document.addEventListener("visibilitychange", handleVisibilityChange);
 
     // Vérifier si on doit afficher le loader
-    if (sessionStorage.getItem('shouldShowLoader') === 'true') {
-      setIsLoading(true);
-      sessionStorage.removeItem('shouldShowLoader');
+    try {
+      if (sessionStorage.getItem('shouldShowLoader') === 'true') {
+        setIsLoading(true);
+        sessionStorage.removeItem('shouldShowLoader');
+      }
+    } catch {
+      // Ignorer si sessionStorage n'est pas disponible
     }
 
     return () => {

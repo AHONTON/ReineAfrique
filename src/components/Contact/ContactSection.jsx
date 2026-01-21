@@ -26,7 +26,7 @@ export default function ContactForm() {
 
   // VALIDATION - Mémoïsées
   const validateEmail = useCallback((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
-  const validatePhone = useCallback((phone) => /^[\d\s\-\+\(\)]{8,}$/.test(phone), []);
+  const validatePhone = useCallback((phone) => /^[\d\s\-+()]{8,}$/.test(phone), []);
 
   const validateForm = useCallback(() => {
     const err = {};
@@ -75,6 +75,7 @@ export default function ContactForm() {
     } catch (err) {
       // Gestion silencieuse des erreurs en production
       if (import.meta.env.DEV) {
+        // eslint-disable-next-line no-console
         console.error("Erreur lors de l'envoi du formulaire:", err);
       }
       setStatus("error");

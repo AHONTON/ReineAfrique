@@ -75,7 +75,6 @@ export default function ContactForm() {
     } catch (err) {
       // Gestion silencieuse des erreurs en production
       if (import.meta.env.DEV) {
-        // eslint-disable-next-line no-console
         console.error("Erreur lors de l'envoi du formulaire:", err);
       }
       setStatus("error");

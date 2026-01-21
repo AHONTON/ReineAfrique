@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone } from "lucide-react";
 
 const Faq = () => {
   const [openIndex, setOpenIndex] = useState(null);
@@ -145,15 +144,6 @@ const Faq = () => {
           </div>
         </motion.div>
 
-        {/* Floating WhatsApp Button */}
-        <a
-          href="https://wa.me/+2290150035719"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed z-50 flex items-center justify-center text-white transition-transform bg-green-500 rounded-full shadow-lg bottom-6 right-6 w-14 h-14 hover:scale-110"
-        >
-          <Phone className="w-6 h-6" />
-        </a>
       </div>
     </div>
   );

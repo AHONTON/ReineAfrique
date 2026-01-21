@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, memo } from "react";
 import { motion } from "framer-motion";
 import { ShoppingCart } from "lucide-react";
 
@@ -13,24 +13,25 @@ const categories = [
   { id: 8, name: "Tissus Mixtes", image: "/images/c8.jpg" },
 ];
 
-const CategoryCard = ({ category, index }) => {
+const CategoryCard = memo(({ category, index }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const handleResize = () => checkMobile();
+    window.addEventListener('resize', handleResize, { passive: true });
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const handleWhatsAppClick = (e) => {
+  const handleWhatsAppClick = useCallback((e) => {
     e.stopPropagation();
     const msg = encodeURIComponent(
       `Bonjour, je souhaite commander: ${category.name}`
     );
     window.open(`https://wa.me/+2290150035719?text=${msg}`, "_blank");
-  };
+  }, [category.name]);
 
   return (
     <motion.article
@@ -47,7 +48,7 @@ const CategoryCard = ({ category, index }) => {
       }}
     >
       <motion.div
-        className="relative h-64 sm:h-72 md:h-80 rounded-xl overflow-hidden shadow-md"
+        className="relative h-56 xs:h-64 sm:h-72 md:h-80 rounded-xl overflow-hidden shadow-md"
         whileHover={!isMobile ? { y: -6 } : {}}
         transition={{ duration: 0.3 }}
       >
@@ -104,7 +105,9 @@ const CategoryCard = ({ category, index }) => {
       </motion.div>
     </motion.article>
   );
-};
+});
+
+CategoryCard.displayName = 'CategoryCard';
 
 export default function CategoriesSection() {
   return (
@@ -127,11 +130,11 @@ export default function CategoriesSection() {
             transition={{ duration: 0.8 }}
           />
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-gray-900 tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif text-white tracking-tight">
             Nos Tissus
           </h2>
 
-          <p className="text-gray-600 text-base sm:text-lg max-w-xl mx-auto mt-3 leading-relaxed">
+          <p className="text-white text-base sm:text-lg max-w-xl mx-auto mt-3 leading-relaxed">
             Découvrez notre collection raffinée de tissus africains.
           </p>
         </motion.header>

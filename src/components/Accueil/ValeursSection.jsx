@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import { Heart, Sparkles, Globe2 } from "lucide-react";
 

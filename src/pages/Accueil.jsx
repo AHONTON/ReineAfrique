@@ -1,4 +1,3 @@
-import React from "react";
 import { motion } from "framer-motion";
 import Header from "../components/Layout/Header";
 import HeroBanner from "../components/Accueil/HeroBanner";
@@ -21,7 +20,7 @@ const Accueil = () => {
       <Header logoSrc="/images/logo2.png" />
       <main className="pt-16">
         {/* HeroBanner en full width */}
-        <HeroBanner whatsappNumber="2290150035719" />
+        <HeroBanner whatsappNumber="2290150035719" logoSrc="/images/logo2.png" />
 
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>

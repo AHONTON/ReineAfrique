@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { Facebook, Phone, ChevronRight, Sparkles } from "lucide-react";
+import { Facebook, ChevronRight, Sparkles } from "lucide-react";
+import WhatsAppIcon from "../WhatsAppIcon";
 
 // Logo TikTok custom
 const TikTokIcon = () => (
@@ -49,10 +50,11 @@ const Footer = () => {
       isCustom: true,
     },
     {
-      icon: Phone,
+      icon: WhatsAppIcon,
       href: "https://wa.me/+2290150035719",
       label: "WhatsApp",
       color: "hover:bg-green-600",
+      isCustom: true,
     },
   ];
 

@@ -1,15 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
+import Clock from "../Clock";
 
-const Header = ({ logoSrc }) => {
+const Header = memo(({ logoSrc }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -37,9 +38,9 @@ const Header = ({ logoSrc }) => {
         scrolled ? "bg-white/95 shadow-md backdrop-blur-md" : "bg-transparent"
       }`}
     >
-      <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between px-4 py-4 mx-auto max-w-7xl sm:px-6 lg:px-8 relative">
         {/* Logo */}
-        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+        <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }} className="flex-1">
           <Link to="/" className="flex items-center">
             <motion.img
               src={logoSrc}
@@ -51,8 +52,13 @@ const Header = ({ logoSrc }) => {
           </Link>
         </motion.div>
 
+        {/* Horloge - Centrée et responsive */}
+        <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center">
+          <Clock />
+        </div>
+
         {/* Menu desktop */}
-        <div className="items-center hidden space-x-6 md:flex">
+        <div className="items-center hidden space-x-6 md:flex flex-1 justify-end">
           {navLinks.map((link) => (
             <motion.div key={link.name} whileHover={{ y: -2 }} whileTap={{ y: 0 }}>
               <Link
@@ -73,8 +79,15 @@ const Header = ({ logoSrc }) => {
             rel="noopener noreferrer"
             whileHover={{ scale: 1.05, y: -2 }}
             whileTap={{ scale: 0.95 }}
-            className="relative px-6 py-2.5 ml-4 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl overflow-hidden group"
+            className="relative px-6 py-2.5 ml-4 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl overflow-hidden group flex items-center gap-2"
           >
+            <motion.img
+              src={logoSrc}
+              alt="Reine d'Afrique"
+              className="w-5 h-5 relative z-10 object-contain"
+              whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+              transition={{ duration: 0.5 }}
+            />
             <span className="relative z-10">Nous rejoindre</span>
             <motion.div
               className="absolute inset-0 bg-gradient-to-r from-amber-600 to-amber-500 opacity-0 group-hover:opacity-100"
@@ -132,6 +145,10 @@ const Header = ({ logoSrc }) => {
               animate="visible"
               exit="hidden"
             >
+              {/* Horloge dans le menu mobile */}
+              <motion.div variants={itemVariants} className="pb-2 border-b border-amber-100 w-full flex justify-center">
+                <Clock />
+              </motion.div>
               {navLinks.map((link) => (
                 <motion.div key={link.name} variants={itemVariants}>
                   <Link
@@ -150,9 +167,16 @@ const Header = ({ logoSrc }) => {
                 onClick={() => setMenuOpen(false)}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
-                className="px-6 py-3 mt-2 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl"
+                className="px-6 py-3 mt-2 font-semibold text-white transition-all duration-300 rounded-full shadow-lg bg-gradient-to-r from-amber-500 to-amber-400 hover:shadow-xl flex items-center justify-center gap-2"
                 variants={itemVariants}
               >
+                <motion.img
+                  src={logoSrc}
+                  alt="Reine d'Afrique"
+                  className="w-5 h-5 object-contain"
+                  whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+                  transition={{ duration: 0.5 }}
+                />
                 Nous rejoindre
               </motion.a>
             </motion.ul>
@@ -161,6 +185,8 @@ const Header = ({ logoSrc }) => {
       </AnimatePresence>
     </header>
   );
-};
+});
+
+Header.displayName = 'Header';
 
 export default Header;

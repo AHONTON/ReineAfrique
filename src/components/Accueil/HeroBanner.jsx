@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, MessageCircle } from "lucide-react";
+import { useState, useEffect, useCallback, memo } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // Import des images locales
@@ -8,7 +8,7 @@ import tissu2 from "/images/tissu2.jpg";
 import tissu3 from "/images/tissu3.jpg";
 import tissu4 from "/images/tissu4.jpg";
 
-const HeroBanner = ({ whatsappNumber = "+2290150035719" }) => {
+const HeroBanner = memo(({ whatsappNumber = "+2290150035719", logoSrc = "/images/logo2.png" }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
 
   const slides = [
@@ -41,19 +41,19 @@ const HeroBanner = ({ whatsappNumber = "+2290150035719" }) => {
     return () => clearInterval(timer);
   }, [slides.length]);
 
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () =>
-    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+  const nextSlide = useCallback(() => setCurrentSlide((prev) => (prev + 1) % slides.length), [slides.length]);
+  const prevSlide = useCallback(() =>
+    setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length), [slides.length]);
 
-  const handleWhatsApp = () => {
+  const handleWhatsApp = useCallback(() => {
     const message = encodeURIComponent(
       "Bonjour, je souhaite en savoir plus sur vos tissus africains."
     );
     window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
-  };
+  }, [whatsappNumber]);
 
   return (
-    <div className="relative w-full h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+    <div className="relative w-full h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
       <AnimatePresence mode="wait">
         {slides.map((slide, index) => (
           index === currentSlide && (
@@ -124,7 +124,13 @@ const HeroBanner = ({ whatsappNumber = "+2290150035719" }) => {
                 whileTap={{ scale: 0.95 }}
                 className="flex items-center justify-center gap-2 px-8 py-3.5 font-semibold transition-all duration-300 bg-white rounded-full shadow-xl text-amber-600 hover:shadow-2xl hover:bg-amber-50"
               >
-                <MessageCircle size={20} />
+                <motion.img
+                  src={logoSrc}
+                  alt="Reine d'Afrique"
+                  className="w-5 h-5 object-contain"
+                  whileHover={{ rotate: [0, -5, 5, -5, 0] }}
+                  transition={{ duration: 0.5 }}
+                />
                 Discuter en ligne
               </motion.button>
             </motion.div>
@@ -145,13 +151,13 @@ const HeroBanner = ({ whatsappNumber = "+2290150035719" }) => {
         onClick={nextSlide}
         whileHover={{ scale: 1.1, x: 5 }}
         whileTap={{ scale: 0.9 }}
-        className="absolute z-20 p-3 transition-all -translate-y-1/2 rounded-full right-4 top-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md shadow-lg border border-white/30"
+        className="absolute z-20 p-2 sm:p-3 transition-all -translate-y-1/2 rounded-full right-2 sm:right-4 top-1/2 bg-white/20 hover:bg-white/40 backdrop-blur-md shadow-lg border border-white/30"
       >
         <ChevronRight className="text-white" size={28} />
       </motion.button>
 
       {/* Indicateurs */}
-      <div className="absolute z-20 flex gap-2 -translate-x-1/2 bottom-6 left-1/2">
+      <div className="absolute z-20 flex gap-1.5 sm:gap-2 -translate-x-1/2 bottom-4 sm:bottom-6 left-1/2">
         {slides.map((_, index) => (
           <motion.button
             key={index}
@@ -170,6 +176,8 @@ const HeroBanner = ({ whatsappNumber = "+2290150035719" }) => {
       </div>
     </div>
   );
-};
+});
+
+HeroBanner.displayName = 'HeroBanner';
 
 export default HeroBanner;

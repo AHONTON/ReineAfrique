@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import axios from "axios";
+import { useState, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Mail,
@@ -25,11 +24,11 @@ export default function ContactForm() {
   const [status, setStatus] = useState("idle");
   const [focusedField, setFocusedField] = useState(null);
 
-  // VALIDATION
-  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const validatePhone = (phone) => /^[\d\s\-\+\(\)]{8,}$/.test(phone);
+  // VALIDATION - Mémoïsées
+  const validateEmail = useCallback((email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email), []);
+  const validatePhone = useCallback((phone) => /^[\d\s\-\+\(\)]{8,}$/.test(phone), []);
 
-  const validateForm = () => {
+  const validateForm = useCallback(() => {
     const err = {};
     if (!formData.name.trim()) err.name = "Le nom est requis";
     if (!validateEmail(formData.email)) err.email = "Email invalide";
@@ -39,17 +38,17 @@ export default function ContactForm() {
     if (!formData.message.trim() || formData.message.length < 10)
       err.message = "Message trop court";
     return err;
-  };
+  }, [formData, validateEmail, validatePhone]);
 
-  // HANDLE CHANGE
-  const handleChange = (e) => {
+  // HANDLE CHANGE - Optimisé
+  const handleChange = useCallback((e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
-  };
+  }, [errors]);
 
-  // SUBMIT
-  const handleSubmit = async () => {
+  // SUBMIT - Optimisé
+  const handleSubmit = useCallback(async () => {
     const formErrors = validateForm();
     if (Object.keys(formErrors).length > 0) {
       setErrors(formErrors);
@@ -74,14 +73,17 @@ export default function ContactForm() {
         message: "",
       });
     } catch (err) {
-      console.error("Erreur lors de l'envoi du formulaire:", err);
+      // Gestion silencieuse des erreurs en production
+      if (import.meta.env.DEV) {
+        console.error("Erreur lors de l'envoi du formulaire:", err);
+      }
       setStatus("error");
     }
 
     setTimeout(() => setStatus("idle"), 4000);
-  };
+  }, [validateForm]);
 
-  const contactInfo = [
+  const contactInfo = useMemo(() => [
     {
       icon: Mail,
       title: "Email",
@@ -100,10 +102,10 @@ export default function ContactForm() {
       content: "Cotonou, Bénin",
       link: "https://maps.google.com",
     },
-  ];
+  ], []);
 
   return (
-    <div className="min-h-screen px-4 py-16 bg-gradient-to-br from-orange-50 to-orange-100">
+    <div className="min-h-screen px-4 py-12 sm:py-16 bg-gradient-to-br from-orange-50 to-orange-100">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -217,7 +219,7 @@ export default function ContactForm() {
                   <option value="info">Demande d'information</option>
                   <option value="support">Support</option>
                   <option value="partnership">Partenariat</option>
-                </select>
+                </motion.select>
                 <AnimatePresence>
                   {errors.subject && (
                     <motion.p

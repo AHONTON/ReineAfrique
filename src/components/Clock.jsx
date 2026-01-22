@@ -50,24 +50,31 @@ const Clock = memo(({ isScrolled = false, className = "", showDate = true }) => 
   const dateColor = isScrolled ? "text-gray-600" : "text-white/90";
   
   // Ombre de texte pour améliorer la lisibilité sur fond transparent
-  const textShadow = isScrolled ? "" : "drop-shadow-[0_1px_2px_rgba(0,0,0,0.3)]";
+  const textShadow = isScrolled ? "" : "drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]";
+  
+  // Style pour améliorer la visibilité de l'heure
+  const timeStyle = isScrolled 
+    ? "font-bold text-gray-900" 
+    : "font-bold text-white";
 
   return (
     <div className={`flex items-center justify-between w-full gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 ${className}`}>
-      {/* Horloge à gauche */}
-      <div className={`flex items-center gap-1 xs:gap-1.5 sm:gap-2 text-[10px] xs:text-xs sm:text-sm flex-shrink-0 ${textColor}`}>
-        <ClockIcon className={`w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 ${iconColor} ${textShadow}`} />
-        <span className={`font-semibold whitespace-nowrap ${textColor} ${textShadow}`}>{formatTime(time)}</span>
+      {/* Horloge - TOUJOURS visible sur tous les écrans */}
+      <div className={`flex items-center gap-1 xs:gap-1.5 sm:gap-2 flex-shrink-0`}>
+        <ClockIcon className={`w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 ${iconColor} ${textShadow}`} />
+        <span className={`text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg whitespace-nowrap ${timeStyle} ${textShadow}`}>
+          {formatTime(time)}
+        </span>
       </div>
       
-      {/* Date à droite - responsive avec gestion des espacements - cachée sur desktop */}
+      {/* Date à droite - visible sur mobile/tablette, cachée sur desktop (md+) */}
       {showDate && (
         <>
-          {/* Version mobile très courte - visible seulement si assez d'espace */}
+          {/* Version mobile très courte - visible seulement sur mobile (xs à sm) */}
           <span className={`text-[9px] xs:text-[10px] font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden xs:inline md:hidden`}>
             {formatDateMobile(time)}
           </span>
-          {/* Version courte pour tablette - cachée sur desktop (md+) */}
+          {/* Version courte pour tablette - visible sur sm, cachée sur md+ */}
           <span className={`text-[10px] sm:text-xs font-medium whitespace-nowrap ${dateColor} ${textShadow} hidden sm:inline md:hidden`}>
             {formatDateShort(time)}
           </span>

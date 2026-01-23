@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Plus, Edit, Trash2, Package } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import { showError, showSuccess, showConfirm } from '../../utils/swal';
 
-const Stock = () => {
+const Stock = memo(() => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -23,11 +23,7 @@ const Stock = () => {
     description: '',
   });
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       const [categoriesRes, productsRes] = await Promise.all([
@@ -37,11 +33,18 @@ const Stock = () => {
       setCategories(categoriesRes.data);
       setProducts(productsRes.data);
     } catch (error) {
-      showError('Erreur lors du chargement des données');
+      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
+      if (error.response?.status && error.response.status !== 404) {
+        showError('Erreur lors du chargement des données');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   // Gestion des catégories
   const handleCreateCategory = () => {
@@ -152,13 +155,21 @@ const Stock = () => {
     }
   };
 
-  const categoryColumns = [
+  const formatCurrency = useCallback((amount) => {
+    return new Intl.NumberFormat('fr-FR', {
+      style: 'currency',
+      currency: 'XOF',
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }, []);
+
+  const categoryColumns = useMemo(() => [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nom' },
     { key: 'description', label: 'Description' },
-  ];
+  ], []);
 
-  const productColumns = [
+  const productColumns = useMemo(() => [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nom' },
     {
@@ -181,13 +192,9 @@ const Stock = () => {
     {
       key: 'pricePerMeter',
       label: 'Prix/mètre',
-      render: (value) =>
-        new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'XOF',
-        }).format(value),
+      render: (value) => formatCurrency(value),
     },
-  ];
+  ], [categories, formatCurrency]);
 
   const categoryActions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -241,28 +248,28 @@ const Stock = () => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion du Stock</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion du Stock</h1>
       </div>
 
       {/* Tabs */}
-      <div className="bg-white rounded-lg shadow-md p-1 flex space-x-1">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 flex space-x-1 border border-gray-200 dark:border-gray-700">
         <button
           onClick={() => setActiveTab('products')}
-          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+          className={`flex-1 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
             activeTab === 'products'
               ? 'bg-orange-500 text-white'
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
           Produits
         </button>
         <button
           onClick={() => setActiveTab('categories')}
-          className={`flex-1 px-4 py-2 rounded-lg font-medium transition-colors ${
+          className={`flex-1 px-3 sm:px-4 py-2 rounded-lg text-sm sm:text-base font-medium transition-colors ${
             activeTab === 'categories'
               ? 'bg-orange-500 text-white'
-              : 'text-gray-600 hover:bg-gray-100'
+              : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
         >
           Catégories
@@ -398,11 +405,11 @@ const Stock = () => {
                 setProductForm({ ...productForm, categoryId: e.target.value })
               }
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
             >
-              <option value="">Sélectionner une catégorie</option>
+              <option value="" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Sélectionner une catégorie</option>
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id}>
+                <option key={cat.id} value={cat.id} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
                   {cat.name}
                 </option>
               ))}
@@ -477,6 +484,8 @@ const Stock = () => {
       </Modal>
     </div>
   );
-};
+});
+
+Stock.displayName = 'Stock';
 
 export default Stock;

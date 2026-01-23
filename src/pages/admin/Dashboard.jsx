@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import {
   TrendingUp,
   ShoppingCart,
@@ -11,8 +10,6 @@ import api from '../../api/axios';
 import StatCard from '../../components/admin/StatCard';
 import Loader from '../../components/admin/Loader';
 import {
-  LineChart,
-  Line,
   BarChart,
   Bar,
   PieChart,
@@ -27,40 +24,42 @@ import {
 } from 'recharts';
 import { showError } from '../../utils/swal';
 
-const Dashboard = () => {
-  const [loading, setLoading] = useState(false); // Commencer avec false pour afficher immédiatement
-  const [period, setPeriod] = useState('month'); // day, week, month, custom
+// Constantes en dehors du composant pour éviter les recréations
+const COLORS = ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12'];
+
+const DEFAULT_STATS = {
+  revenue: 1250000,
+  orders: 45,
+  clients: 12,
+  lowStock: 8,
+};
+
+const DEFAULT_SALES_DATA = [
+  { month: 'Jan', sales: 250000 },
+  { month: 'Fév', sales: 320000 },
+  { month: 'Mar', sales: 280000 },
+  { month: 'Avr', sales: 420000 },
+  { month: 'Mai', sales: 380000 },
+  { month: 'Jun', sales: 450000 },
+];
+
+const DEFAULT_SALES_DISTRIBUTION = [
+  { name: 'Wax', value: 500000 },
+  { name: 'Bogolan', value: 250000 },
+  { name: 'Autres', value: 187500 },
+  { name: 'Soie', value: 312500 },
+];
+
+const Dashboard = memo(() => {
+  const [loading, setLoading] = useState(false);
+  const [period, setPeriod] = useState('month');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
-  const [stats, setStats] = useState({
-    revenue: 1250000,
-    orders: 45,
-    clients: 12,
-    lowStock: 8,
-  });
-  const [salesData, setSalesData] = useState([
-    { month: 'Jan', sales: 250000 },
-    { month: 'Fév', sales: 320000 },
-    { month: 'Mar', sales: 280000 },
-    { month: 'Avr', sales: 420000 },
-    { month: 'Mai', sales: 380000 },
-    { month: 'Jun', sales: 450000 },
-  ]);
-  const [salesDistribution, setSalesDistribution] = useState([
-    { name: 'Wax', value: 500000 },
-    { name: 'Bogolan', value: 250000 },
-    { name: 'Autres', value: 187500 },
-    { name: 'Soie', value: 312500 },
-  ]);
+  const [stats, setStats] = useState(DEFAULT_STATS);
+  const [salesData, setSalesData] = useState(DEFAULT_SALES_DATA);
+  const [salesDistribution, setSalesDistribution] = useState(DEFAULT_SALES_DISTRIBUTION);
 
-  const COLORS = ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12'];
-
-  useEffect(() => {
-    // Charger les données depuis l'API en arrière-plan
-    fetchDashboardData();
-  }, [period, startDate, endDate]);
-
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       setLoading(true);
       const params = { period };
@@ -80,43 +79,29 @@ const Dashboard = () => {
       setSalesDistribution(distributionRes.data);
     } catch (error) {
       // Si l'API n'est pas disponible, utiliser des données par défaut pour l'affichage
-      console.warn('API non disponible, utilisation de données par défaut:', error);
-      setStats({
-        revenue: 1250000,
-        orders: 45,
-        clients: 12,
-        lowStock: 8,
-      });
-      setSalesData([
-        { month: 'Jan', sales: 250000 },
-        { month: 'Fév', sales: 320000 },
-        { month: 'Mar', sales: 280000 },
-        { month: 'Avr', sales: 420000 },
-        { month: 'Mai', sales: 380000 },
-        { month: 'Jun', sales: 450000 },
-      ]);
-      setSalesDistribution([
-        { name: 'Wax', value: 500000 },
-        { name: 'Bogolan', value: 250000 },
-        { name: 'Autres', value: 187500 },
-        { name: 'Soie', value: 312500 },
-      ]);
-      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible
-      if (error.response?.status !== 404) {
+      setStats(DEFAULT_STATS);
+      setSalesData(DEFAULT_SALES_DATA);
+      setSalesDistribution(DEFAULT_SALES_DISTRIBUTION);
+      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
+      if (error.response?.status && error.response.status !== 404) {
         showError('Erreur lors du chargement des données du dashboard');
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [period, startDate, endDate]);
 
-  const formatCurrency = (amount) => {
+  useEffect(() => {
+    fetchDashboardData();
+  }, [fetchDashboardData]);
+
+  const formatCurrency = useCallback((amount) => {
     return new Intl.NumberFormat('fr-FR', {
       style: 'currency',
       currency: 'XOF',
       minimumFractionDigits: 0,
     }).format(amount);
-  };
+  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-5 md:space-y-6">
@@ -134,12 +119,12 @@ const Dashboard = () => {
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="border-none focus:ring-0 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent flex-1 sm:flex-initial cursor-pointer"
+              className="border-none focus:ring-0 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-800 flex-1 sm:flex-initial cursor-pointer appearance-none"
             >
-              <option value="day">Jour</option>
-              <option value="week">Semaine</option>
-              <option value="month">Mois</option>
-              <option value="custom">Période personnalisée</option>
+              <option value="day" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
+              <option value="week" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
+              <option value="month" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
+              <option value="custom" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
             </select>
           </div>
           {period === 'custom' && (
@@ -197,11 +182,7 @@ const Dashboard = () => {
       {/* Graphiques */}
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Ventes Mensuelles */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-shadow"
-        >
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-shadow">
           {/* Pattern subtil en arrière-plan */}
           <div 
             className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
@@ -237,14 +218,10 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* Répartition des Ventes */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-all"
-        >
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-all">
           {/* Pattern subtil en arrière-plan */}
           <div 
             className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -289,10 +266,12 @@ const Dashboard = () => {
               </ResponsiveContainer>
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );
-};
+});
+
+Dashboard.displayName = 'Dashboard';
 
 export default Dashboard;

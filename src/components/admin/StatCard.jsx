@@ -1,120 +1,113 @@
-import { motion } from 'framer-motion';
+import { memo } from 'react';
 
-const StatCard = ({ title, value, icon: Icon, color = 'orange', trend, loading = false }) => {
-  const colorClasses = {
-    orange: 'bg-orange-500',
-    green: 'bg-green-500',
-    blue: 'bg-blue-500',
-    red: 'bg-red-500',
-    purple: 'bg-purple-500',
-  };
+// Constantes en dehors du composant
+const colorClasses = {
+  orange: 'bg-orange-500',
+  green: 'bg-green-500',
+  blue: 'bg-blue-500',
+  red: 'bg-red-500',
+  purple: 'bg-purple-500',
+};
+
+// Patterns africains selon la couleur
+const patternStyles = {
+  orange: {
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(251, 115, 22, 0.08) 8px,
+      rgba(251, 115, 22, 0.08) 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(234, 88, 12, 0.08) 8px,
+      rgba(234, 88, 12, 0.08) 16px
+    )`,
+  },
+  green: {
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(34, 197, 94, 0.08) 8px,
+      rgba(34, 197, 94, 0.08) 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(22, 163, 74, 0.08) 8px,
+      rgba(22, 163, 74, 0.08) 16px
+    )`,
+  },
+  blue: {
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(59, 130, 246, 0.08) 8px,
+      rgba(59, 130, 246, 0.08) 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(37, 99, 235, 0.08) 8px,
+      rgba(37, 99, 235, 0.08) 16px
+    )`,
+  },
+  red: {
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(239, 68, 68, 0.08) 8px,
+      rgba(239, 68, 68, 0.08) 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(220, 38, 38, 0.08) 8px,
+      rgba(220, 38, 38, 0.08) 16px
+    )`,
+  },
+  purple: {
+    backgroundImage: `repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 8px,
+      rgba(168, 85, 247, 0.08) 8px,
+      rgba(168, 85, 247, 0.08) 16px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      transparent,
+      transparent 8px,
+      rgba(147, 51, 234, 0.08) 8px,
+      rgba(147, 51, 234, 0.08) 16px
+    )`,
+  },
+};
+
+const StatCard = memo(({ title, value, icon: Icon, color = 'orange', trend, loading = false }) => {
 
   if (loading) {
     return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg shadow-md p-6 border border-gray-200"
-      >
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700">
         <div className="animate-pulse">
-          <div className="h-4 bg-gray-200 rounded w-1/2 mb-4"></div>
-          <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+          <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mb-4"></div>
+          <div className="h-8 bg-gray-200 dark:bg-gray-700 rounded w-3/4"></div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 
-  // Patterns africains selon la couleur
-  const patternStyles = {
-    orange: {
-      backgroundImage: `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 8px,
-        rgba(251, 115, 22, 0.08) 8px,
-        rgba(251, 115, 22, 0.08) 16px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(234, 88, 12, 0.08) 8px,
-        rgba(234, 88, 12, 0.08) 16px
-      )`,
-    },
-    green: {
-      backgroundImage: `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 8px,
-        rgba(34, 197, 94, 0.08) 8px,
-        rgba(34, 197, 94, 0.08) 16px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(22, 163, 74, 0.08) 8px,
-        rgba(22, 163, 74, 0.08) 16px
-      )`,
-    },
-    blue: {
-      backgroundImage: `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 8px,
-        rgba(59, 130, 246, 0.08) 8px,
-        rgba(59, 130, 246, 0.08) 16px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(37, 99, 235, 0.08) 8px,
-        rgba(37, 99, 235, 0.08) 16px
-      )`,
-    },
-    red: {
-      backgroundImage: `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 8px,
-        rgba(239, 68, 68, 0.08) 8px,
-        rgba(239, 68, 68, 0.08) 16px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(220, 38, 38, 0.08) 8px,
-        rgba(220, 38, 38, 0.08) 16px
-      )`,
-    },
-    purple: {
-      backgroundImage: `repeating-linear-gradient(
-        45deg,
-        transparent,
-        transparent 8px,
-        rgba(168, 85, 247, 0.08) 8px,
-        rgba(168, 85, 247, 0.08) 16px
-      ),
-      repeating-linear-gradient(
-        -45deg,
-        transparent,
-        transparent 8px,
-        rgba(147, 51, 234, 0.08) 8px,
-        rgba(147, 51, 234, 0.08) 16px
-      )`,
-    },
-  };
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      whileHover={{ y: -5 }}
-      className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden"
-    >
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden">
       {/* Pattern de tissu africain en arrière-plan */}
       <div 
         className="absolute inset-0 opacity-30 pointer-events-none"
@@ -137,8 +130,10 @@ const StatCard = ({ title, value, icon: Icon, color = 'orange', trend, loading =
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
-};
+});
+
+StatCard.displayName = 'StatCard';
 
 export default StatCard;

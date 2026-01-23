@@ -1,7 +1,8 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { memo } from 'react';
 
-const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
+const Modal = memo(({ isOpen, onClose, title, children, size = 'md' }) => {
   const sizeClasses = {
     sm: 'max-w-md',
     md: 'max-w-2xl',
@@ -30,15 +31,15 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className={`bg-white rounded-lg shadow-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden flex flex-col`}
+              className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl ${sizeClasses[size]} w-full max-h-[90vh] overflow-hidden flex flex-col`}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Header */}
-              <div className="flex items-center justify-between p-6 border-b border-gray-200">
-                <h2 className="text-xl font-bold text-gray-800">{title}</h2>
+              <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-800 dark:text-white">{title}</h2>
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
                 >
                   <X size={24} />
                 </button>
@@ -52,6 +53,8 @@ const Modal = ({ isOpen, onClose, title, children, size = 'md' }) => {
       )}
     </AnimatePresence>
   );
-};
+});
+
+Modal.displayName = 'Modal';
 
 export default Modal;

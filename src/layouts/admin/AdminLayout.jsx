@@ -27,7 +27,7 @@ const AdminLayout = () => {
       />
       
       <Sidebar />
-      <div className="lg:pl-64 transition-all duration-300 w-full min-h-screen">
+      <div className="lg:pl-64 w-full min-h-screen">
         <Header />
         <main className="p-3 sm:p-4 md:p-6">
           <Outlet />

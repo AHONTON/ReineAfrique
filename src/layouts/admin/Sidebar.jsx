@@ -8,8 +8,9 @@ import {
   Download,
   Menu,
   X,
+  Clock as ClockIcon,
 } from 'lucide-react';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo, useCallback, memo } from 'react';
 import logo from '/images/logo.png';
 
 const menuItems = [
@@ -21,9 +22,10 @@ const menuItems = [
   { path: '/admin/exports', icon: Download, label: 'Exports' },
 ];
 
-const Sidebar = () => {
+const Sidebar = memo(() => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(false);
+  const [currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const checkDesktop = () => {
@@ -37,6 +39,34 @@ const Sidebar = () => {
     window.addEventListener('resize', checkDesktop);
     return () => window.removeEventListener('resize', checkDesktop);
   }, []);
+
+  // Mise à jour de l'heure chaque seconde
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = useCallback((date) => {
+    return date.toLocaleTimeString("fr-FR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+  }, []);
+
+  const formatDate = useCallback((date) => {
+    return date.toLocaleDateString("fr-FR", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }, []);
+
+  const formattedTime = useMemo(() => formatTime(currentTime), [currentTime, formatTime]);
+  const formattedDate = useMemo(() => formatDate(currentTime), [currentTime, formatDate]);
 
   return (
     <>
@@ -93,26 +123,15 @@ const Sidebar = () => {
 
         <div className="flex flex-col h-full relative z-10">
           {/* Header */}
-          <div className="p-4 sm:p-6 border-b border-gray-700 flex items-center justify-between">
+          <div className="px-4 sm:px-6 py-4 sm:py-6 border-b border-gray-700 dark:border-gray-600 flex items-center justify-between h-[73px] sm:h-[81px] md:h-[89px]">
             <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="relative flex-shrink-0">
-                <div className="relative w-10 h-10 sm:w-12 sm:h-12">
+                <div className="relative w-10 h-10 sm:w-12 sm:h-12 bg-white dark:bg-gray-800 rounded-lg p-1 flex items-center justify-center">
                   <img
                     src={logo}
                     alt="Reine d'Afrique"
                     className="w-full h-full object-contain"
                   />
-                  {/* Silhouette du continent africain en overlay orange */}
-                  <div className="absolute inset-0 flex items-center justify-center opacity-80">
-                    <svg
-                      viewBox="0 0 200 200"
-                      className="w-full h-full text-orange-500"
-                      fill="currentColor"
-                    >
-                      {/* Forme simplifiée du continent africain */}
-                      <path d="M100 20 L85 35 L75 45 L70 60 L65 75 L60 90 L55 105 L50 120 L48 135 L50 150 L55 165 L60 175 L65 180 L70 175 L75 170 L80 165 L85 160 L90 155 L95 150 L100 145 L105 150 L110 155 L115 160 L120 165 L125 170 L130 175 L135 180 L140 175 L145 165 L150 150 L152 135 L150 120 L145 105 L140 90 L135 75 L130 60 L125 45 L115 35 Z" />
-                    </svg>
-                  </div>
                 </div>
               </div>
               <div className="min-w-0">
@@ -130,7 +149,7 @@ const Sidebar = () => {
 
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {menuItems.map((item, index) => (
+            {menuItems.map((item) => (
               <NavLink
                 key={item.path}
                 to={item.path}
@@ -151,7 +170,7 @@ const Sidebar = () => {
           </nav>
 
           {/* Footer Pattern */}
-          <div className="p-4 border-t border-gray-700 relative">
+          <div className="p-4 border-t border-gray-700 dark:border-gray-600 relative">
             {/* Pattern décoratif */}
             <div 
               className="absolute bottom-0 left-0 right-0 h-16 opacity-20"
@@ -172,14 +191,27 @@ const Sidebar = () => {
                 )`,
               }}
             />
-            <div className="relative z-10 text-xs text-gray-400 text-center">
-              © 2024 Reine d'Afrique
+            <div className="relative z-10 space-y-2">
+              {/* Date et Heure */}
+              <div className="flex items-center justify-center gap-2 text-xs text-gray-300 dark:text-gray-400">
+                <ClockIcon className="w-3.5 h-3.5 text-orange-400" />
+                <div className="flex flex-col items-center gap-0.5">
+                  <span className="font-medium">{formattedTime}</span>
+                  <span className="text-[10px] text-gray-400 dark:text-gray-500">{formattedDate}</span>
+                </div>
+              </div>
+              {/* Copyright */}
+              <div className="text-xs text-gray-400 dark:text-gray-500 text-center">
+                © {new Date().getFullYear()} Reine d'Afrique
+              </div>
             </div>
           </div>
         </div>
       </aside>
     </>
   );
-};
+});
+
+Sidebar.displayName = 'Sidebar';
 
 export default Sidebar;

@@ -1,13 +1,16 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useLoading } from "../../contexts/LoadingContext";
+import { useLocation } from "react-router-dom";
 
 const PageTransition = ({ children }) => {
   const { isPageLoading } = useLoading();
+  const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
     <>
       <AnimatePresence mode="wait">
-        {isPageLoading && (
+        {isPageLoading && !isAdminRoute && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -24,14 +27,20 @@ const PageTransition = ({ children }) => {
           </motion.div>
         )}
       </AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
-        transition={{ duration: 0.3 }}
-      >
-        {children}
-      </motion.div>
+      {isAdminRoute ? (
+        <div>
+          {children}
+        </div>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+          transition={{ duration: 0.3 }}
+        >
+          {children}
+        </motion.div>
+      )}
     </>
   );
 };

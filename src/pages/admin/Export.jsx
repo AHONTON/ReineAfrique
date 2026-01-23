@@ -64,15 +64,15 @@ const Export = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Exportation des Données</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Exportation des Données</h1>
         <p className="text-gray-600 dark:text-gray-400 mt-2">
           Téléchargez vos données au format CSV ou Excel
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {exportOptions.map((option) => (
           <div
             key={option.type}

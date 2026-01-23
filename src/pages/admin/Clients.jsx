@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import { showError, showSuccess, showConfirm } from '../../utils/swal';
 
-const Clients = () => {
+const Clients = memo(() => {
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -18,21 +18,24 @@ const Clients = () => {
     address: '',
   });
 
-  useEffect(() => {
-    fetchClients();
-  }, []);
-
-  const fetchClients = async () => {
+  const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/admin/clients');
       setClients(response.data);
     } catch (error) {
-      showError('Erreur lors du chargement des clients');
+      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
+      if (error.response?.status && error.response.status !== 404) {
+        showError('Erreur lors du chargement des clients');
+      }
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    fetchClients();
+  }, [fetchClients]);
 
   const handleCreate = () => {
     setSelectedClient(null);
@@ -108,13 +111,9 @@ const Clients = () => {
     {
       key: 'totalSpent',
       label: 'Total dépensé',
-      render: (value) =>
-        new Intl.NumberFormat('fr-FR', {
-          style: 'currency',
-          currency: 'XOF',
-        }).format(value || 0),
+      render: (value) => formatCurrency(value || 0),
     },
-  ];
+  ], [formatCurrency]);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -152,9 +151,9 @@ const Clients = () => {
   );
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Clients</h1>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion des Clients</h1>
         <button
           onClick={handleCreate}
           className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
@@ -319,6 +318,8 @@ const Clients = () => {
       </Modal>
     </div>
   );
-};
+});
+
+Clients.displayName = 'Clients';
 
 export default Clients;

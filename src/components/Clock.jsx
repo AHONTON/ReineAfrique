@@ -49,10 +49,12 @@ const Clock = memo(({ isScrolled = false, className = "", showDate = true }) => 
   const iconColor = isScrolled ? "text-amber-600" : "text-white";
   const dateColor = isScrolled ? "text-gray-600" : "text-white/90";
   
-  // Ombre de texte pour améliorer la lisibilité sur fond transparent
-  const textShadow = isScrolled ? "" : "drop-shadow-[0_1px_3px_rgba(0,0,0,0.5)]";
+  // Ombre de texte renforcée pour améliorer la lisibilité sur fond transparent
+  const textShadow = isScrolled 
+    ? "" 
+    : "drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)] drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]";
   
-  // Style pour améliorer la visibilité de l'heure
+  // Style pour améliorer la visibilité de l'heure avec contraste renforcé
   const timeStyle = isScrolled 
     ? "font-bold text-gray-900" 
     : "font-bold text-white";
@@ -60,7 +62,7 @@ const Clock = memo(({ isScrolled = false, className = "", showDate = true }) => 
   return (
     <div className={`flex items-center justify-between w-full gap-1.5 xs:gap-2 sm:gap-3 md:gap-4 ${className}`}>
       {/* Horloge - TOUJOURS visible sur tous les écrans */}
-      <div className={`flex items-center gap-1 xs:gap-1.5 sm:gap-2 flex-shrink-0`}>
+      <div className={`flex items-center gap-1 xs:gap-1.5 sm:gap-2 flex-shrink-0 ${!isScrolled ? 'bg-black/20 backdrop-blur-sm px-2 py-1 rounded-lg' : ''}`}>
         <ClockIcon className={`w-3.5 h-3.5 xs:w-4 xs:h-4 sm:w-4 sm:h-4 md:w-5 md:h-5 flex-shrink-0 ${iconColor} ${textShadow}`} />
         <span className={`text-[11px] xs:text-xs sm:text-sm md:text-base lg:text-lg whitespace-nowrap ${timeStyle} ${textShadow}`}>
           {formatTime(time)}

@@ -119,17 +119,22 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-5 md:space-y-6">
       {/* Header avec filtres */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-800">Dashboard - Reine d'Afrique</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+        <div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent">
+            Dashboard
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 mt-1">Reine d'Afrique - Tableau de bord</p>
+        </div>
         <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
-          <div className="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-2 w-full sm:w-auto">
-            <Calendar size={16} className="text-gray-500 sm:w-5 sm:h-5" />
+          <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 w-full sm:w-auto">
+            <Calendar size={16} className="text-orange-500 dark:text-orange-400 sm:w-5 sm:h-5 flex-shrink-0" />
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="border-none focus:ring-0 text-xs sm:text-sm font-medium text-gray-700 flex-1 sm:flex-initial"
+              className="border-none focus:ring-0 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent flex-1 sm:flex-initial cursor-pointer"
             >
               <option value="day">Jour</option>
               <option value="week">Semaine</option>
@@ -143,14 +148,14 @@ const Dashboard = () => {
                 type="date"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 flex-1 sm:flex-initial"
+                className="px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex-1 sm:flex-initial"
               />
-              <span className="text-gray-500 text-sm">-</span>
+              <span className="text-gray-500 dark:text-gray-400 text-sm">-</span>
               <input
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
-                className="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 flex-1 sm:flex-initial"
+                className="px-2 sm:px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-xs sm:text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex-1 sm:flex-initial"
               />
             </div>
           )}
@@ -158,7 +163,7 @@ const Dashboard = () => {
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
         <StatCard
           title="Chiffre d'Affaires"
           value={formatCurrency(stats.revenue)}
@@ -190,16 +195,16 @@ const Dashboard = () => {
       </div>
 
       {/* Graphiques */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Ventes Mensuelles */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-hidden relative"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-shadow"
         >
           {/* Pattern subtil en arrière-plan */}
           <div 
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
             style={{
               backgroundImage: `repeating-linear-gradient(
                 45deg,
@@ -210,7 +215,7 @@ const Dashboard = () => {
               )`,
             }}
           />
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 relative z-10">Ventes Mensuelles</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 relative z-10">Ventes Mensuelles</h3>
           {loading ? (
             <div className="h-48 sm:h-64 flex items-center justify-center relative z-10">
               <Loader size="lg" />
@@ -238,7 +243,7 @@ const Dashboard = () => {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-md p-4 sm:p-6 overflow-hidden relative"
+          className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-all"
         >
           {/* Pattern subtil en arrière-plan */}
           <div 
@@ -253,7 +258,7 @@ const Dashboard = () => {
               )`,
             }}
           />
-          <h3 className="text-base sm:text-lg font-bold text-gray-800 mb-3 sm:mb-4 relative z-10">Répartition des Ventes</h3>
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 relative z-10">Répartition des Ventes</h3>
           {loading ? (
             <div className="h-48 sm:h-64 flex items-center justify-center relative z-10">
               <Loader size="lg" />

@@ -242,7 +242,7 @@ const Stock = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Gestion du Stock</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion du Stock</h1>
       </div>
 
       {/* Tabs */}

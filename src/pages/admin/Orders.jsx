@@ -124,7 +124,7 @@ const Orders = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Gestion des Commandes</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Commandes</h1>
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}

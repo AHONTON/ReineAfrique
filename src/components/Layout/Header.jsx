@@ -9,7 +9,11 @@ const Header = memo(({ logoSrc }) => {
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    // Vérifier immédiatement la position au chargement
+    const checkScroll = () => setScrolled(window.scrollY > 50);
+    checkScroll(); // Vérifier immédiatement
+    
+    const handleScroll = () => checkScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
@@ -55,7 +59,7 @@ const Header = memo(({ logoSrc }) => {
         {/* Horloge et Date - Centrées et responsive avec espacement pour éviter le menu */}
         <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center justify-center z-10 pointer-events-none">
           <div className="w-auto max-w-[140px] xs:max-w-[180px] sm:max-w-[240px] md:max-w-[200px] lg:max-w-[220px] xl:max-w-[240px] pointer-events-auto px-1 sm:px-2">
-            <Clock isScrolled={scrolled} showDate={true} />
+            <Clock isScrolled={scrolled} showDate={true} className="opacity-100" />
           </div>
         </div>
 

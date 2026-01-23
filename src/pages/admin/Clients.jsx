@@ -154,7 +154,7 @@ const Clients = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <h1 className="text-2xl font-bold text-gray-800">Gestion des Clients</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des Clients</h1>
         <button
           onClick={handleCreate}
           className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"

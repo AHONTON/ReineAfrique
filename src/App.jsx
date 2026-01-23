@@ -4,7 +4,7 @@ import { AnimatePresence } from "framer-motion";
 import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
 import { CookieProvider } from "./contexts/CookieContext";
 import { AuthProvider } from "./auth/AuthContext";
-import ProtectedRoute from "./auth/ProtectedRoute";
+import { ThemeProvider } from "./contexts/ThemeContext";
 import LoadingScreen from "./components/Layout/LoadingScreen";
 import PageTransition from "./components/Layout/PageTransition";
 import ContactModal from "./components/ContactModal";
@@ -69,15 +69,17 @@ function AppContent() {
 
 function App() {
   return (
-    <LoadingProvider>
-      <CookieProvider>
-        <AuthProvider>
-          <AppContent />
-          <CookieConsent />
-          <PrivacyPolicyModal />
-        </AuthProvider>
-      </CookieProvider>
-    </LoadingProvider>
+    <ThemeProvider>
+      <LoadingProvider>
+        <CookieProvider>
+          <AuthProvider>
+            <AppContent />
+            <CookieConsent />
+            <PrivacyPolicyModal />
+          </AuthProvider>
+        </CookieProvider>
+      </LoadingProvider>
+    </ThemeProvider>
   );
 }
 

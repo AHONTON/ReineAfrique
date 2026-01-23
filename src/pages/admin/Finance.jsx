@@ -110,7 +110,7 @@ const Finance = () => {
     <div className="space-y-6">
       {/* Header avec filtres */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <h1 className="text-2xl font-bold text-gray-800">Finances</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Finances</h1>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center space-x-2 bg-white rounded-lg shadow-sm p-2">
             <Calendar size={18} className="text-gray-500" />
@@ -174,9 +174,9 @@ const Finance = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-lg shadow-md p-6"
+        className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6"
       >
-        <h3 className="text-lg font-bold text-gray-800 mb-4">
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
           Évolution du Chiffre d'Affaires
         </h3>
         {loading ? (
@@ -208,7 +208,7 @@ const Finance = () => {
 
       {/* Table des Transactions */}
       <div>
-        <h3 className="text-lg font-bold text-gray-800 mb-4">Transactions</h3>
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">Transactions</h3>
         <DataTable columns={columns} data={transactions} loading={loading} searchable />
       </div>
     </div>

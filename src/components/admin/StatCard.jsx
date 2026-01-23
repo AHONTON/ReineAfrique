@@ -113,7 +113,7 @@ const StatCard = ({ title, value, icon: Icon, color = 'orange', trend, loading =
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -5 }}
-      className="bg-white rounded-lg shadow-md p-4 sm:p-6 border border-gray-200 hover:shadow-lg transition-shadow relative overflow-hidden"
+      className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden"
     >
       {/* Pattern de tissu africain en arrière-plan */}
       <div 
@@ -123,10 +123,10 @@ const StatCard = ({ title, value, icon: Icon, color = 'orange', trend, loading =
       
       <div className="flex items-center justify-between gap-3 relative z-10">
         <div className="flex-1 min-w-0">
-          <p className="text-gray-600 text-xs sm:text-sm font-medium mb-1 truncate">{title}</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-800 break-words">{value}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1 truncate">{title}</p>
+          <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white break-words">{value}</p>
           {trend && (
-            <p className={`text-xs sm:text-sm mt-2 ${trend.type === 'up' ? 'text-green-600' : 'text-red-600'}`}>
+            <p className={`text-xs sm:text-sm mt-2 ${trend.type === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {trend.value}
             </p>
           )}

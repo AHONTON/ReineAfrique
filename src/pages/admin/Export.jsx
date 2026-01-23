@@ -66,8 +66,8 @@ const Export = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Exportation des Données</h1>
-        <p className="text-gray-500 mt-2">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Exportation des Données</h1>
+        <p className="text-gray-600 dark:text-gray-400 mt-2">
           Téléchargez vos données au format CSV ou Excel
         </p>
       </div>
@@ -76,15 +76,15 @@ const Export = () => {
         {exportOptions.map((option) => (
           <div
             key={option.type}
-            className="bg-white rounded-lg shadow-md p-6 border border-gray-200 hover:shadow-lg transition-shadow"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-shadow"
           >
             <div className="flex items-start space-x-4">
               <div className="p-3 bg-orange-100 rounded-lg">
                 <option.icon className="text-orange-500" size={24} />
               </div>
               <div className="flex-1">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{option.title}</h3>
-                <p className="text-sm text-gray-500 mb-4">{option.description}</p>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1">{option.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{option.description}</p>
                 <div className="flex space-x-2">
                   <button
                     onClick={() => handleExport(option.type, 'csv')}

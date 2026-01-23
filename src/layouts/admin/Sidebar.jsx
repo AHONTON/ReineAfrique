@@ -1,5 +1,4 @@
 import { NavLink } from 'react-router-dom';
-import { motion } from 'framer-motion';
 import {
   LayoutDashboard,
   ShoppingCart,
@@ -10,7 +9,7 @@ import {
   Menu,
   X,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '/images/logo.png';
 
 const menuItems = [
@@ -24,19 +23,34 @@ const menuItems = [
 
 const Sidebar = () => {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const checkDesktop = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      if (desktop) {
+        setIsMobileOpen(false);
+      }
+    };
+    checkDesktop();
+    window.addEventListener('resize', checkDesktop);
+    return () => window.removeEventListener('resize', checkDesktop);
+  }, []);
 
   return (
     <>
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-orange-500 text-white rounded-lg shadow-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
+        aria-label="Ouvrir le menu"
       >
         <Menu size={24} />
       </button>
 
       {/* Mobile Overlay */}
-      {isMobileOpen && (
+      {isMobileOpen && !isDesktop && (
         <div
           className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsMobileOpen(false)}
@@ -44,12 +58,13 @@ const Sidebar = () => {
       )}
 
       {/* Sidebar */}
-      <motion.aside
-        initial={false}
-        animate={{
-          x: isMobileOpen ? 0 : '-100%',
+      <aside
+        className={`fixed top-0 left-0 bottom-0 z-40 w-64 bg-gradient-to-b from-gray-900 via-gray-800 to-gray-900 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 text-white shadow-2xl lg:shadow-xl overflow-hidden transition-colors duration-300 ${
+          isDesktop ? '' : (isMobileOpen ? '' : '-translate-x-full')
+        }`}
+        style={{
+          transition: isDesktop ? 'none' : 'transform 0.3s ease-in-out'
         }}
-        className={`fixed lg:static inset-y-0 left-0 z-50 w-64 bg-gradient-to-b from-gray-900 to-gray-800 text-white transform transition-transform duration-300 lg:transform-none relative overflow-hidden`}
       >
         {/* Pattern de tissu africain en arrière-plan */}
         <div className="absolute inset-0 opacity-10 pointer-events-none">
@@ -162,7 +177,7 @@ const Sidebar = () => {
             </div>
           </div>
         </div>
-      </motion.aside>
+      </aside>
     </>
   );
 };

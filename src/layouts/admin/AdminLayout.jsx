@@ -4,10 +4,10 @@ import Header from './Header';
 
 const AdminLayout = () => {
   return (
-    <div className="min-h-screen bg-gray-50 relative">
+    <div className="admin-dashboard min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative transition-colors duration-300">
       {/* Pattern de fond subtil */}
       <div 
-        className="fixed inset-0 opacity-[0.02] pointer-events-none z-0"
+        className="fixed inset-0 opacity-[0.015] pointer-events-none z-0"
         style={{
           backgroundImage: `repeating-linear-gradient(
             0deg,
@@ -27,9 +27,9 @@ const AdminLayout = () => {
       />
       
       <Sidebar />
-      <div className="lg:pl-64 relative z-10">
+      <div className="lg:pl-64 transition-all duration-300 w-full min-h-screen">
         <Header />
-        <main className="p-4 sm:p-6 relative z-10">
+        <main className="p-3 sm:p-4 md:p-6">
           <Outlet />
         </main>
       </div>

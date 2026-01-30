@@ -15,15 +15,18 @@ const DataTable = memo(({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
+  // S'assurer que data est toujours un tableau
+  const safeData = Array.isArray(data) ? data : [];
+
   // Filtrage des données avec useMemo
   const filteredData = useMemo(() => {
-    if (!searchable) return data;
-    return data.filter((row) =>
+    if (!searchable) return safeData;
+    return safeData.filter((row) =>
       Object.values(row).some((value) =>
         String(value).toLowerCase().includes(searchTerm.toLowerCase())
       )
     );
-  }, [data, searchTerm, searchable]);
+  }, [safeData, searchTerm, searchable]);
 
   // Pagination avec useMemo
   const { totalPages, startIndex, endIndex, paginatedData } = useMemo(() => {
@@ -67,7 +70,7 @@ const DataTable = memo(({
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full">
+        <table className="min-w-full">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
               {columns.map((col, index) => (
@@ -99,13 +102,13 @@ const DataTable = memo(({
                   className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 >
                   {columns.map((col, colIndex) => (
-                    <td key={col.key || colIndex} className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900 dark:text-gray-100">
-                      {col.render ? col.render(row[col.key], row) : row[col.key]}
+                    <td key={col.key || colIndex} className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 align-top break-words max-w-[220px] sm:max-w-none">
+                      <div className="whitespace-normal break-words">{col.render ? col.render(row[col.key], row) : row[col.key]}</div>
                     </td>
                   ))}
                   {actions && (
-                    <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-xs sm:text-sm font-medium">
-                      {actions(row)}
+                    <td className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-right text-xs sm:text-sm font-medium">
+                      <div className="flex items-center justify-end gap-2 flex-wrap">{actions(row)}</div>
                     </td>
                   )}
                 </tr>
@@ -119,10 +122,9 @@ const DataTable = memo(({
       {pagination && totalPages > 1 && (
         <div className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 border-t border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 text-center sm:text-left">
-            Affichage de {startIndex + 1} à {Math.min(endIndex, filteredData.length)} sur{' '}
-            {filteredData.length} résultats
-          </div>
-          <div className="flex items-center space-x-2">
+              Affichage de {startIndex + 1} à {Math.min(endIndex, filteredData.length)} sur {filteredData.length} résultats
+            </div>
+            <div className="flex items-center space-x-2 flex-wrap">
             <button
               onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
               disabled={currentPage === 1}

@@ -1,7 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import api from '../api/axios';
-import { showError, showSuccess } from '../utils/swal';
+import toastService from '../utils/toastService';
+import { STORAGE_KEYS } from '../config/constants';
+import { AUTH_ENDPOINTS } from '../config/api';
 
 const AuthContext = createContext(null);
 
@@ -26,15 +28,15 @@ export const AuthProvider = ({ children }) => {
 
   // Vérifier si l'utilisateur est connecté au chargement
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    const adminData = localStorage.getItem('adminData');
+    const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+    const adminData = localStorage.getItem(STORAGE_KEYS.ADMIN_DATA);
 
     if (token && adminData) {
       try {
         setAdmin(JSON.parse(adminData));
       } catch (error) {
-        localStorage.removeItem('authToken');
-        localStorage.removeItem('adminData');
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.ADMIN_DATA);
       }
     }
     setLoading(false);
@@ -43,19 +45,20 @@ export const AuthProvider = ({ children }) => {
   // Login
   const login = async (email, password) => {
     try {
-      const response = await api.post('/auth/login', { email, password });
+      // Requête POST de login (CSRF exclu pour cette route car on utilise des tokens Bearer)
+      const response = await api.post(AUTH_ENDPOINTS.LOGIN, { email, password });
       const { token, admin: adminData } = response.data;
 
-      localStorage.setItem('authToken', token);
-      localStorage.setItem('adminData', JSON.stringify(adminData));
+      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      localStorage.setItem(STORAGE_KEYS.ADMIN_DATA, JSON.stringify(adminData));
       setAdmin(adminData);
 
-      showSuccess('Connexion réussie !', 'Bienvenue');
+      toastService.showSuccess('Connexion réussie !', 'Bienvenue');
       return { success: true };
     } catch (error) {
       const errorMessage =
         error.response?.data?.message || 'Erreur de connexion';
-      showError(errorMessage, 'Échec de la connexion');
+      toastService.showError(errorMessage, 'Échec de la connexion');
       return { success: false, error: errorMessage };
     }
   };
@@ -74,10 +77,25 @@ export const AuthProvider = ({ children }) => {
     });
 
     if (confirmed) {
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('adminData');
+      try {
+        // Appeler l'endpoint de déconnexion si un token existe
+        const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+        if (token) {
+          try {
+            await api.post(AUTH_ENDPOINTS.LOGOUT);
+          } catch (error) {
+            // Ignorer les erreurs de déconnexion API (token peut être déjà expiré)
+            console.warn('Erreur lors de la déconnexion API:', error);
+          }
+        }
+      } catch (error) {
+        // Ignorer les erreurs
+      }
+
+      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+      localStorage.removeItem(STORAGE_KEYS.ADMIN_DATA);
       setAdmin(null);
-      showSuccess('Vous avez été déconnecté avec succès');
+      toastService.showSuccess('Vous avez été déconnecté avec succès');
       window.location.href = '/admin/login';
     }
   };

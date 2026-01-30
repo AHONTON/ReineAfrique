@@ -14,11 +14,14 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { showError } from '../../utils/swal';
+import toastService from '../../utils/toastService';
+import { FINANCE_ENDPOINTS } from '../../config/api';
+import { PERIODS, TRANSACTION_TYPE, TRANSACTION_TYPE_CONFIG } from '../../config/constants';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Finance = memo(() => {
   const [loading, setLoading] = useState(true);
-  const [period, setPeriod] = useState('month');
+  const [period, setPeriod] = useState(PERIODS.MONTH);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [stats, setStats] = useState({
@@ -39,15 +42,28 @@ const Finance = memo(() => {
       }
 
       const [statsRes, transactionsRes, revenueRes] = await Promise.all([
-        api.get('/admin/finance/stats', { params }),
-        api.get('/admin/finance/transactions', { params }),
-        api.get('/admin/finance/revenue', { params }),
+        api.get(FINANCE_ENDPOINTS.STATS, { params }),
+        api.get(FINANCE_ENDPOINTS.TRANSACTIONS, { params }),
+        api.get(FINANCE_ENDPOINTS.REVENUE, { params }),
       ]);
 
-      setStats(statsRes.data);
-      setTransactions(transactionsRes.data);
-      setRevenueData(revenueRes.data);
+      setStats(statsRes.data || { daily: 0, weekly: 0, monthly: 0 });
+      // S'assurer que les données sont des tableaux
+      // TransactionResource::collection() retourne { data: [...] }
+      const transactionsData = transactionsRes.data?.data || transactionsRes.data;
+      setTransactions(Array.isArray(transactionsData) ? transactionsData : []);
+      
+      // Valider et formater les données de revenue pour le graphique
+      const rawRevenueData = revenueRes.data?.data || revenueRes.data;
+      const validRevenueData = Array.isArray(rawRevenueData) 
+        ? rawRevenueData.filter(item => item && item.date && typeof item.revenue === 'number')
+        : [];
+      setRevenueData(validRevenueData);
     } catch (error) {
+      // En cas d'erreur, initialiser avec des valeurs par défaut
+      setStats({ daily: 0, weekly: 0, monthly: 0 });
+      setTransactions([]);
+      setRevenueData([]);
       // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
       if (error.response?.status && error.response.status !== 404) {
         showError('Erreur lors du chargement des données financières');
@@ -61,22 +77,11 @@ const Finance = memo(() => {
     fetchFinanceData();
   }, [fetchFinanceData]);
 
-  const formatCurrency = useCallback((amount) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  }, []);
-
   const getTypeBadge = useCallback((type) => {
-    return type === 'vente' ? (
-      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-        Vente
-      </span>
-    ) : (
-      <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">
-        Dépense
+    const config = TRANSACTION_TYPE_CONFIG[type] || TRANSACTION_TYPE_CONFIG[TRANSACTION_TYPE.DEPENSE];
+    return (
+      <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
+        {config.label}
       </span>
     );
   }, []);
@@ -85,7 +90,7 @@ const Finance = memo(() => {
     {
       key: 'date',
       label: 'Date',
-      render: (value) => new Date(value).toLocaleDateString('fr-FR'),
+      render: (value) => formatDate(value),
     },
     {
       key: 'type',
@@ -100,13 +105,13 @@ const Finance = memo(() => {
       key: 'amount',
       label: 'Montant',
       render: (value, row) => (
-        <span className={row.type === 'vente' ? 'text-green-600' : 'text-red-600'}>
-          {row.type === 'vente' ? '+' : '-'}
+        <span className={row.type === TRANSACTION_TYPE.VENTE ? 'text-green-600' : 'text-red-600'}>
+          {row.type === TRANSACTION_TYPE.VENTE ? '+' : '-'}
           {formatCurrency(Math.abs(value))}
         </span>
       ),
     },
-  ], [formatCurrency, getTypeBadge]);
+  ], [getTypeBadge]);
 
   return (
     <div className="space-y-6">
@@ -121,13 +126,13 @@ const Finance = memo(() => {
               onChange={(e) => setPeriod(e.target.value)}
               className="border-none focus:ring-0 text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-800 cursor-pointer"
             >
-              <option value="day" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
-              <option value="week" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
-              <option value="month" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
-              <option value="custom" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
+              <option value={PERIODS.DAY} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
+              <option value={PERIODS.WEEK} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
+              <option value={PERIODS.MONTH} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
+              <option value={PERIODS.CUSTOM} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
             </select>
           </div>
-          {period === 'custom' && (
+          {period === PERIODS.CUSTOM && (
             <div className="flex items-center space-x-2">
               <input
                 type="date"
@@ -181,12 +186,22 @@ const Finance = memo(() => {
           <div className="h-64 flex items-center justify-center">
             <Loader size="lg" />
           </div>
+        ) : revenueData.length === 0 ? (
+          <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+            Aucune donnée disponible pour cette période
+          </div>
         ) : (
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={revenueData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" />
-              <YAxis />
+              <XAxis 
+                dataKey="date" 
+                tick={{ fontSize: 12 }}
+              />
+              <YAxis 
+                tick={{ fontSize: 12 }}
+                tickFormatter={(value) => formatCurrency(value)}
+              />
               <Tooltip
                 formatter={(value) => formatCurrency(value)}
                 contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb' }}
@@ -198,6 +213,8 @@ const Finance = memo(() => {
                 stroke="#f97316"
                 strokeWidth={2}
                 name="Chiffre d'affaires"
+                dot={{ r: 4 }}
+                activeDot={{ r: 6 }}
               />
             </LineChart>
           </ResponsiveContainer>
@@ -211,6 +228,8 @@ const Finance = memo(() => {
       </div>
     </div>
   );
-};
+});
+
+Finance.displayName = 'Finance';
 
 export default Finance;

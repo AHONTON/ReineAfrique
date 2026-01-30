@@ -1,37 +1,48 @@
 import { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { Eye, Edit } from 'lucide-react';
+import { Eye, Plus, Trash2 } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import Loader from '../../components/admin/Loader';
-import { showError, showSuccess, showConfirm } from '../../utils/swal';
-
-// Constantes en dehors du composant
-const STATUS_CONFIG = {
-  'en_discussion': { label: 'En discussion', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400' },
-  'confirmee': { label: 'Confirmée', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400' },
-  'en_preparation': { label: 'En préparation', color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400' },
-  'livree': { label: 'Livrée', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400' },
-  'annulee': { label: 'Annulée', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400' },
-};
+import { showConfirm } from '../../utils/swal';
+import toastService from '../../utils/toastService';
+import { ORDER_STATUS_CONFIG, ORDER_STATUS } from '../../config/constants';
+import { ORDER_ENDPOINTS, CLIENT_ENDPOINTS, PRODUCT_ENDPOINTS } from '../../config/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Orders = memo(() => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
+  const [clients, setClients] = useState([]);
+  const [products, setProducts] = useState([]);
+  const [formData, setFormData] = useState({
+    client_id: '',
+    date: new Date().toISOString().split('T')[0],
+    status: ORDER_STATUS.EN_DISCUSSION,
+    source: 'dashboard',
+    items: [{ product_id: '', quantity: '', price: '' }],
+  });
 
   const fetchOrders = useCallback(async () => {
     try {
       setLoading(true);
       const params = statusFilter !== 'all' ? { status: statusFilter } : {};
-      const response = await api.get('/admin/orders', { params });
-      setOrders(response.data);
+      const response = await api.get(ORDER_ENDPOINTS.LIST, { params });
+      // S'assurer que response.data est un tableau
+      const ordersData = Array.isArray(response.data) ? response.data : [];
+      setOrders(ordersData);
+      console.log('Commandes chargées:', ordersData.length);
     } catch (error) {
+      // En cas d'erreur, initialiser avec un tableau vide
+      setOrders([]);
+      console.error('Erreur lors du chargement des commandes:', error);
       // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
       if (error.response?.status && error.response.status !== 404) {
-        showError('Erreur lors du chargement des commandes');
+        toastService.showError('Erreur lors du chargement des commandes');
       }
     } finally {
       setLoading(false);
@@ -42,6 +53,123 @@ const Orders = memo(() => {
     fetchOrders();
   }, [fetchOrders]);
 
+  const fetchClientsAndProducts = useCallback(async () => {
+    try {
+      const [clientsRes, productsRes] = await Promise.all([
+        api.get(CLIENT_ENDPOINTS.LIST),
+        api.get(PRODUCT_ENDPOINTS.LIST),
+      ]);
+      setClients(Array.isArray(clientsRes.data) ? clientsRes.data : []);
+      setProducts(Array.isArray(productsRes.data) ? productsRes.data : []);
+    } catch (error) {
+      setClients([]);
+      setProducts([]);
+      if (error.response?.status && error.response.status !== 404) {
+        toastService.showError('Erreur lors du chargement des clients et produits');
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isCreateModalOpen) {
+      fetchClientsAndProducts();
+    }
+  }, [isCreateModalOpen, fetchClientsAndProducts]);
+
+  const handleCreate = () => {
+    setFormData({
+      client_id: '',
+      date: new Date().toISOString().split('T')[0],
+      status: ORDER_STATUS.EN_DISCUSSION,
+      source: 'dashboard',
+      items: [{ product_id: '', quantity: '', price: '' }],
+    });
+    setIsCreateModalOpen(true);
+  };
+
+  const handleAddItem = () => {
+    setFormData({
+      ...formData,
+      items: [...formData.items, { product_id: '', quantity: '', price: '' }],
+    });
+  };
+
+  const handleRemoveItem = (index) => {
+    if (formData.items.length > 1) {
+      setFormData({
+        ...formData,
+        items: formData.items.filter((_, i) => i !== index),
+      });
+    }
+  };
+
+  const handleItemChange = (index, field, value) => {
+    const newItems = [...formData.items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    
+    // Si le produit change, mettre à jour le prix automatiquement
+    if (field === 'product_id') {
+      const product = products.find(p => p.id === parseInt(value));
+      if (product && product.price_per_meter) {
+        newItems[index].price = product.price_per_meter;
+      }
+    }
+    
+    setFormData({ ...formData, items: newItems });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      // Validation
+      if (!formData.client_id) {
+        toastService.showError('Veuillez sélectionner un client');
+        return;
+      }
+      if (formData.items.some(item => !item.product_id || !item.quantity || !item.price)) {
+        toastService.showError('Veuillez remplir tous les champs des articles');
+        return;
+      }
+
+      const orderData = {
+        ...formData,
+        client_id: parseInt(formData.client_id),
+        items: formData.items.map(item => ({
+          product_id: parseInt(item.product_id),
+          quantity: parseFloat(item.quantity),
+          price: parseFloat(item.price),
+        })),
+      };
+
+      const response = await api.post(ORDER_ENDPOINTS.CREATE, orderData);
+      if (response && (response.status === 201 || response.status === 200)) {
+        toastService.showSuccess('Commande créée avec succès');
+        setIsCreateModalOpen(false);
+        setFormData({
+          client_id: '',
+          date: new Date().toISOString().split('T')[0],
+          status: ORDER_STATUS.EN_DISCUSSION,
+          source: 'dashboard',
+          items: [{ product_id: '', quantity: '', price: '' }],
+        });
+        // Rafraîchir après un court délai pour s'assurer que l'API a bien enregistré
+        setTimeout(async () => {
+          await fetchOrders();
+        }, 100);
+      }
+    } catch (error) {
+      // Afficher le message d'erreur spécifique de l'API
+      const errorMessage = 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.response?.data?.errors ? 
+          Object.values(error.response.data.errors).flat().join(', ') : 
+          'Erreur lors de la création de la commande'
+        );
+      showError(errorMessage);
+    }
+  };
+
   const handleStatusChange = useCallback(async (orderId, newStatus) => {
     const { value: confirmed } = await showConfirm(
       `Voulez-vous changer le statut de cette commande ?`,
@@ -50,30 +178,31 @@ const Orders = memo(() => {
 
     if (confirmed) {
       try {
-        await api.put(`/admin/orders/${orderId}/status`, { status: newStatus });
-        showSuccess('Statut mis à jour avec succès');
-        fetchOrders();
+        const response = await api.put(ORDER_ENDPOINTS.UPDATE_STATUS(orderId), { status: newStatus });
+        if (response && (response.status === 200 || response.status === 204)) {
+          showSuccess('Statut mis à jour avec succès');
+          // Rafraîchir après un court délai
+          setTimeout(async () => {
+            await fetchOrders();
+          }, 100);
+        }
       } catch (error) {
-        showError('Erreur lors de la mise à jour du statut');
+        const errorMessage = 
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Erreur lors de la mise à jour du statut';
+        showError(errorMessage);
       }
     }
-  }, []);
+  }, [fetchOrders]);
 
   const getStatusBadge = useCallback((status) => {
-    const config = STATUS_CONFIG[status] || { label: status, color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
+    const config = ORDER_STATUS_CONFIG[status] || { label: status, color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
     return (
       <span className={`px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
         {config.label}
       </span>
     );
-  }, []);
-
-  const formatCurrency = useCallback((amount) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-    }).format(amount);
   }, []);
 
   const columns = useMemo(() => [
@@ -86,7 +215,7 @@ const Orders = memo(() => {
     {
       key: 'date',
       label: 'Date',
-      render: (value) => new Date(value).toLocaleDateString('fr-FR'),
+      render: (value) => formatDate(value),
     },
     {
       key: 'status',
@@ -98,7 +227,7 @@ const Orders = memo(() => {
       label: 'Montant',
       render: (value) => formatCurrency(value),
     },
-  ], [getStatusBadge, formatCurrency]);
+  ], [getStatusBadge]);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -119,11 +248,11 @@ const Orders = memo(() => {
         onClick={(e) => e.stopPropagation()}
         className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
       >
-        <option value="en_discussion" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
-        <option value="confirmee" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
-        <option value="en_preparation" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
-        <option value="livree" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
-        <option value="annulee" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
+        <option value={ORDER_STATUS.EN_DISCUSSION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
+        <option value={ORDER_STATUS.CONFIRMEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
+        <option value={ORDER_STATUS.EN_PREPARATION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
+        <option value={ORDER_STATUS.LIVREE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
+        <option value={ORDER_STATUS.ANNULEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
       </select>
     </div>
   );
@@ -132,18 +261,27 @@ const Orders = memo(() => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion des Commandes</h1>
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto"
-        >
-          <option value="all" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Tous les statuts</option>
-          <option value="en_discussion" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
-          <option value="confirmee" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
-          <option value="en_preparation" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
-          <option value="livree" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
-          <option value="annulee" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
-        </select>
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+          <button
+            onClick={handleCreate}
+            className="flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors text-sm font-medium"
+          >
+            <Plus size={18} />
+            Ajouter une commande
+          </button>
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto"
+          >
+            <option value="all" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Tous les statuts</option>
+            <option value={ORDER_STATUS.EN_DISCUSSION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
+            <option value={ORDER_STATUS.CONFIRMEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
+            <option value={ORDER_STATUS.EN_PREPARATION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
+            <option value={ORDER_STATUS.LIVREE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
+            <option value={ORDER_STATUS.ANNULEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
+          </select>
+        </div>
       </div>
 
       <DataTable
@@ -174,7 +312,7 @@ const Orders = memo(() => {
               <div>
                 <p className="text-sm text-gray-500">Date</p>
                 <p className="font-medium">
-                  {new Date(selectedOrder.date).toLocaleDateString('fr-FR')}
+                  {formatDate(selectedOrder.date)}
                 </p>
               </div>
               <div>
@@ -188,10 +326,7 @@ const Orders = memo(() => {
               <div>
                 <p className="text-sm text-gray-500">Montant Total</p>
                 <p className="font-medium text-lg">
-                  {new Intl.NumberFormat('fr-FR', {
-                    style: 'currency',
-                    currency: 'XOF',
-                  }).format(selectedOrder.amount)}
+                  {formatCurrency(selectedOrder.amount)}
                 </p>
               </div>
             </div>
@@ -216,6 +351,173 @@ const Orders = memo(() => {
             </div>
           </div>
         )}
+      </Modal>
+
+      {/* Modal Création Commande */}
+      <Modal
+        isOpen={isCreateModalOpen}
+        onClose={() => {
+          setIsCreateModalOpen(false);
+          setFormData({
+            client_id: '',
+            date: new Date().toISOString().split('T')[0],
+            status: ORDER_STATUS.EN_DISCUSSION,
+            source: 'dashboard',
+            items: [{ product_id: '', quantity: '', price: '' }],
+          });
+        }}
+        title="Créer une commande"
+        size="lg"
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Client *
+              </label>
+              <select
+                value={formData.client_id}
+                onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                required
+              >
+                <option value="">Sélectionner un client</option>
+                {clients.map((client) => (
+                  <option key={client.id} value={client.id} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                    {client.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Date *
+              </label>
+              <input
+                type="date"
+                value={formData.date}
+                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Statut *
+              </label>
+              <select
+                value={formData.status}
+                onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                required
+              >
+                <option value={ORDER_STATUS.EN_DISCUSSION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
+                <option value={ORDER_STATUS.CONFIRMEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
+                <option value={ORDER_STATUS.EN_PREPARATION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
+                <option value={ORDER_STATUS.LIVREE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
+                <option value={ORDER_STATUS.ANNULEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Source
+              </label>
+              <input
+                type="text"
+                value={formData.source}
+                onChange={(e) => setFormData({ ...formData, source: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                placeholder="dashboard"
+              />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Articles *
+              </label>
+              <button
+                type="button"
+                onClick={handleAddItem}
+                className="text-sm text-orange-500 hover:text-orange-600 font-medium"
+              >
+                + Ajouter un article
+              </button>
+            </div>
+            <div className="space-y-3">
+              {formData.items.map((item, index) => (
+                <div key={index} className="flex gap-2 items-end">
+                  <div className="flex-1">
+                    <label className="block text-xs text-gray-500 mb-1">Produit</label>
+                    <select
+                      value={item.product_id}
+                      onChange={(e) => handleItemChange(index, 'product_id', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                      required
+                    >
+                      <option value="">Sélectionner</option>
+                      {products.map((product) => (
+                        <option key={product.id} value={product.id} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+                          {product.name} ({formatCurrency(product.price_per_meter || 0)}/m)
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="w-24">
+                    <label className="block text-xs text-gray-500 mb-1">Quantité</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0.01"
+                      value={item.quantity}
+                      onChange={(e) => handleItemChange(index, 'quantity', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                      required
+                    />
+                  </div>
+                  <div className="w-32">
+                    <label className="block text-xs text-gray-500 mb-1">Prix unitaire</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={item.price}
+                      onChange={(e) => handleItemChange(index, 'price', e.target.value)}
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                      required
+                    />
+                  </div>
+                  {formData.items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveItem(index)}
+                      className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
+                    >
+                      <Trash2 size={18} />
+                    </button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-gray-700">
+            <button
+              type="button"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition-colors"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition-colors"
+            >
+              Créer la commande
+            </button>
+          </div>
+        </form>
       </Modal>
     </div>
   );

@@ -9,87 +9,22 @@ const colorClasses = {
   purple: 'bg-purple-500',
 };
 
-// Patterns africains selon la couleur
+// Subtil overlay dégradé pour conserver une texture sans créer d'effets "carreaux"
 const patternStyles = {
   orange: {
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(251, 115, 22, 0.08) 8px,
-      rgba(251, 115, 22, 0.08) 16px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(234, 88, 12, 0.08) 8px,
-      rgba(234, 88, 12, 0.08) 16px
-    )`,
+    backgroundImage: 'linear-gradient(135deg, rgba(249,115,22,0.06), rgba(255,255,255,0))',
   },
   green: {
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(34, 197, 94, 0.08) 8px,
-      rgba(34, 197, 94, 0.08) 16px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(22, 163, 74, 0.08) 8px,
-      rgba(22, 163, 74, 0.08) 16px
-    )`,
+    backgroundImage: 'linear-gradient(135deg, rgba(34,197,94,0.06), rgba(255,255,255,0))',
   },
   blue: {
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(59, 130, 246, 0.08) 8px,
-      rgba(59, 130, 246, 0.08) 16px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(37, 99, 235, 0.08) 8px,
-      rgba(37, 99, 235, 0.08) 16px
-    )`,
+    backgroundImage: 'linear-gradient(135deg, rgba(59,130,246,0.06), rgba(255,255,255,0))',
   },
   red: {
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(239, 68, 68, 0.08) 8px,
-      rgba(239, 68, 68, 0.08) 16px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(220, 38, 38, 0.08) 8px,
-      rgba(220, 38, 38, 0.08) 16px
-    )`,
+    backgroundImage: 'linear-gradient(135deg, rgba(239,68,68,0.06), rgba(255,255,255,0))',
   },
   purple: {
-    backgroundImage: `repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 8px,
-      rgba(168, 85, 247, 0.08) 8px,
-      rgba(168, 85, 247, 0.08) 16px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      transparent,
-      transparent 8px,
-      rgba(147, 51, 234, 0.08) 8px,
-      rgba(147, 51, 234, 0.08) 16px
-    )`,
+    backgroundImage: 'linear-gradient(135deg, rgba(168,85,247,0.06), rgba(255,255,255,0))',
   },
 };
 
@@ -110,8 +45,8 @@ const StatCard = memo(({ title, value, icon: Icon, color = 'orange', trend, load
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden">
       {/* Pattern de tissu africain en arrière-plan */}
       <div 
-        className="absolute inset-0 opacity-30 pointer-events-none"
-        style={patternStyles[color] || patternStyles.orange}
+        className="absolute inset-0 pointer-events-none"
+        style={{ ...(patternStyles[color] || patternStyles.orange), opacity: 0.12 }}
       />
       
       <div className="flex items-center justify-between gap-3 relative z-10">

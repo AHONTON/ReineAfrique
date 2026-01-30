@@ -22,10 +22,10 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { showError } from '../../utils/swal';
-
-// Constantes en dehors du composant pour éviter les recréations
-const COLORS = ['#f97316', '#ea580c', '#c2410c', '#9a3412', '#7c2d12'];
+import toastService from '../../utils/toastService';
+import { DASHBOARD_ENDPOINTS } from '../../config/api';
+import { CHART_COLORS, PERIODS } from '../../config/constants';
+import { formatCurrency } from '../../utils/formatters';
 
 const DEFAULT_STATS = {
   revenue: 1250000,
@@ -52,7 +52,7 @@ const DEFAULT_SALES_DISTRIBUTION = [
 
 const Dashboard = memo(() => {
   const [loading, setLoading] = useState(false);
-  const [period, setPeriod] = useState('month');
+  const [period, setPeriod] = useState(PERIODS.MONTH);
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [stats, setStats] = useState(DEFAULT_STATS);
@@ -69,14 +69,34 @@ const Dashboard = memo(() => {
       }
 
       const [statsRes, salesRes, distributionRes] = await Promise.all([
-        api.get('/admin/dashboard/stats', { params }),
-        api.get('/admin/dashboard/sales', { params }),
-        api.get('/admin/dashboard/distribution', { params }),
+        api.get(DASHBOARD_ENDPOINTS.STATS, { params }),
+        api.get(DASHBOARD_ENDPOINTS.SALES, { params }),
+        api.get(DASHBOARD_ENDPOINTS.DISTRIBUTION, { params }),
       ]);
 
-      setStats(statsRes.data);
-      setSalesData(salesRes.data);
-      setSalesDistribution(distributionRes.data);
+      // Validation et protection des données reçues
+      const statsData = {
+        revenue: statsRes.data?.revenue ?? DEFAULT_STATS.revenue,
+        orders: statsRes.data?.orders ?? DEFAULT_STATS.orders,
+        clients: statsRes.data?.clients ?? DEFAULT_STATS.clients,
+        lowStock: statsRes.data?.lowStock ?? DEFAULT_STATS.lowStock,
+      };
+      setStats(statsData);
+      console.log('Dashboard stats chargées:', statsData);
+      
+      // S'assurer que salesData est un tableau
+      const salesDataArray = Array.isArray(salesRes.data) && salesRes.data.length > 0 
+        ? salesRes.data 
+        : DEFAULT_SALES_DATA;
+      setSalesData(salesDataArray);
+      console.log('Données de ventes chargées:', salesDataArray.length, 'mois');
+      
+      // S'assurer que salesDistribution est un tableau
+      const distributionData = Array.isArray(distributionRes.data) && distributionRes.data.length > 0
+        ? distributionRes.data
+        : DEFAULT_SALES_DISTRIBUTION;
+      setSalesDistribution(distributionData);
+      console.log('Répartition des ventes chargée:', distributionData.length, 'catégories');
     } catch (error) {
       // Si l'API n'est pas disponible, utiliser des données par défaut pour l'affichage
       setStats(DEFAULT_STATS);
@@ -95,13 +115,6 @@ const Dashboard = memo(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-  const formatCurrency = useCallback((amount) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  }, []);
 
   return (
     <div className="space-y-4 sm:space-y-5 md:space-y-6">
@@ -121,13 +134,13 @@ const Dashboard = memo(() => {
               onChange={(e) => setPeriod(e.target.value)}
               className="border-none focus:ring-0 text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-800 flex-1 sm:flex-initial cursor-pointer appearance-none"
             >
-              <option value="day" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
-              <option value="week" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
-              <option value="month" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
-              <option value="custom" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
+              <option value={PERIODS.DAY} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
+              <option value={PERIODS.WEEK} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
+              <option value={PERIODS.MONTH} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
+              <option value={PERIODS.CUSTOM} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
             </select>
           </div>
-          {period === 'custom' && (
+          {period === PERIODS.CUSTOM && (
             <div className="flex items-center space-x-2 w-full sm:w-auto">
               <input
                 type="date"
@@ -183,17 +196,11 @@ const Dashboard = memo(() => {
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-5 md:gap-6">
         {/* Ventes Mensuelles */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-gray-900/50 border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-shadow">
-          {/* Pattern subtil en arrière-plan */}
-          <div 
-            className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none"
+          {/* Subtil overlay dégradé (remplace les motifs en carreaux) */}
+          <div
+            className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: `repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 15px,
-                rgba(251, 115, 22, 0.1) 15px,
-                rgba(251, 115, 22, 0.1) 30px
-              )`,
+              background: 'linear-gradient(135deg, rgba(249,115,22,0.03), rgba(255,255,255,0))',
             }}
           />
           <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 relative z-10">Ventes Mensuelles</h3>
@@ -201,13 +208,20 @@ const Dashboard = memo(() => {
             <div className="h-48 sm:h-64 flex items-center justify-center relative z-10">
               <Loader size="lg" />
             </div>
+          ) : salesData.length === 0 ? (
+            <div className="h-48 sm:h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 relative z-10">
+              Aucune donnée disponible
+            </div>
           ) : (
             <div className="w-full overflow-x-auto relative z-10">
               <ResponsiveContainer width="100%" height={250} minHeight={250}>
                 <BarChart data={salesData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="month" tick={{ fontSize: 12 }} />
-                  <YAxis tick={{ fontSize: 12 }} />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    tickFormatter={(value) => formatCurrency(value)}
+                  />
                   <Tooltip
                     formatter={(value) => formatCurrency(value)}
                     contentStyle={{ backgroundColor: '#fff', border: '1px solid #e5e7eb', fontSize: '12px' }}
@@ -222,23 +236,21 @@ const Dashboard = memo(() => {
 
         {/* Répartition des Ventes */}
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg dark:shadow-xl border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6 overflow-hidden relative hover:shadow-xl dark:hover:shadow-2xl transition-all">
-          {/* Pattern subtil en arrière-plan */}
-          <div 
-            className="absolute inset-0 opacity-[0.03] pointer-events-none"
+          {/* Subtil overlay dégradé (remplace les motifs en carreaux) */}
+          <div
+            className="absolute inset-0 pointer-events-none"
             style={{
-              backgroundImage: `repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 15px,
-                rgba(234, 88, 12, 0.1) 15px,
-                rgba(234, 88, 12, 0.1) 30px
-              )`,
+              background: 'linear-gradient(225deg, rgba(234,88,12,0.03), rgba(255,255,255,0))',
             }}
           />
           <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3 sm:mb-4 relative z-10">Répartition des Ventes</h3>
           {loading ? (
             <div className="h-48 sm:h-64 flex items-center justify-center relative z-10">
               <Loader size="lg" />
+            </div>
+          ) : salesDistribution.length === 0 ? (
+            <div className="h-48 sm:h-64 flex items-center justify-center text-gray-500 dark:text-gray-400 relative z-10">
+              Aucune donnée disponible
             </div>
           ) : (
             <div className="w-full overflow-x-auto relative z-10">
@@ -255,7 +267,7 @@ const Dashboard = memo(() => {
                     dataKey="value"
                   >
                     {salesDistribution.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
                     ))}
                   </Pie>
                   <Tooltip

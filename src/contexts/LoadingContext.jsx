@@ -95,13 +95,20 @@ export const LoadingProvider = ({ children }) => {
   useEffect(() => {
     // Ne pas afficher le loader de page si on est déjà en train de charger initialement
     if (isLoading) return;
+    
+    // Ne pas afficher le loader pour les routes admin (navigation interne)
+    const isAdminRoute = location.pathname.startsWith('/admin');
+    if (isAdminRoute) {
+      setIsPageLoading(false);
+      return;
+    }
 
     setIsPageLoading(true);
 
-    // Simuler un chargement de page
+    // Simuler un chargement de page (plus rapide pour éviter les problèmes)
     const timer = setTimeout(() => {
       setIsPageLoading(false);
-    }, 600);
+    }, 300);
 
     return () => clearTimeout(timer);
   }, [location.pathname, isLoading]);

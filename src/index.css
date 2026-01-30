@@ -12,6 +12,20 @@ body {
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    padding: 0;
+    /* Fond par défaut pour éviter le blanc - sera surchargé par JavaScript pour les routes admin */
+    background-color: #ffffff;
+}
+
+/* Fond pour les routes admin - appliqué immédiatement pour éviter le flash */
+body.admin-route {
+    background: linear-gradient(to bottom right, rgb(249 250 251), rgb(255 255 255), rgb(249 250 251));
+    min-height: 100vh;
+}
+
+body.admin-route.dark {
+    background: linear-gradient(to bottom right, rgb(17 24 39), rgb(31 41 55), rgb(17 24 39));
 }
 
 /* Améliorations pour les interactions */
@@ -74,4 +88,78 @@ h1, h2, h3, h4, h5, h6 {
     outline: 2px solid rgb(251 146 60);
     outline-offset: 2px;
     border-radius: 4px;
+}
+
+/* Styles personnalisés pour SweetAlert2 */
+.swal2-popup-custom {
+    font-family: 'Inter', system-ui, sans-serif;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Support du mode sombre pour SweetAlert */
+.dark .swal2-popup {
+    background-color: rgb(31 41 55) !important;
+    color: rgb(243 244 246) !important;
+}
+
+.dark .swal2-title {
+    color: rgb(243 244 246) !important;
+}
+
+.dark .swal2-content {
+    color: rgb(209 213 219) !important;
+}
+
+.dark .swal2-confirm {
+    background-color: rgb(249 115 22) !important;
+    color: white !important;
+}
+
+.dark .swal2-confirm:hover {
+    background-color: rgb(234 88 12) !important;
+}
+
+.dark .swal2-cancel {
+    background-color: rgb(75 85 99) !important;
+    color: white !important;
+}
+
+.dark .swal2-cancel:hover {
+    background-color: rgb(107 114 128) !important;
+}
+
+/* Couleurs spécifiques selon le type d'alerte */
+.swal2-icon.swal2-success {
+    border-color: #10b981 !important;
+    color: #10b981 !important;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #ef4444 !important;
+    color: #ef4444 !important;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #f59e0b !important;
+    color: #f59e0b !important;
+}
+
+.swal2-icon.swal2-info {
+    border-color: #3b82f6 !important;
+    color: #3b82f6 !important;
+}
+
+.swal2-icon.swal2-question {
+    border-color: #f97316 !important;
+    color: #f97316 !important;
+}
+
+/* Barre de progression du timer */
+.swal2-timer-progress-bar {
+    background-color: rgb(249 115 22) !important;
+}
+
+.dark .swal2-timer-progress-bar {
+    background-color: rgb(249 115 22) !important;
 }

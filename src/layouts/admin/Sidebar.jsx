@@ -96,26 +96,13 @@ const Sidebar = memo(() => {
           transition: isDesktop ? 'none' : 'transform 0.3s ease-in-out'
         }}
       >
-        {/* Pattern de tissu africain en arrière-plan */}
-        <div className="absolute inset-0 opacity-10 pointer-events-none">
-          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-orange-900/20 to-transparent">
-            <div 
+        {/* Subtil overlay décoratif (remplace motifs en carreaux) */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute bottom-0 left-0 right-0 h-1/3 bg-gradient-to-t from-orange-900/12 to-transparent">
+            <div
               className="w-full h-full"
               style={{
-                backgroundImage: `repeating-linear-gradient(
-                  45deg,
-                  transparent,
-                  transparent 10px,
-                  rgba(251, 115, 22, 0.1) 10px,
-                  rgba(251, 115, 22, 0.1) 20px
-                ),
-                repeating-linear-gradient(
-                  -45deg,
-                  transparent,
-                  transparent 10px,
-                  rgba(154, 52, 18, 0.1) 10px,
-                  rgba(154, 52, 18, 0.1) 20px
-                )`,
+                background: 'linear-gradient(180deg, rgba(249,115,22,0.04), transparent)',
               }}
             />
           </div>
@@ -173,22 +160,9 @@ const Sidebar = memo(() => {
           <div className="p-4 border-t border-gray-700 dark:border-gray-600 relative">
             {/* Pattern décoratif */}
             <div 
-              className="absolute bottom-0 left-0 right-0 h-16 opacity-20"
+              className="absolute bottom-0 left-0 right-0 h-16 opacity-18"
               style={{
-                backgroundImage: `repeating-linear-gradient(
-                  0deg,
-                  transparent,
-                  transparent 2px,
-                  rgba(251, 115, 22, 0.3) 2px,
-                  rgba(251, 115, 22, 0.3) 4px
-                ),
-                repeating-linear-gradient(
-                  90deg,
-                  transparent,
-                  transparent 2px,
-                  rgba(154, 52, 18, 0.3) 2px,
-                  rgba(154, 52, 18, 0.3) 4px
-                )`,
+                background: 'linear-gradient(180deg, rgba(249,115,22,0.06), rgba(154,52,18,0.02))',
               }}
             />
             <div className="relative z-10 space-y-2">

@@ -6,10 +6,12 @@ const Loader = ({ size = 'md' }) => {
   };
 
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center" role="status" aria-live="polite">
       <div
         className={`${sizeClasses[size]} animate-spin rounded-full border-b-2 border-orange-500`}
-      ></div>
+      >
+        <span className="sr-only">Chargement en cours</span>
+      </div>
     </div>
   );
 };

@@ -3,7 +3,11 @@ import { Plus, Edit, Trash2, Package } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
-import { showError, showSuccess, showConfirm } from '../../utils/swal';
+import { showConfirm } from '../../utils/swal';
+import toastService from '../../utils/toastService';
+import { CATEGORY_ENDPOINTS, PRODUCT_ENDPOINTS } from '../../config/api';
+import { LOW_STOCK_THRESHOLD } from '../../config/constants';
+import { formatCurrency } from '../../utils/formatters';
 
 const Stock = memo(() => {
   const [categories, setCategories] = useState([]);
@@ -27,15 +31,23 @@ const Stock = memo(() => {
     try {
       setLoading(true);
       const [categoriesRes, productsRes] = await Promise.all([
-        api.get('/admin/categories'),
-        api.get('/admin/products'),
+        api.get(CATEGORY_ENDPOINTS.LIST),
+        api.get(PRODUCT_ENDPOINTS.LIST),
       ]);
-      setCategories(categoriesRes.data);
-      setProducts(productsRes.data);
+      // S'assurer que les données sont des tableaux
+      const categoriesData = Array.isArray(categoriesRes.data) ? categoriesRes.data : [];
+      const productsData = Array.isArray(productsRes.data) ? productsRes.data : [];
+      setCategories(categoriesData);
+      setProducts(productsData);
+      console.log('Données chargées - Catégories:', categoriesData.length, 'Produits:', productsData.length);
     } catch (error) {
+      // En cas d'erreur, initialiser avec des tableaux vides
+      setCategories([]);
+      setProducts([]);
+      console.error('Erreur lors du chargement des données:', error);
       // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
       if (error.response?.status && error.response.status !== 404) {
-        showError('Erreur lors du chargement des données');
+        toastService.showError('Erreur lors du chargement des données');
       }
     } finally {
       setLoading(false);
@@ -70,11 +82,19 @@ const Stock = memo(() => {
 
     if (confirmed) {
       try {
-        await api.delete(`/admin/categories/${categoryId}`);
-        showSuccess('Catégorie supprimée avec succès');
-        fetchData();
+        const response = await api.delete(CATEGORY_ENDPOINTS.DELETE(categoryId));
+        if (response && (response.status === 200 || response.status === 204)) {
+          toastService.showSuccess('Catégorie supprimée avec succès');
+          setTimeout(async () => {
+            await fetchData();
+          }, 100);
+        }
       } catch (error) {
-        showError('Erreur lors de la suppression de la catégorie');
+        const errorMessage = 
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Erreur lors de la suppression de la catégorie';
+        toastService.showError(errorMessage);
       }
     }
   };
@@ -82,17 +102,32 @@ const Stock = memo(() => {
   const handleSubmitCategory = async (e) => {
     e.preventDefault();
     try {
+      let response;
       if (selectedCategory) {
-        await api.put(`/admin/categories/${selectedCategory.id}`, categoryForm);
-        showSuccess('Catégorie modifiée avec succès');
+        response = await api.put(CATEGORY_ENDPOINTS.UPDATE(selectedCategory.id), categoryForm);
+        toastService.showSuccess('Catégorie modifiée avec succès');
       } else {
-        await api.post('/admin/categories', categoryForm);
+        response = await api.post(CATEGORY_ENDPOINTS.CREATE, categoryForm);
         showSuccess('Catégorie créée avec succès');
       }
-      setIsCategoryModalOpen(false);
-      fetchData();
+      if (response && (response.status === 201 || response.status === 200)) {
+        setIsCategoryModalOpen(false);
+        setCategoryForm({ name: '', description: '' });
+        setSelectedCategory(null);
+        // Rafraîchir après un court délai
+        setTimeout(async () => {
+          await fetchData();
+        }, 100);
+      }
     } catch (error) {
-      showError('Erreur lors de la sauvegarde de la catégorie');
+      const errorMessage = 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.response?.data?.errors ? 
+          Object.values(error.response.data.errors).flat().join(', ') : 
+          'Erreur lors de la sauvegarde de la catégorie'
+        );
+      showError(errorMessage);
     }
   };
 
@@ -129,11 +164,19 @@ const Stock = memo(() => {
 
     if (confirmed) {
       try {
-        await api.delete(`/admin/products/${productId}`);
-        showSuccess('Produit supprimé avec succès');
-        fetchData();
+        const response = await api.delete(PRODUCT_ENDPOINTS.DELETE(productId));
+        if (response && (response.status === 200 || response.status === 204)) {
+          toastService.showSuccess('Produit supprimé avec succès');
+          setTimeout(async () => {
+            await fetchData();
+          }, 100);
+        }
       } catch (error) {
-        showError('Erreur lors de la suppression du produit');
+        const errorMessage = 
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Erreur lors de la suppression du produit';
+        toastService.showError(errorMessage);
       }
     }
   };
@@ -141,27 +184,41 @@ const Stock = memo(() => {
   const handleSubmitProduct = async (e) => {
     e.preventDefault();
     try {
+      let response;
       if (selectedProduct) {
-        await api.put(`/admin/products/${selectedProduct.id}`, productForm);
-        showSuccess('Produit modifié avec succès');
+        response = await api.put(PRODUCT_ENDPOINTS.UPDATE(selectedProduct.id), productForm);
+        toastService.showSuccess('Produit modifié avec succès');
       } else {
-        await api.post('/admin/products', productForm);
+        response = await api.post(PRODUCT_ENDPOINTS.CREATE, productForm);
         showSuccess('Produit créé avec succès');
       }
-      setIsProductModalOpen(false);
-      fetchData();
+      if (response && (response.status === 201 || response.status === 200)) {
+        setIsProductModalOpen(false);
+        setProductForm({
+          name: '',
+          categoryId: '',
+          stock: 0,
+          pricePerMeter: 0,
+          description: '',
+        });
+        setSelectedProduct(null);
+        // Rafraîchir après un court délai
+        setTimeout(async () => {
+          await fetchData();
+        }, 100);
+      }
     } catch (error) {
-      showError('Erreur lors de la sauvegarde du produit');
+      const errorMessage = 
+        error.response?.data?.message ||
+        error.response?.data?.error ||
+        (error.response?.data?.errors ? 
+          Object.values(error.response.data.errors).flat().join(', ') : 
+          'Erreur lors de la sauvegarde du produit'
+        );
+      toastService.showError(errorMessage);
     }
   };
 
-  const formatCurrency = useCallback((amount) => {
-    return new Intl.NumberFormat('fr-FR', {
-      style: 'currency',
-      currency: 'XOF',
-      minimumFractionDigits: 0,
-    }).format(amount);
-  }, []);
 
   const categoryColumns = useMemo(() => [
     { key: 'id', label: 'ID' },
@@ -184,7 +241,7 @@ const Stock = memo(() => {
       key: 'stock',
       label: 'Stock (m)',
       render: (value) => (
-        <span className={value < 10 ? 'text-red-600 font-bold' : ''}>
+        <span className={value < LOW_STOCK_THRESHOLD ? 'text-red-600 font-bold' : ''}>
           {value} m
         </span>
       ),
@@ -194,7 +251,7 @@ const Stock = memo(() => {
       label: 'Prix/mètre',
       render: (value) => formatCurrency(value),
     },
-  ], [categories, formatCurrency]);
+  ], [categories]);
 
   const categoryActions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -331,7 +388,7 @@ const Stock = memo(() => {
       >
         <form onSubmit={handleSubmitCategory} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nom
             </label>
             <input
@@ -339,11 +396,11 @@ const Stock = memo(() => {
               value={categoryForm.name}
               onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description
             </label>
             <textarea
@@ -352,20 +409,20 @@ const Stock = memo(() => {
                 setCategoryForm({ ...categoryForm, description: e.target.value })
               }
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500 resize-none"
             />
           </div>
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={() => setIsCategoryModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
             >
               {selectedCategory ? 'Modifier' : 'Créer'}
             </button>
@@ -384,7 +441,7 @@ const Stock = memo(() => {
       >
         <form onSubmit={handleSubmitProduct} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Nom
             </label>
             <input
@@ -392,11 +449,11 @@ const Stock = memo(() => {
               value={productForm.name}
               onChange={(e) => setProductForm({ ...productForm, name: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Catégorie
             </label>
             <select
@@ -405,7 +462,7 @@ const Stock = memo(() => {
                 setProductForm({ ...productForm, categoryId: e.target.value })
               }
               required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
             >
               <option value="" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Sélectionner une catégorie</option>
               {categories.map((cat) => (
@@ -417,7 +474,7 @@ const Stock = memo(() => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Stock (mètres)
               </label>
               <input
@@ -429,11 +486,11 @@ const Stock = memo(() => {
                   setProductForm({ ...productForm, stock: parseFloat(e.target.value) })
                 }
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                 Prix au mètre (CFA)
               </label>
               <input
@@ -448,12 +505,12 @@ const Stock = memo(() => {
                   })
                 }
                 required
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Description
             </label>
             <textarea
@@ -462,20 +519,20 @@ const Stock = memo(() => {
                 setProductForm({ ...productForm, description: e.target.value })
               }
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500 resize-none"
             />
           </div>
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
               onClick={() => setIsProductModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
             >
               {selectedProduct ? 'Modifier' : 'Créer'}
             </button>

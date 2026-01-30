@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import api from '../../api/axios';
 import { showError, showSuccess, showLoading, closeLoading } from '../../utils/swal';
+import toastService from '../../utils/toastService';
+import { EXPORT_ENDPOINTS } from '../../config/api';
+import { EXPORT_TYPES, EXPORT_FORMATS } from '../../config/constants';
 
 const Export = () => {
   const [exporting, setExporting] = useState(null);
@@ -27,11 +30,11 @@ const Export = () => {
       window.URL.revokeObjectURL(url);
 
       closeLoading();
-      showSuccess('Export réussi !', 'Fichier téléchargé');
+      toastService.showSuccess('Export réussi !', 'Fichier téléchargé');
       setExporting(null);
     } catch (error) {
       closeLoading();
-      showError('Erreur lors de l\'export');
+      toastService.showError('Erreur lors de l\'export');
       setExporting(null);
     }
   };
@@ -40,25 +43,25 @@ const Export = () => {
     {
       title: 'Clients',
       description: 'Exporter la liste complète des clients',
-      type: 'clients',
+      type: EXPORT_TYPES.CLIENTS,
       icon: FileText,
     },
     {
       title: 'Commandes',
       description: 'Exporter toutes les commandes',
-      type: 'orders',
+      type: EXPORT_TYPES.ORDERS,
       icon: FileText,
     },
     {
       title: 'Finances',
       description: 'Exporter les données financières',
-      type: 'finance',
+      type: EXPORT_TYPES.FINANCE,
       icon: FileSpreadsheet,
     },
     {
       title: 'Stock',
       description: 'Exporter l\'état du stock',
-      type: 'stock',
+      type: EXPORT_TYPES.STOCK,
       icon: FileSpreadsheet,
     },
   ];
@@ -87,16 +90,16 @@ const Export = () => {
                 <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">{option.description}</p>
                 <div className="flex space-x-2">
                   <button
-                    onClick={() => handleExport(option.type, 'csv')}
-                    disabled={exporting === `${option.type}-csv`}
+                    onClick={() => handleExport(option.type, EXPORT_FORMATS.CSV)}
+                    disabled={exporting === `${option.type}-${EXPORT_FORMATS.CSV}`}
                     className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={18} />
                     <span>CSV</span>
                   </button>
                   <button
-                    onClick={() => handleExport(option.type, 'xlsx')}
-                    disabled={exporting === `${option.type}-xlsx`}
+                    onClick={() => handleExport(option.type, EXPORT_FORMATS.XLSX)}
+                    disabled={exporting === `${option.type}-${EXPORT_FORMATS.XLSX}`}
                     className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <Download size={18} />

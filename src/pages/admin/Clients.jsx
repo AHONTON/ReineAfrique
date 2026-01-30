@@ -3,7 +3,10 @@ import { Plus, Edit, Trash2, Eye } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
-import { showError, showSuccess, showConfirm } from '../../utils/swal';
+import { showConfirm } from '../../utils/swal';
+import toastService from '../../utils/toastService';
+import { CLIENT_ENDPOINTS } from '../../config/api';
+import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Clients = memo(() => {
   const [clients, setClients] = useState([]);
@@ -21,12 +24,18 @@ const Clients = memo(() => {
   const fetchClients = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get('/admin/clients');
-      setClients(response.data);
+      const response = await api.get(CLIENT_ENDPOINTS.LIST);
+      // S'assurer que response.data est un tableau
+      const clientsData = Array.isArray(response.data) ? response.data : [];
+      setClients(clientsData);
+      console.log('Clients chargés:', clientsData.length);
     } catch (error) {
+      // En cas d'erreur, initialiser avec un tableau vide
+      setClients([]);
+      console.error('Erreur lors du chargement des clients:', error);
       // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
       if (error.response?.status && error.response.status !== 404) {
-        showError('Erreur lors du chargement des clients');
+        toastService.showError('Erreur lors du chargement des clients');
       }
     } finally {
       setLoading(false);
@@ -62,11 +71,11 @@ const Clients = memo(() => {
 
     if (confirmed) {
       try {
-        await api.delete(`/admin/clients/${clientId}`);
-        showSuccess('Client supprimé avec succès');
+        await api.delete(CLIENT_ENDPOINTS.DELETE(clientId));
+        toastService.showSuccess('Client supprimé avec succès');
         fetchClients();
       } catch (error) {
-        showError('Erreur lors de la suppression du client');
+        toastService.showError('Erreur lors de la suppression du client');
       }
     }
   };
@@ -74,31 +83,55 @@ const Clients = memo(() => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let response;
       if (selectedClient) {
-        await api.put(`/admin/clients/${selectedClient.id}`, formData);
+        response = await api.put(CLIENT_ENDPOINTS.UPDATE(selectedClient.id), formData);
         showSuccess('Client modifié avec succès');
       } else {
-        await api.post('/admin/clients', formData);
+        response = await api.post(CLIENT_ENDPOINTS.CREATE, formData);
         showSuccess('Client créé avec succès');
       }
-      setIsModalOpen(false);
-      fetchClients();
+      
+      // Si la requête a réussi, fermer le modal et rafraîchir la liste
+      if (response && (response.status === 201 || response.status === 200)) {
+        setIsModalOpen(false);
+        setFormData({ name: '', email: '', phone: '', address: '' });
+        setSelectedClient(null);
+        // Rafraîchir immédiatement la liste avec un petit délai pour s'assurer que l'API a bien enregistré
+        setTimeout(async () => {
+          await fetchClients();
+        }, 100);
+      }
     } catch (error) {
-      showError('Erreur lors de la sauvegarde du client');
+      // Afficher le message d'erreur spécifique de l'API
+      let errorMessage = 'Erreur lors de la sauvegarde du client';
+      
+      if (error.response?.data?.errors) {
+        // Erreurs de validation - afficher toutes les erreurs
+        const validationErrors = Object.values(error.response.data.errors).flat();
+        errorMessage = validationErrors.join(', ');
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      toastService.showError(errorMessage);
     }
   };
 
   const handleViewDetails = async (client) => {
     try {
-      const response = await api.get(`/admin/clients/${client.id}`);
+      const response = await api.get(CLIENT_ENDPOINTS.SHOW(client.id));
       setSelectedClient(response.data);
       setIsDetailsModalOpen(true);
     } catch (error) {
-      showError('Erreur lors du chargement des détails');
+      toastService.showError('Erreur lors du chargement des détails');
     }
   };
 
-  const columns = [
+
+  const columns = useMemo(() => [
     { key: 'id', label: 'ID' },
     { key: 'name', label: 'Nom' },
     { key: 'email', label: 'Email' },
@@ -113,7 +146,7 @@ const Clients = memo(() => {
       label: 'Total dépensé',
       render: (value) => formatCurrency(value || 0),
     },
-  ], [formatCurrency]);
+  ], []);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -182,63 +215,71 @@ const Clients = memo(() => {
       >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Nom complet
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Nom complet *
             </label>
             <input
               type="text"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+              placeholder="Entrez le nom complet du client"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email *
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+              placeholder="exemple@email.com"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Téléphone
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Téléphone *
             </label>
             <input
               type="tel"
               value={formData.phone}
               onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+              placeholder="+229 XX XX XX XX"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Adresse
             </label>
             <textarea
               value={formData.address}
               onChange={(e) => setFormData({ ...formData, address: e.target.value })}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500 resize-none"
+              placeholder="Adresse complète du client (optionnel)"
             />
           </div>
-          <div className="flex justify-end space-x-3 pt-4">
+          <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"
-              onClick={() => setIsModalOpen(false)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              onClick={() => {
+                setIsModalOpen(false);
+                setFormData({ name: '', email: '', phone: '', address: '' });
+                setSelectedClient(null);
+              }}
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
             >
               Annuler
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors font-medium"
             >
               {selectedClient ? 'Modifier' : 'Créer'}
             </button>
@@ -258,55 +299,49 @@ const Clients = memo(() => {
       >
         {selectedClient && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Nom</p>
-                <p className="font-medium">{selectedClient.name}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Nom</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.name}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Email</p>
-                <p className="font-medium">{selectedClient.email}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.email}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Téléphone</p>
-                <p className="font-medium">{selectedClient.phone}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Téléphone</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.phone}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Adresse</p>
-                <p className="font-medium">{selectedClient.address || 'N/A'}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Adresse</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.address || 'N/A'}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Nombre de commandes</p>
-                <p className="font-medium">{selectedClient.totalOrders || 0}</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Nombre de commandes</p>
+                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.totalOrders || 0}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total dépensé</p>
-                <p className="font-medium text-lg">
-                  {new Intl.NumberFormat('fr-FR', {
-                    style: 'currency',
-                    currency: 'XOF',
-                  }).format(selectedClient.totalSpent || 0)}
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Total dépensé</p>
+                <p className="font-medium text-lg text-gray-900 dark:text-white">
+                  {formatCurrency(selectedClient.totalSpent || 0)}
                 </p>
               </div>
             </div>
 
             {selectedClient.orders && selectedClient.orders.length > 0 && (
               <div>
-                <p className="text-sm text-gray-500 mb-2">Historique des commandes</p>
-                <div className="border border-gray-200 rounded-lg p-4 max-h-64 overflow-y-auto">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Historique des commandes</p>
+                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 max-h-64 overflow-y-auto bg-gray-50 dark:bg-gray-900/50">
                   {selectedClient.orders.map((order) => (
-                    <div key={order.id} className="flex justify-between py-2 border-b last:border-0">
+                    <div key={order.id} className="flex justify-between py-2 border-b border-gray-200 dark:border-gray-700 last:border-0">
                       <div>
-                        <p className="font-medium">Commande #{order.id}</p>
-                        <p className="text-sm text-gray-500">
-                          {new Date(order.date).toLocaleDateString('fr-FR')}
+                        <p className="font-medium text-gray-900 dark:text-white">Commande #{order.id}</p>
+                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                          {formatDate(order.date)}
                         </p>
                       </div>
-                      <p className="font-medium">
-                        {new Intl.NumberFormat('fr-FR', {
-                          style: 'currency',
-                          currency: 'XOF',
-                        }).format(order.amount)}
+                      <p className="font-medium text-gray-900 dark:text-white">
+                        {formatCurrency(order.amount)}
                       </p>
                     </div>
                   ))}

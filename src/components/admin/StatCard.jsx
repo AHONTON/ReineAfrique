@@ -42,26 +42,26 @@ const StatCard = memo(({ title, value, icon: Icon, color = 'orange', trend, load
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md dark:shadow-lg p-4 sm:p-5 md:p-6 border border-gray-200 dark:border-gray-700 hover:shadow-lg dark:hover:shadow-xl transition-all relative overflow-hidden">
       {/* Pattern de tissu africain en arrière-plan */}
       <div 
         className="absolute inset-0 pointer-events-none"
         style={{ ...(patternStyles[color] || patternStyles.orange), opacity: 0.12 }}
       />
       
-      <div className="flex items-center justify-between gap-3 relative z-10">
+      <div className="flex items-center justify-between gap-3 sm:gap-4 relative z-10">
         <div className="flex-1 min-w-0">
-          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm font-medium mb-1 truncate">{title}</p>
-          <p className="text-xl sm:text-2xl font-bold text-gray-800 dark:text-white break-words">{value}</p>
+          <p className="text-gray-600 dark:text-gray-400 text-xs sm:text-sm md:text-base font-medium mb-1 sm:mb-1.5 truncate">{title}</p>
+          <p className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-white break-words leading-tight">{value}</p>
           {trend && (
-            <p className={`text-xs sm:text-sm mt-2 ${trend.type === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
+            <p className={`text-xs sm:text-sm md:text-base mt-2 ${trend.type === 'up' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}>
               {trend.value}
             </p>
           )}
         </div>
         {Icon && (
-          <div className={`${colorClasses[color]} p-2 sm:p-3 rounded-lg flex-shrink-0 shadow-sm`}>
-            <Icon className="text-white" size={20} />
+          <div className={`${colorClasses[color]} p-2 sm:p-2.5 md:p-3 rounded-lg flex-shrink-0 shadow-sm`}>
+            <Icon className="text-white" size={18} />
           </div>
         )}
       </div>

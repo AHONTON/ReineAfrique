@@ -4,6 +4,7 @@ import api from '../../api/axios';
 import StatCard from '../../components/admin/StatCard';
 import DataTable from '../../components/admin/DataTable';
 import Loader from '../../components/admin/Loader';
+import toastService from '../../utils/toastService';
 import {
   LineChart,
   Line,
@@ -14,7 +15,6 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import toastService from '../../utils/toastService';
 import { FINANCE_ENDPOINTS } from '../../config/api';
 import { PERIODS, TRANSACTION_TYPE, TRANSACTION_TYPE_CONFIG } from '../../config/constants';
 import { formatCurrency, formatDate } from '../../utils/formatters';
@@ -59,14 +59,41 @@ const Finance = memo(() => {
         ? rawRevenueData.filter(item => item && item.date && typeof item.revenue === 'number')
         : [];
       setRevenueData(validRevenueData);
+      
+      console.log('✅ Données financières chargées:', {
+        stats: statsRes.data,
+        transactions: transactionsData.length,
+        revenue: validRevenueData.length,
+      });
     } catch (error) {
       // En cas d'erreur, initialiser avec des valeurs par défaut
       setStats({ daily: 0, weekly: 0, monthly: 0 });
       setTransactions([]);
       setRevenueData([]);
-      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
-      if (error.response?.status && error.response.status !== 404) {
-        showError('Erreur lors du chargement des données financières');
+      
+      console.error('❌ Erreur lors du chargement des données financières:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+      });
+      
+      // Afficher un message d'erreur plus détaillé
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Erreur lors du chargement des données financières';
+      
+      // Ne pas afficher d'erreur pour les 404 (API non disponible) mais afficher pour les autres
+      if (error.response?.status === 404) {
+        console.warn('⚠️ API non disponible (404)');
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        // L'intercepteur gère déjà la redirection pour 401/403
+        console.error('🔒 Erreur d\'authentification');
+      } else {
+        toastService.showError(
+          `Erreur lors du chargement des données: ${errorMessage}`,
+          'Erreur de chargement'
+        );
       }
     } finally {
       setLoading(false);

@@ -35,14 +35,38 @@ const Orders = memo(() => {
       // S'assurer que response.data est un tableau
       const ordersData = Array.isArray(response.data) ? response.data : [];
       setOrders(ordersData);
-      console.log('Commandes chargées:', ordersData.length);
+      console.log('✅ Commandes chargées:', ordersData.length);
+      
+      if (ordersData.length === 0) {
+        console.warn('⚠️ Aucune commande trouvée dans la réponse API');
+      }
     } catch (error) {
       // En cas d'erreur, initialiser avec un tableau vide
       setOrders([]);
-      console.error('Erreur lors du chargement des commandes:', error);
-      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
-      if (error.response?.status && error.response.status !== 404) {
-        toastService.showError('Erreur lors du chargement des commandes');
+      console.error('❌ Erreur lors du chargement des commandes:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+        url: error.config?.url,
+      });
+      
+      // Afficher un message d'erreur plus détaillé
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Erreur lors du chargement des commandes';
+      
+      // Ne pas afficher d'erreur pour les 404 (API non disponible) mais afficher pour les autres
+      if (error.response?.status === 404) {
+        console.warn('⚠️ API non disponible (404)');
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        // L'intercepteur gère déjà la redirection pour 401/403
+        console.error('🔒 Erreur d\'authentification');
+      } else {
+        toastService.showError(
+          `Erreur lors du chargement des commandes: ${errorMessage}`,
+          'Erreur de chargement'
+        );
       }
     } finally {
       setLoading(false);
@@ -144,6 +168,13 @@ const Orders = memo(() => {
       const response = await api.post(ORDER_ENDPOINTS.CREATE, orderData);
       if (response && (response.status === 201 || response.status === 200)) {
         toastService.showSuccess('Commande créée avec succès');
+        
+        const newOrder = response.data?.order || response.data;
+        if (newOrder) {
+          // Ajouter immédiatement la nouvelle commande à la liste
+          setOrders(prevOrders => [newOrder, ...prevOrders]);
+        }
+        
         setIsCreateModalOpen(false);
         setFormData({
           client_id: '',
@@ -152,10 +183,8 @@ const Orders = memo(() => {
           source: 'dashboard',
           items: [{ product_id: '', quantity: '', price: '' }],
         });
-        // Rafraîchir après un court délai pour s'assurer que l'API a bien enregistré
-        setTimeout(async () => {
-          await fetchOrders();
-        }, 100);
+        // Rafraîchir pour s'assurer de la synchronisation complète
+        fetchOrders();
       }
     } catch (error) {
       // Afficher le message d'erreur spécifique de l'API
@@ -166,7 +195,7 @@ const Orders = memo(() => {
           Object.values(error.response.data.errors).flat().join(', ') : 
           'Erreur lors de la création de la commande'
         );
-      showError(errorMessage);
+      toastService.showError(errorMessage);
     }
   };
 
@@ -180,18 +209,27 @@ const Orders = memo(() => {
       try {
         const response = await api.put(ORDER_ENDPOINTS.UPDATE_STATUS(orderId), { status: newStatus });
         if (response && (response.status === 200 || response.status === 204)) {
-          showSuccess('Statut mis à jour avec succès');
-          // Rafraîchir après un court délai
-          setTimeout(async () => {
-            await fetchOrders();
-          }, 100);
+          toastService.showSuccess('Statut mis à jour avec succès');
+          
+          const updatedOrder = response.data?.order || response.data;
+          if (updatedOrder) {
+            // Mettre à jour immédiatement le statut dans la liste
+            setOrders(prevOrders => 
+              prevOrders.map(order => 
+                order.id === orderId ? { ...order, status: newStatus } : order
+              )
+            );
+          }
+          
+          // Rafraîchir pour s'assurer de la synchronisation complète
+          fetchOrders();
         }
       } catch (error) {
         const errorMessage = 
           error.response?.data?.message ||
           error.response?.data?.error ||
           'Erreur lors de la mise à jour du statut';
-        showError(errorMessage);
+        toastService.showError(errorMessage);
       }
     }
   }, [fetchOrders]);

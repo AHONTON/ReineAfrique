@@ -74,7 +74,13 @@ api.interceptors.response.use(
       error.code === 'ECONNABORTED'; // Timeout
 
     if (is404OrNetwork && isGetRequest) {
-      // Silencieux pour les erreurs réseau/404/timeout lors du développement
+      // Log pour le débogage mais ne pas afficher d'alerte
+      console.warn('⚠️ Erreur réseau/404 sur requête GET:', {
+        url: error.config?.url,
+        status: error.response?.status,
+        code: error.code,
+        message: error.message,
+      });
       return Promise.reject(error);
     }
 

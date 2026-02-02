@@ -28,14 +28,38 @@ const Clients = memo(() => {
       // S'assurer que response.data est un tableau
       const clientsData = Array.isArray(response.data) ? response.data : [];
       setClients(clientsData);
-      console.log('Clients chargés:', clientsData.length);
+      console.log('✅ Clients chargés:', clientsData.length);
+      
+      if (clientsData.length === 0) {
+        console.warn('⚠️ Aucun client trouvé dans la réponse API');
+      }
     } catch (error) {
       // En cas d'erreur, initialiser avec un tableau vide
       setClients([]);
-      console.error('Erreur lors du chargement des clients:', error);
-      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
-      if (error.response?.status && error.response.status !== 404) {
-        toastService.showError('Erreur lors du chargement des clients');
+      console.error('❌ Erreur lors du chargement des clients:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+        url: error.config?.url,
+      });
+      
+      // Afficher un message d'erreur plus détaillé
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Erreur lors du chargement des clients';
+      
+      // Ne pas afficher d'erreur pour les 404 (API non disponible) mais afficher pour les autres
+      if (error.response?.status === 404) {
+        console.warn('⚠️ API non disponible (404)');
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        // L'intercepteur gère déjà la redirection pour 401/403
+        console.error('🔒 Erreur d\'authentification');
+      } else {
+        toastService.showError(
+          `Erreur lors du chargement des clients: ${errorMessage}`,
+          'Erreur de chargement'
+        );
       }
     } finally {
       setLoading(false);
@@ -73,9 +97,16 @@ const Clients = memo(() => {
       try {
         await api.delete(CLIENT_ENDPOINTS.DELETE(clientId));
         toastService.showSuccess('Client supprimé avec succès');
+        // Mettre à jour immédiatement l'état local
+        setClients(prevClients => prevClients.filter(client => client.id !== clientId));
+        // Rafraîchir pour s'assurer de la synchronisation
         fetchClients();
       } catch (error) {
-        toastService.showError('Erreur lors de la suppression du client');
+        const errorMessage = 
+          error.response?.data?.message ||
+          error.response?.data?.error ||
+          'Erreur lors de la suppression du client';
+        toastService.showError(errorMessage);
       }
     }
   };
@@ -86,21 +117,36 @@ const Clients = memo(() => {
       let response;
       if (selectedClient) {
         response = await api.put(CLIENT_ENDPOINTS.UPDATE(selectedClient.id), formData);
-        showSuccess('Client modifié avec succès');
+        toastService.showSuccess('Client modifié avec succès');
       } else {
         response = await api.post(CLIENT_ENDPOINTS.CREATE, formData);
-        showSuccess('Client créé avec succès');
+        toastService.showSuccess('Client créé avec succès');
       }
       
-      // Si la requête a réussi, fermer le modal et rafraîchir la liste
+      // Si la requête a réussi, mettre à jour immédiatement l'état local
       if (response && (response.status === 201 || response.status === 200)) {
+        const updatedClient = response.data?.client || response.data;
+        
+        if (updatedClient) {
+          if (selectedClient) {
+            // Mise à jour : remplacer le client modifié dans la liste
+            setClients(prevClients => 
+              prevClients.map(client => 
+                client.id === selectedClient.id ? updatedClient : client
+              )
+            );
+          } else {
+            // Création : ajouter le nouveau client à la liste
+            setClients(prevClients => [...prevClients, updatedClient]);
+          }
+        }
+        
         setIsModalOpen(false);
         setFormData({ name: '', email: '', phone: '', address: '' });
         setSelectedClient(null);
-        // Rafraîchir immédiatement la liste avec un petit délai pour s'assurer que l'API a bien enregistré
-        setTimeout(async () => {
-          await fetchClients();
-        }, 100);
+        
+        // Rafraîchir la liste pour s'assurer de la synchronisation complète
+        fetchClients();
       }
     } catch (error) {
       // Afficher le message d'erreur spécifique de l'API

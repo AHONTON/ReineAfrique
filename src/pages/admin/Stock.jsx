@@ -39,15 +39,39 @@ const Stock = memo(() => {
       const productsData = Array.isArray(productsRes.data) ? productsRes.data : [];
       setCategories(categoriesData);
       setProducts(productsData);
-      console.log('Données chargées - Catégories:', categoriesData.length, 'Produits:', productsData.length);
+      console.log('✅ Données chargées - Catégories:', categoriesData.length, 'Produits:', productsData.length);
+      
+      if (categoriesData.length === 0 && productsData.length === 0) {
+        console.warn('⚠️ Aucune donnée trouvée dans la réponse API');
+      }
     } catch (error) {
       // En cas d'erreur, initialiser avec des tableaux vides
       setCategories([]);
       setProducts([]);
-      console.error('Erreur lors du chargement des données:', error);
-      // Ne pas afficher d'erreur si c'est juste que l'API n'est pas disponible (404)
-      if (error.response?.status && error.response.status !== 404) {
-        toastService.showError('Erreur lors du chargement des données');
+      console.error('❌ Erreur lors du chargement des données:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        message: error.response?.data?.message || error.message,
+        data: error.response?.data,
+        url: error.config?.url,
+      });
+      
+      // Afficher un message d'erreur plus détaillé
+      const errorMessage = error.response?.data?.message || 
+                          error.message || 
+                          'Erreur lors du chargement des données';
+      
+      // Ne pas afficher d'erreur pour les 404 (API non disponible) mais afficher pour les autres
+      if (error.response?.status === 404) {
+        console.warn('⚠️ API non disponible (404)');
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        // L'intercepteur gère déjà la redirection pour 401/403
+        console.error('🔒 Erreur d\'authentification');
+      } else {
+        toastService.showError(
+          `Erreur lors du chargement des données: ${errorMessage}`,
+          'Erreur de chargement'
+        );
       }
     } finally {
       setLoading(false);
@@ -85,9 +109,10 @@ const Stock = memo(() => {
         const response = await api.delete(CATEGORY_ENDPOINTS.DELETE(categoryId));
         if (response && (response.status === 200 || response.status === 204)) {
           toastService.showSuccess('Catégorie supprimée avec succès');
-          setTimeout(async () => {
-            await fetchData();
-          }, 100);
+          // Mettre à jour immédiatement l'état local
+          setCategories(prevCategories => prevCategories.filter(category => category.id !== categoryId));
+          // Rafraîchir pour s'assurer de la synchronisation
+          fetchData();
         }
       } catch (error) {
         const errorMessage = 
@@ -108,16 +133,30 @@ const Stock = memo(() => {
         toastService.showSuccess('Catégorie modifiée avec succès');
       } else {
         response = await api.post(CATEGORY_ENDPOINTS.CREATE, categoryForm);
-        showSuccess('Catégorie créée avec succès');
+        toastService.showSuccess('Catégorie créée avec succès');
       }
       if (response && (response.status === 201 || response.status === 200)) {
+        const updatedCategory = response.data?.category || response.data;
+        
+        if (updatedCategory) {
+          if (selectedCategory) {
+            // Mise à jour : remplacer la catégorie modifiée dans la liste
+            setCategories(prevCategories => 
+              prevCategories.map(category => 
+                category.id === selectedCategory.id ? updatedCategory : category
+              )
+            );
+          } else {
+            // Création : ajouter la nouvelle catégorie à la liste
+            setCategories(prevCategories => [...prevCategories, updatedCategory]);
+          }
+        }
+        
         setIsCategoryModalOpen(false);
         setCategoryForm({ name: '', description: '' });
         setSelectedCategory(null);
-        // Rafraîchir après un court délai
-        setTimeout(async () => {
-          await fetchData();
-        }, 100);
+        // Rafraîchir pour s'assurer de la synchronisation complète
+        fetchData();
       }
     } catch (error) {
       const errorMessage = 
@@ -127,7 +166,7 @@ const Stock = memo(() => {
           Object.values(error.response.data.errors).flat().join(', ') : 
           'Erreur lors de la sauvegarde de la catégorie'
         );
-      showError(errorMessage);
+      toastService.showError(errorMessage);
     }
   };
 
@@ -167,9 +206,10 @@ const Stock = memo(() => {
         const response = await api.delete(PRODUCT_ENDPOINTS.DELETE(productId));
         if (response && (response.status === 200 || response.status === 204)) {
           toastService.showSuccess('Produit supprimé avec succès');
-          setTimeout(async () => {
-            await fetchData();
-          }, 100);
+          // Mettre à jour immédiatement l'état local
+          setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+          // Rafraîchir pour s'assurer de la synchronisation
+          fetchData();
         }
       } catch (error) {
         const errorMessage = 
@@ -184,15 +224,39 @@ const Stock = memo(() => {
   const handleSubmitProduct = async (e) => {
     e.preventDefault();
     try {
+      // S'assurer que categoryId est un entier
+      const productData = {
+        ...productForm,
+        categoryId: productForm.categoryId ? parseInt(productForm.categoryId, 10) : productForm.categoryId,
+        stock: parseFloat(productForm.stock) || 0,
+        pricePerMeter: parseFloat(productForm.pricePerMeter) || 0,
+      };
+      
       let response;
       if (selectedProduct) {
-        response = await api.put(PRODUCT_ENDPOINTS.UPDATE(selectedProduct.id), productForm);
+        response = await api.put(PRODUCT_ENDPOINTS.UPDATE(selectedProduct.id), productData);
         toastService.showSuccess('Produit modifié avec succès');
       } else {
-        response = await api.post(PRODUCT_ENDPOINTS.CREATE, productForm);
-        showSuccess('Produit créé avec succès');
+        response = await api.post(PRODUCT_ENDPOINTS.CREATE, productData);
+        toastService.showSuccess('Produit créé avec succès');
       }
       if (response && (response.status === 201 || response.status === 200)) {
+        const updatedProduct = response.data?.product || response.data;
+        
+        if (updatedProduct) {
+          if (selectedProduct) {
+            // Mise à jour : remplacer le produit modifié dans la liste
+            setProducts(prevProducts => 
+              prevProducts.map(product => 
+                product.id === selectedProduct.id ? updatedProduct : product
+              )
+            );
+          } else {
+            // Création : ajouter le nouveau produit à la liste
+            setProducts(prevProducts => [...prevProducts, updatedProduct]);
+          }
+        }
+        
         setIsProductModalOpen(false);
         setProductForm({
           name: '',
@@ -202,10 +266,8 @@ const Stock = memo(() => {
           description: '',
         });
         setSelectedProduct(null);
-        // Rafraîchir après un court délai
-        setTimeout(async () => {
-          await fetchData();
-        }, 100);
+        // Rafraîchir pour s'assurer de la synchronisation complète
+        fetchData();
       }
     } catch (error) {
       const errorMessage = 

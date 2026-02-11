@@ -4,7 +4,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const ThemeToggle = () => {
-  const { theme, changeTheme, isDark } = useTheme();
+  const { theme, changeTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
 
   const themes = [

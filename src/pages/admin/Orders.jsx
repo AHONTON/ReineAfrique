@@ -10,6 +10,12 @@ import { ORDER_STATUS_CONFIG, ORDER_STATUS } from '../../config/constants';
 import { ORDER_ENDPOINTS, CLIENT_ENDPOINTS, PRODUCT_ENDPOINTS } from '../../config/api';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
+const isPlaceholderEmail = (email) => {
+  if (!email || typeof email !== 'string') return true;
+  return email.includes('@reine-afrique.local') && email.startsWith('sans-email-');
+};
+const displayEmail = (email) => (!email || isPlaceholderEmail(email) ? '—' : email);
+
 const Orders = memo(() => {
   const [orders, setOrders] = useState([]);
   const [updatingOrders, setUpdatingOrders] = useState([]);
@@ -247,7 +253,7 @@ const Orders = memo(() => {
             )
           );
         }
-    } catch (error) {
+    } catch {
         toastService.showError('Erreur lors de la mise à jour de la livraison');
     } finally {
         setUpdatingOrders(prev => prev.filter(id => id !== orderId));
@@ -288,7 +294,7 @@ const Orders = memo(() => {
           const items = Array.isArray(row.items) ? row.items : [];
           const totalQty = items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
           return totalQty || 0;
-        } catch (err) {
+        } catch {
           return 0;
         }
       }
@@ -435,9 +441,7 @@ const Orders = memo(() => {
                     {selectedOrder.client?.name || (selectedOrder.guest_info ? `${selectedOrder.guest_info.nom} ${selectedOrder.guest_info.prenom}` : 'Inconnu')}
                 </p>
                 <p className="text-sm">{selectedOrder.client?.phone || selectedOrder.guest_info?.telephone || 'Pas de numéro'}</p>
-                {(selectedOrder.client?.email || selectedOrder.guest_info?.email) && (
-                  <p className="text-sm text-gray-400">{selectedOrder.client?.email || selectedOrder.guest_info?.email}</p>
-                )}
+                <p className="text-sm text-gray-400">{displayEmail(selectedOrder.client?.email || selectedOrder.guest_info?.email)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Adresse de Livraison</p>

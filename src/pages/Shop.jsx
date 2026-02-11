@@ -7,7 +7,6 @@ import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
 import ProductCard from "../components/Shop/ProductCard";
 import ShopBanner from "../components/Shop/ShopBanner";
-import { useLoading } from '../contexts/LoadingContext';
 import api from '../api/axios';
 import { SHOP_ENDPOINTS } from '../config/api';
 import toastService from '../utils/toastService';
@@ -47,7 +46,7 @@ const Shop = () => {
                 setCategories(categoriesRes.data || []);
             } catch (error) {
                 console.error("Error fetching shop data:", error);
-                toastService.error("Impossible de charger les articles.");
+                toastService.showError("Impossible de charger les articles.");
             } finally {
                 setIsLoading(false);
             }

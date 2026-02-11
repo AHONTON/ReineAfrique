@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }) => {
     if (token && adminData) {
       try {
         setAdmin(JSON.parse(adminData));
-      } catch (error) {
+      } catch {
         localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         localStorage.removeItem(STORAGE_KEYS.ADMIN_DATA);
       }
@@ -55,9 +55,9 @@ export const AuthProvider = ({ children }) => {
 
       toastService.showSuccess('Connexion réussie !', 'Bienvenue');
       return { success: true };
-    } catch (error) {
+    } catch (err) {
       const errorMessage =
-        error.response?.data?.message || 'Erreur de connexion';
+        err.response?.data?.message || 'Erreur de connexion';
       toastService.showError(errorMessage, 'Échec de la connexion');
       return { success: false, error: errorMessage };
     }
@@ -83,12 +83,11 @@ export const AuthProvider = ({ children }) => {
         if (token) {
           try {
             await api.post(AUTH_ENDPOINTS.LOGOUT);
-          } catch (error) {
-            // Ignorer les erreurs de déconnexion API (token peut être déjà expiré)
-            console.warn('Erreur lors de la déconnexion API:', error);
+          } catch (err) {
+            console.warn('Erreur lors de la déconnexion API:', err);
           }
         }
-      } catch (error) {
+      } catch {
         // Ignorer les erreurs
       }
 

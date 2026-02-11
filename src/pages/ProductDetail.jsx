@@ -38,7 +38,7 @@ const ProductDetail = () => {
                 setProduct(response.data);
             } catch (error) {
                 console.error("Error fetching product:", error);
-                toastService.error("Impossible de charger le produit.");
+                toastService.showError("Impossible de charger le produit.");
                 navigate('/shop');
             } finally {
                 setIsLoading(false);
@@ -58,9 +58,8 @@ const ProductDetail = () => {
     const handleDirectOrder = async (e) => {
         e.preventDefault();
         
-        // Basic validation
-        if (!orderForm.nom || !orderForm.telephone || !orderForm.adresse) {
-            toastService.error("Veuillez remplir les champs obligatoires (*)");
+        if (!orderForm.nom || !orderForm.prenom || !orderForm.telephone || !orderForm.adresse) {
+            toastService.showError("Veuillez remplir tous les champs obligatoires (*)");
             return;
         }
 
@@ -97,7 +96,7 @@ const ProductDetail = () => {
 
         } catch (error) {
             console.error("Order error:", error);
-            toastService.error("Une erreur est survenue lors de la commande.");
+            toastService.showError("Une erreur est survenue lors de la commande.");
         }
     };
 
@@ -260,32 +259,41 @@ const ProductDetail = () => {
                             </div>
 
                             <form onSubmit={handleDirectOrder} className="p-6 space-y-4">
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Identité</p>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block mb-1 text-xs font-bold text-gray-700">Nom *</label>
+                                        <label className="block mb-1 text-xs font-bold text-gray-700">Nom de famille *</label>
                                         <input 
                                             type="text" 
                                             name="nom"
                                             value={orderForm.nom}
                                             onChange={handleInputChange}
                                             className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-sm"
-                                            placeholder="Votre nom"
+                                            placeholder="Ex: Traoré"
                                             required 
                                         />
                                     </div>
                                     <div>
-                                        <label className="block mb-1 text-xs font-bold text-gray-700">Prénom</label>
+                                        <label className="block mb-1 text-xs font-bold text-gray-700">Prénom *</label>
                                         <input 
                                             type="text" 
                                             name="prenom"
                                             value={orderForm.prenom}
                                             onChange={handleInputChange}
                                             className="w-full p-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-orange-500 outline-none text-sm"
-                                            placeholder="Votre prénom" 
+                                            placeholder="Ex: Fatou"
+                                            required 
                                         />
                                     </div>
                                 </div>
+                                {(orderForm.nom || orderForm.prenom) && (
+                                    <p className="text-xs text-gray-500">
+                                        <span className="font-medium text-gray-600">Nom complet :</span>{' '}
+                                        {[orderForm.prenom, orderForm.nom].filter(Boolean).join(' ')}
+                                    </p>
+                                )}
 
+                                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide pt-1">Contact & livraison</p>
                                 <div>
                                     <label className="block mb-1 text-xs font-bold text-gray-700">Téléphone *</label>
                                     <input 

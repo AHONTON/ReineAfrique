@@ -259,7 +259,7 @@ const Header = memo(({ logoSrc }) => {
 
                     <div className="flex-1 px-4 py-4 overflow-y-auto">
                         <nav className="flex flex-col gap-2">
-                            {navLinks.map((link, idx) => (
+                            {navLinks.map((link) => (
                                 <Link 
                                     key={link.path} 
                                     to={link.path}

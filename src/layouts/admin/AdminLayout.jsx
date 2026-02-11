@@ -1,9 +1,11 @@
 import { Outlet } from 'react-router-dom';
+import { OrderNotificationsProvider } from '../../contexts/OrderNotificationsContext';
 import Sidebar from './Sidebar';
 import Header from './Header';
 
 const AdminLayout = () => {
   return (
+    <OrderNotificationsProvider>
     <div className="admin-dashboard min-h-screen min-w-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative transition-colors duration-300">
       {/* Subtil overlay dégradé pour éviter effets de carreaux */}
       <div
@@ -21,6 +23,7 @@ const AdminLayout = () => {
         </main>
       </div>
     </div>
+    </OrderNotificationsProvider>
   );
 };
 

@@ -8,7 +8,7 @@ const colorMap = {
   warning: 'bg-amber-50 border-amber-200 text-amber-800',
 };
 
-const Toast = ({ id, type = 'info', message = '', title, timeout = 4000, onClose }) => {
+const Toast = ({ id: _id, type = 'info', message = '', title, timeout = 4000, onClose }) => {
   useEffect(() => {
     const t = setTimeout(() => {
       onClose();

@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react';
+import { useState, useEffect, useCallback, memo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   ShoppingCart,
@@ -50,38 +51,18 @@ const useWindowSize = () => {
   return windowSize;
 };
 
-const DEFAULT_STATS = {
-  revenue: 1250000,
-  orders: 45,
-  clients: 12,
-  lowStock: 8,
-};
-
-const DEFAULT_SALES_DATA = [
-  { month: 'Jan', sales: 250000 },
-  { month: 'Fév', sales: 320000 },
-  { month: 'Mar', sales: 280000 },
-  { month: 'Avr', sales: 420000 },
-  { month: 'Mai', sales: 380000 },
-  { month: 'Jun', sales: 450000 },
-];
-
-const DEFAULT_SALES_DISTRIBUTION = [
-  { name: 'Wax', value: 500000 },
-  { name: 'Bogolan', value: 250000 },
-  { name: 'Autres', value: 187500 },
-  { name: 'Soie', value: 312500 },
-];
+const ZERO_STATS = { revenue: 0, orders: 0, clients: 0, lowStock: 0 };
 
 const Dashboard = memo(() => {
+  const navigate = useNavigate();
   const { width } = useWindowSize();
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState(PERIODS.MONTH);
-  const [startDate, setStartDate] = useState('');
-  const [endDate, setEndDate] = useState('');
-  const [stats, setStats] = useState(DEFAULT_STATS);
-  const [salesData, setSalesData] = useState(DEFAULT_SALES_DATA);
-  const [salesDistribution, setSalesDistribution] = useState(DEFAULT_SALES_DISTRIBUTION);
+  const [startDate, _setStartDate] = useState('');
+  const [endDate, _setEndDate] = useState('');
+  const [stats, setStats] = useState(ZERO_STATS);
+  const [salesData, setSalesData] = useState([]);
+  const [salesDistribution, setSalesDistribution] = useState([]);
   const [recentOrders, setRecentOrders] = useState([]);
   const [lowStockItems, setLowStockItems] = useState([]);
   const [ordersLoading, setOrdersLoading] = useState(false);
@@ -109,39 +90,33 @@ const Dashboard = memo(() => {
         api.get(DASHBOARD_ENDPOINTS.DISTRIBUTION, { params }),
       ]);
 
-      // Validation et protection des données reçues
+      // Données réelles uniquement — 0 si absent
       const statsData = {
-        revenue: statsRes.data?.revenue ?? DEFAULT_STATS.revenue,
-        orders: statsRes.data?.orders ?? DEFAULT_STATS.orders,
-        clients: statsRes.data?.clients ?? DEFAULT_STATS.clients,
-        lowStock: statsRes.data?.lowStock ?? DEFAULT_STATS.lowStock,
+        revenue: Number(statsRes.data?.revenue) || 0,
+        orders: Number(statsRes.data?.orders) || 0,
+        clients: Number(statsRes.data?.clients) || 0,
+        lowStock: Number(statsRes.data?.lowStock) || 0,
       };
       setStats(statsData);
-      console.log('✅ Dashboard stats chargées:', statsData);
-      
-      // S'assurer que salesData est un tableau
-      const salesDataArray = Array.isArray(salesRes.data) && salesRes.data.length > 0 
-        ? salesRes.data 
-        : DEFAULT_SALES_DATA;
+
+      const salesDataArray = Array.isArray(salesRes.data) && salesRes.data.length > 0
+        ? salesRes.data
+        : [];
       setSalesData(salesDataArray);
-      console.log('✅ Données de ventes chargées:', salesDataArray.length, 'mois');
-      
-      // S'assurer que salesDistribution est un tableau
+
       const distributionData = Array.isArray(distributionRes.data) && distributionRes.data.length > 0
         ? distributionRes.data
-        : DEFAULT_SALES_DISTRIBUTION;
+        : [];
       setSalesDistribution(distributionData);
-      console.log('✅ Répartition des ventes chargée:', distributionData.length, 'catégories');
 
       // Fire-and-forget: charger commandes et stock séparément pour ne pas bloquer charts
       fetchRecentOrders();
       fetchLowStock();
     } catch (error) {
-      // Si l'API n'est pas disponible, utiliser des données par défaut pour l'affichage
-      setStats(DEFAULT_STATS);
-      setSalesData(DEFAULT_SALES_DATA);
-      setSalesDistribution(DEFAULT_SALES_DISTRIBUTION);
-      
+      setStats(ZERO_STATS);
+      setSalesData([]);
+      setSalesDistribution([]);
+
       console.error('❌ Erreur lors du chargement des données du dashboard:', {
         status: error.response?.status,
         statusText: error.response?.statusText,
@@ -279,49 +254,83 @@ const Dashboard = memo(() => {
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
-                {(recentOrders && recentOrders.length > 0 ? recentOrders : [
-                  { id: '1', client: 'Aminata Diallo', status: 'En préparation', amount: '85 000 CFA' },
-                  { id: '2', client: 'Ibrahima Koné', status: 'Livrée', amount: '120 000 CFA' },
-                  { id: '3', client: 'Fatou Traoré', status: 'En discussion', amount: '50 000 CFA' },
-                ]).map((row, idx) => (
-                  <tr key={row.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.client || row.customer_name || row.customer?.name}</td>
-                    <td className="px-4 py-3">
-                      <span className={`badge-status ${row.status === 'Livrée' || row.status === 'delivered' ? 'badge-green' : row.status === 'En préparation' || row.status === 'processing' ? 'badge-yellow' : 'badge-orange'}`}>
-                        {row.status || row.state}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.amount ?? (row.total ? formatCurrency(row.total) : (row.total == null ? '—' : formatCurrency(row.total)))}</td>
-                    <td className="px-4 py-3 text-right">
-                      <button onClick={() => console.log('Voir commande', row.id)} className="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded shadow">Voir</button>
+                {recentOrders && recentOrders.length > 0 ? (
+                  recentOrders.map((row, idx) => (
+                    <tr key={row.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                      <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.client || row.customer_name || row.customer?.name}</td>
+                      <td className="px-4 py-3">
+                        <span className={`badge-status ${row.status === 'Livrée' || row.status === 'delivered' ? 'badge-green' : row.status === 'En préparation' || row.status === 'processing' ? 'badge-yellow' : 'badge-orange'}`}>
+                          {row.status || row.state}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.amount ?? (row.total ? formatCurrency(row.total) : (row.total == null ? '—' : formatCurrency(row.total)))}</td>
+                      <td className="px-4 py-3 text-right">
+                        <button type="button" onClick={() => navigate('/admin/commandes')} className="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded shadow">Voir</button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                      {ordersLoading ? 'Chargement…' : 'Aucune commande récente'}
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6">
-          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Stock Faible</h3>
-          <ul className="space-y-3">
-            {(lowStockItems && lowStockItems.length > 0 ? lowStockItems : [
-              { id: 'p1', name: 'Wax Rouge', qty: '5 m' },
-              { id: 'p2', name: 'Soie Dorée', qty: '2 m' },
-              { id: 'p3', name: 'Bogolan Noir', qty: '3 m' },
-            ]).map((item) => (
-              <li key={item.id} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-md bg-orange-100 flex items-center justify-center text-sm font-medium text-orange-700">{(item.name || item.title || '').split(' ').slice(0,1)}</div>
-                  <div>
-                    <div className="text-sm font-medium text-gray-800 dark:text-gray-100">{item.name || item.title}</div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">{item.qty ?? (item.stock ? `${item.stock} unités` : '')}</div>
-                  </div>
-                </div>
-                <div className="text-sm text-orange-600">-</div>
-              </li>
-            ))}
-          </ul>
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 border-l-4 border-l-amber-500 dark:border-l-amber-400 overflow-hidden flex flex-col min-h-[200px]">
+          <div className="p-4 sm:p-5 md:p-6 pb-0 flex-shrink-0">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center flex-shrink-0">
+                <Package className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white">Stock Faible</h3>
+            </div>
+          </div>
+          <div className="p-4 sm:p-5 md:p-6 pt-3 flex-1 flex flex-col">
+            <ul className="space-y-2.5 flex-1">
+              {lowStockItems && lowStockItems.length > 0 ? (
+                lowStockItems.map((item) => (
+                  <li key={item.id} className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg bg-gray-50 dark:bg-gray-700/50 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center text-xs font-bold text-amber-700 dark:text-amber-300 flex-shrink-0">
+                        {(item.name || item.title || '?').trim().charAt(0).toUpperCase()}
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-sm font-medium text-gray-800 dark:text-gray-100 truncate">{item.name || item.title}</div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400">
+                          {item.qty != null && item.qty !== '' ? `${item.qty} en stock` : 'Stock non renseigné'}
+                        </div>
+                      </div>
+                    </div>
+                    <span className="text-xs font-semibold text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-900/40 px-2 py-1 rounded flex-shrink-0">
+                      Faible
+                    </span>
+                  </li>
+                ))
+              ) : (
+                <li className="py-8 text-center">
+                  {stockLoading ? (
+                    <span className="text-sm text-gray-500 dark:text-gray-400">Chargement…</span>
+                  ) : (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Aucun produit en stock faible</p>
+                  )}
+                </li>
+              )}
+            </ul>
+            <div className="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700 flex-shrink-0">
+              <button
+                type="button"
+                onClick={() => navigate('/admin/stock')}
+                className="w-full py-2 text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:bg-amber-50 dark:hover:bg-amber-900/20 rounded-lg transition-colors"
+              >
+                Voir le stock
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 

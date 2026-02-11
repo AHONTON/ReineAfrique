@@ -43,6 +43,8 @@ export const CLIENT_ENDPOINTS = {
   CREATE: '/admin/clients',
   UPDATE: (clientId) => `/admin/clients/${clientId}`,
   DELETE: (clientId) => `/admin/clients/${clientId}`,
+  /** Optionnel : vérification WhatsApp (backend peut ne pas l’implémenter) */
+  CHECK_WHATSAPP: (clientId) => `/admin/clients/${clientId}/check-whatsapp`,
 };
 
 // Endpoints des catégories

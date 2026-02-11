@@ -13,8 +13,6 @@ const show = ({ type = 'info', message = '', title = '', timeout = 4000 }) => {
   if (handler) {
     handler({ type, message, title, timeout });
   } else {
-    // fallback console pour débogage
-    // eslint-disable-next-line no-console
     console.warn('Toast handler not registered yet:', { type, message, title });
   }
 };

@@ -51,10 +51,6 @@ export const ORDER_STATUS_CONFIG = {
     label: 'Confirmée',
     color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   },
-  [ORDER_STATUS.CONFIRMEE]: {
-    label: 'Confirmée',
-    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
-  },
   [ORDER_STATUS.EN_PREPARATION]: {
     label: 'En préparation',
     color: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-400',

@@ -15,10 +15,8 @@ const DataTable = memo(({
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // S'assurer que data est toujours un tableau
-  const safeData = Array.isArray(data) ? data : [];
+  const safeData = useMemo(() => (Array.isArray(data) ? data : []), [data]);
 
-  // Filtrage des données avec useMemo
   const filteredData = useMemo(() => {
     if (!searchable) return safeData;
     return safeData.filter((row) =>

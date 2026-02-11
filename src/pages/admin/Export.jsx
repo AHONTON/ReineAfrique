@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Download, FileText, FileSpreadsheet } from 'lucide-react';
 import api from '../../api/axios';
-import { showError, showSuccess, showLoading, closeLoading } from '../../utils/swal';
+import { showLoading, closeLoading } from '../../utils/swal';
 import toastService from '../../utils/toastService';
 import { EXPORT_ENDPOINTS } from '../../config/api';
 import { EXPORT_TYPES, EXPORT_FORMATS } from '../../config/constants';
@@ -32,7 +32,7 @@ const Export = () => {
       closeLoading();
       toastService.showSuccess('Export réussi !', 'Fichier téléchargé');
       setExporting(null);
-    } catch (error) {
+    } catch {
       closeLoading();
       toastService.showError('Erreur lors de l\'export');
       setExporting(null);

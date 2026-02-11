@@ -81,10 +81,11 @@ const Clients = memo(() => {
   const handleEdit = (client) => {
     setSelectedClient(client);
     const parts = (client.name || '').split(' ');
+    const email = client.email;
     setFormData({
       firstName: parts.shift() || '',
       lastName: parts.join(' ') || '',
-      email: client.email || '',
+      email: !email || (typeof email === 'string' && email.includes('@reine-afrique.local') && email.startsWith('sans-email-')) ? '' : email,
       phone: client.phone || '',
       address: client.address || '',
     });
@@ -119,11 +120,13 @@ const Clients = memo(() => {
     e.preventDefault();
     try {
       let response;
-      // Conserver compatibilité backend: envoyer `name` construit
       const payload = {
         ...formData,
         name: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
       };
+      if (selectedClient && payload.email === '') {
+        delete payload.email;
+      }
 
       if (selectedClient) {
         response = await api.put(CLIENT_ENDPOINTS.UPDATE(selectedClient.id), payload);
@@ -167,7 +170,7 @@ const Clients = memo(() => {
               if (typeof hasWhatsApp === 'boolean') {
                 setClients(prev => prev.map(c => c.id === created.id ? { ...c, hasWhatsApp } : c));
               }
-            } catch (err) {
+            } catch {
               // Backend may not implement this endpoint; c'est facultatif
             }
           }
@@ -199,12 +202,14 @@ const Clients = memo(() => {
       const response = await api.get(CLIENT_ENDPOINTS.SHOW(client.id));
       setSelectedClient(response.data);
       setIsDetailsModalOpen(true);
-    } catch (error) {
+    } catch {
       toastService.showError('Erreur lors du chargement des détails');
     }
   };
 
 
+  // Fonction conservée pour évolution (changement de statut depuis la fiche client)
+  // eslint-disable-next-line no-unused-vars -- utilisé ultérieurement depuis la fiche détail
   const handleInlineOrderStatusChange = async (clientId, orderId, newStatus) => {
     const { value: confirmed } = await showConfirm('Voulez-vous changer le statut de cette commande ?', 'Modifier le statut');
     if (!confirmed) return;
@@ -248,7 +253,7 @@ const Clients = memo(() => {
       if (s.startsWith('229')) return `+${s}`;
       // Sinon, présumer format local et préfixer +229
       return `+229${s}`;
-    } catch (err) {
+    } catch {
       return null;
     }
   };
@@ -264,7 +269,7 @@ const Clients = memo(() => {
       if (s.startsWith('00')) return `+${s.slice(2)}`;
       if (s.startsWith('229')) return `+${s}`;
       return `+229${s}`;
-    } catch (err) {
+    } catch {
       return phone;
     }
   };
@@ -275,12 +280,21 @@ const Clients = memo(() => {
     return { first: parts.shift() || '', last: parts.join(' ') || '' };
   };
 
+  const isPlaceholderEmail = useCallback((email) => {
+    if (!email || typeof email !== 'string') return true;
+    return email.includes('@reine-afrique.local') && email.startsWith('sans-email-');
+  }, []);
+
+  const displayEmail = useCallback((email) => {
+    if (!email || isPlaceholderEmail(email)) return '—';
+    return email;
+  }, [isPlaceholderEmail]);
 
   const columns = useMemo(() => [
     { key: 'id', label: 'ID' },
     { key: 'lastName', label: 'Nom', render: (value, row) => splitName(row.name).last || '—' },
     { key: 'firstName', label: 'Prénom', render: (value, row) => splitName(row.name).first || '—' },
-    { key: 'email', label: 'Email (optionnel)' },
+    { key: 'email', label: 'Email', render: (value) => displayEmail(value) },
     {
       key: 'phone',
       label: 'Téléphone',
@@ -303,7 +317,7 @@ const Clients = memo(() => {
       label: 'Adresse / Quartier',
       render: (value, row) => row.address || '—',
     },
-  ], []);
+  ], [displayEmail]);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -490,7 +504,7 @@ const Clients = memo(() => {
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Email</p>
-                <p className="font-medium text-gray-900 dark:text-white">{selectedClient.email}</p>
+                <p className="font-medium text-gray-900 dark:text-white">{displayEmail(selectedClient.email)}</p>
               </div>
               <div>
                 <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">Téléphone</p>

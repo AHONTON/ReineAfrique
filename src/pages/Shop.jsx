@@ -140,13 +140,13 @@ const Shop = () => {
 
                     {/* Products Grid - Optimized for modern sizing (smaller cards, better density) */}
                     {isLoading ? (
-                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-                            {[...Array(10)].map((_, i) => (
+                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
+                            {[...Array(12)].map((_, i) => (
                                 <ProductSkeleton key={i} />
                             ))}
                          </div>
                     ) : filteredProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
                             {filteredProducts.map(product => (
                                 <ProductCard key={product.id} product={product} />
                             ))}

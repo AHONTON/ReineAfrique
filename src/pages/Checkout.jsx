@@ -31,10 +31,11 @@ const Checkout = () => {
     });
 
     // Redirect if cart is empty
-    if (cartItems.length === 0) {
-        navigate('/shop');
-        return null;
-    }
+    React.useEffect(() => {
+        if (cartItems.length === 0) {
+            navigate('/shop');
+        }
+    }, [cartItems, navigate]);
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -42,7 +43,7 @@ const Checkout = () => {
 
     const validateForm = () => {
         if (!formData.nom || !formData.prenom || !formData.telephone || !formData.adresse || !formData.ville) {
-            toastService.error("Veuillez remplir tous les champs obligatoires (*)");
+            toastService.showError("Veuillez remplir tous les champs obligatoires (*)");
             return false;
         }
         return true;

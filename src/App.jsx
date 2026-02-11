@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect } from "react";
 import { Routes, Route, useLocation } from "react-router-dom";
+import { motion } from "framer-motion";
 import { LoadingProvider, useLoading } from "./contexts/LoadingContext";
 import { CookieProvider } from "./contexts/CookieContext";
 import { AuthProvider } from "./auth/AuthContext";
@@ -7,6 +8,7 @@ import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { AlertProvider } from "./contexts/AlertContext";
 import { CartProvider } from "./contexts/CartContext";
 import LoadingScreen from "./components/Layout/LoadingScreen";
+import ReineLoader from "./components/Layout/ReineLoader";
 import PageTransition from "./components/Layout/PageTransition";
 import ContactModal from "./components/ContactModal";
 import CookieConsent from "./components/CookieConsent";
@@ -34,12 +36,8 @@ import Finance from "./pages/admin/Finance";
 import Export from "./pages/admin/Export";
 import ProtectedRoute from "./auth/ProtectedRoute";
 
-// Fallback pour les routes publiques
-const PublicFallback = () => (
-  <div className="min-h-screen flex items-center justify-center bg-white dark:bg-gray-900">
-    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-  </div>
-);
+// Fallback pour les routes publiques — même loader que l'écran d'accueil
+const PublicFallback = () => <ReineLoader />;
 
 function AppContent() {
   const location = useLocation();
@@ -48,15 +46,18 @@ function AppContent() {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isDark = resolvedTheme === 'dark';
 
-  // Fallback pour AdminLayout - correspond exactement au fond du dashboard
+  // Fallback pour AdminLayout — spinner moderne aligné au dashboard
   const AdminLayoutFallback = (
-    <div className={`admin-dashboard min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 fixed inset-0`}>
-      <div className="lg:pl-64 w-full min-h-screen">
-        <div className="p-3 sm:p-4 md:p-6">
-          <div className="flex items-center justify-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-          </div>
+    <div className={`admin-dashboard min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 fixed inset-0 flex items-center justify-center`}>
+      <div className="flex flex-col items-center gap-4">
+        <div className="relative w-14 h-14">
+          <motion.div
+            className="absolute inset-0 rounded-full border-2 border-transparent border-t-orange-500 border-r-amber-400"
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          />
         </div>
+        <span className="text-sm text-gray-500 dark:text-gray-400">Chargement...</span>
       </div>
     </div>
   );

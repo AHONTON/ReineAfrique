@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Wifi, WifiOff, Loader2 } from "lucide-react";
+import { Wifi, WifiOff } from "lucide-react";
+import ReineLoader from "./ReineLoader";
 
 const LoadingScreen = ({ isLoading, onComplete }) => {
   const [progress, setProgress] = useState(0);
@@ -10,16 +11,12 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
   const [connectionStatus, setConnectionStatus] = useState("checking");
 
   useEffect(() => {
-    // Détection de l'état de connexion
-    if (typeof window === "undefined" || typeof navigator === "undefined") {
-      return;
-    }
+    if (typeof window === "undefined" || typeof navigator === "undefined") return;
 
     const handleOnline = () => {
       setIsOnline(true);
       setConnectionStatus("online");
     };
-
     const handleOffline = () => {
       setIsOnline(false);
       setConnectionStatus("offline");
@@ -27,13 +24,8 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
 
     window.addEventListener("online", handleOnline);
     window.addEventListener("offline", handleOffline);
-
-    // Vérification initiale
-    if (navigator.onLine) {
-      setConnectionStatus("online");
-    } else {
-      setConnectionStatus("offline");
-    }
+    if (navigator.onLine) setConnectionStatus("online");
+    else setConnectionStatus("offline");
 
     return () => {
       window.removeEventListener("online", handleOnline);
@@ -44,7 +36,7 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
   useEffect(() => {
     if (!isLoading) return;
 
-    const minDuration = 5000; // 5 secondes minimum
+    const minDuration = 2800; // ~3 s, fluide
     const startTime = Date.now();
     let animationFrame;
     let loadComplete = false;
@@ -53,71 +45,38 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
       if (loadComplete) return;
       loadComplete = true;
       setProgress(100);
-      setTimeout(() => {
-        onComplete();
-      }, 300);
+      setTimeout(() => onComplete(), 350);
     };
 
     const updateProgress = () => {
       const elapsed = Date.now() - startTime;
-      const baseProgress = Math.min((elapsed / minDuration) * 100, 100);
-
-      // Simulation de chargement avec variations
-      const variation = Math.sin(elapsed / 500) * 5;
-      const currentProgress = Math.min(baseProgress + variation, 100);
-
-      setProgress(currentProgress);
-
-      // Si on est hors ligne, ralentir la progression
-      if (!isOnline && currentProgress > 50) {
-        setProgress(50);
-      }
+      const baseProgress = Math.min((elapsed / minDuration) * 98, 98);
+      const variation = Math.sin(elapsed / 400) * 3;
+      const currentProgress = Math.min(baseProgress + variation, 98);
+      setProgress(isOnline ? currentProgress : Math.min(currentProgress, 50));
 
       if (elapsed < minDuration) {
         animationFrame = requestAnimationFrame(updateProgress);
       } else {
-        // Vérifier si les ressources sont chargées
         if (document.readyState === "complete") {
           completeLoading();
         } else {
-          const handleLoad = () => {
-            completeLoading();
-          };
-          window.addEventListener("load", handleLoad, { once: true });
-          
-          // Fallback : compléter après 6 secondes maximum même si pas chargé
-          setTimeout(() => {
-            completeLoading();
-          }, 1000);
+          window.addEventListener("load", () => completeLoading(), { once: true });
+          setTimeout(completeLoading, 800);
         }
       }
     };
 
     animationFrame = requestAnimationFrame(updateProgress);
-
-    return () => {
-      if (animationFrame) {
-        cancelAnimationFrame(animationFrame);
-      }
-    };
+    return () => animationFrame && cancelAnimationFrame(animationFrame);
   }, [isLoading, onComplete, isOnline]);
 
   const getStatusMessage = () => {
-    if (connectionStatus === "checking") {
-      return "Vérification de la connexion...";
-    }
-    if (connectionStatus === "offline") {
-      return "Mode hors ligne détecté";
-    }
-    if (progress < 30) {
-      return "Chargement des ressources...";
-    }
-    if (progress < 60) {
-      return "Préparation de l'interface...";
-    }
-    if (progress < 90) {
-      return "Finalisation...";
-    }
+    if (connectionStatus === "checking") return "Vérification de la connexion...";
+    if (connectionStatus === "offline") return "Mode hors ligne détecté";
+    if (progress < 35) return "Chargement des ressources...";
+    if (progress < 70) return "Préparation de l'interface...";
+    if (progress < 95) return "Finalisation...";
     return "Presque prêt...";
   };
 
@@ -127,161 +86,82 @@ const LoadingScreen = ({ isLoading, onComplete }) => {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-amber-50 via-orange-50 to-red-50"
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-gradient-to-br from-amber-50/98 via-orange-50/95 to-amber-100/98"
         >
-          {/* Animation de fond */}
-          <div className="absolute inset-0 overflow-hidden">
+          {/* Fond animé fluide */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
             <motion.div
               animate={{
                 backgroundPosition: ["0% 0%", "100% 100%"],
+                opacity: [0.5, 0.9, 0.5],
               }}
               transition={{
-                duration: 20,
-                repeat: Infinity,
-                repeatType: "reverse",
+                backgroundPosition: { duration: 18, repeat: Infinity, repeatType: "reverse" },
+                opacity: { duration: 5, repeat: Infinity, ease: "easeInOut" },
               }}
-              className="absolute inset-0 opacity-10"
+              className="absolute inset-0"
               style={{
                 backgroundImage:
-                  "radial-gradient(circle at 20% 50%, rgba(251, 146, 60, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(249, 115, 22, 0.3) 0%, transparent 50%)",
+                  "radial-gradient(ellipse 90% 60% at 50% 30%, rgba(251, 191, 36, 0.15) 0%, transparent 55%), radial-gradient(ellipse 70% 50% at 85% 75%, rgba(249, 115, 22, 0.1) 0%, transparent 50%)",
                 backgroundSize: "200% 200%",
               }}
             />
           </div>
 
-          {/* Contenu principal */}
-          <div className="relative z-10 flex flex-col items-center justify-center w-full max-w-md px-6">
-            {/* Logo */}
-            <motion.div
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ duration: 0.5 }}
-              className="mb-8"
-            >
-              <div className="relative">
-                <motion.img
-                  src="/images/logo.png"
-                  alt="Reine d'Afrique"
-                  className="w-32 h-32 mx-auto object-contain"
-                  animate={{
-                    rotate: [0, 5, -5, 0],
-                    scale: [1, 1.05, 1],
-                  }}
-                  transition={{
-                    duration: 3,
-                    repeat: Infinity,
-                    ease: "easeInOut",
-                  }}
-                />
-                <motion.div
-                  className="absolute inset-0 border-4 border-amber-400 rounded-full"
-                  animate={{
-                    rotate: 360,
-                    scale: [1, 1.2, 1],
-                  }}
-                  transition={{
-                    rotate: {
-                      duration: 3,
-                      repeat: Infinity,
-                      ease: "linear",
-                    },
-                    scale: {
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    },
-                  }}
-                />
-              </div>
-            </motion.div>
+          {/* Contenu : spinner + nom (style ReineLoader) */}
+          <div className="relative z-10 flex flex-col items-center w-full max-w-sm px-6">
+            <ReineLoader compact />
 
-            {/* Titre */}
-            <motion.h1
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-3xl sm:text-4xl font-serif font-bold text-gray-900 mb-2 text-center"
-            >
-              Reine d'Afrique
-            </motion.h1>
-
-            {/* Statut de connexion */}
+            {/* Statut connexion */}
             <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.5 }}
-              className="flex items-center gap-2 mb-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center gap-2 mt-6"
             >
               {isOnline ? (
                 <>
-                  <Wifi className="w-5 h-5 text-green-500" />
-                  <span className="text-sm text-gray-600">En ligne</span>
+                  <Wifi className="w-4 h-4 text-emerald-500" />
+                  <span className="text-xs text-gray-500">En ligne</span>
                 </>
               ) : (
                 <>
-                  <WifiOff className="w-5 h-5 text-red-500" />
-                  <span className="text-sm text-red-600">Hors ligne</span>
+                  <WifiOff className="w-4 h-4 text-red-500" />
+                  <span className="text-xs text-red-600">Hors ligne</span>
                 </>
               )}
             </motion.div>
 
-            {/* Barre de progression */}
-            <div className="w-full mb-4">
-              <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+            {/* Barre de progression fluide */}
+            <div className="w-full mt-6 max-w-xs">
+              <div className="h-1 bg-gray-200/80 rounded-full overflow-hidden">
                 <motion.div
-                  className="absolute top-0 left-0 h-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 rounded-full"
+                  className="h-full rounded-full bg-gradient-to-r from-amber-400 via-orange-500 to-amber-500"
                   initial={{ width: 0 }}
                   animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.3, ease: "easeOut" }}
-                />
-                <motion.div
-                  className="absolute top-0 left-0 h-full w-full bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                  animate={{
-                    x: ["-100%", "100%"],
-                  }}
-                  transition={{
-                    duration: 1.5,
-                    repeat: Infinity,
-                    ease: "linear",
-                  }}
+                  transition={{ type: "spring", stiffness: 80, damping: 20 }}
                 />
               </div>
             </div>
 
-            {/* Message de statut */}
+            {/* Message + pourcentage */}
             <motion.p
-              key={progress}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="text-sm sm:text-base text-gray-600 mb-6 text-center min-h-[24px]"
+              key={Math.floor(progress / 30)}
+              initial={{ opacity: 0.6 }}
+              animate={{ opacity: 1 }}
+              className="mt-3 text-xs sm:text-sm text-gray-500 text-center min-h-[20px]"
             >
               {getStatusMessage()}
             </motion.p>
-
-            {/* Indicateur de chargement */}
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{
-                duration: 1,
-                repeat: Infinity,
-                ease: "linear",
-              }}
-              className="text-amber-600"
-            >
-              <Loader2 className="w-6 h-6" />
-            </motion.div>
-
-            {/* Pourcentage */}
-            <motion.p
+            <motion.span
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-              className="mt-4 text-xs text-gray-500"
+              transition={{ delay: 0.2 }}
+              className="mt-1 text-[10px] text-gray-400 tabular-nums"
             >
               {Math.round(progress)}%
-            </motion.p>
+            </motion.span>
           </div>
         </motion.div>
       )}

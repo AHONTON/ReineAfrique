@@ -22,9 +22,14 @@ const Stock = memo(() => {
   const [productForm, setProductForm] = useState({
     name: '',
     categoryId: '',
-    stock: 0,
-    pricePerMeter: 0,
+    categoryName: '',
+    quantityInStock: 0,
+    pricePerSample: 0,
     description: '',
+    image: '',
+    imageFile: null,
+    is_available: true,
+    is_promo: false,
   });
 
   const fetchData = useCallback(async () => {
@@ -37,8 +42,18 @@ const Stock = memo(() => {
       // S'assurer que les données sont des tableaux
       const categoriesData = Array.isArray(categoriesRes.data) ? categoriesRes.data : [];
       const productsData = Array.isArray(productsRes.data) ? productsRes.data : [];
+      // Ajouter des champs UI-friendly sans supprimer les originaux
+      const mappedProducts = productsData.map(p => ({
+        ...p,
+        quantityInStock: p.stock ?? 0,
+        pricePerSample: p.pricePerMeter ?? 0,
+        categoryName: (categoriesData.find(c => c.id === p.categoryId)?.name) ?? '',
+        image: p.image || '',
+        is_available: p.is_available ?? true,
+        is_promo: p.is_promo ?? false,
+      }));
       setCategories(categoriesData);
-      setProducts(productsData);
+      setProducts(mappedProducts);
       console.log('✅ Données chargées - Catégories:', categoriesData.length, 'Produits:', productsData.length);
       
       if (categoriesData.length === 0 && productsData.length === 0) {
@@ -176,9 +191,14 @@ const Stock = memo(() => {
     setProductForm({
       name: '',
       categoryId: '',
-      stock: 0,
-      pricePerMeter: 0,
+      categoryName: '',
+      quantityInStock: 0,
+      pricePerSample: 0,
       description: '',
+      image: '',
+      imageFile: null,
+      is_available: true,
+      is_promo: false,
     });
     setIsProductModalOpen(true);
   };
@@ -188,9 +208,14 @@ const Stock = memo(() => {
     setProductForm({
       name: product.name || '',
       categoryId: product.categoryId || '',
-      stock: product.stock || 0,
-      pricePerMeter: product.pricePerMeter || 0,
+      categoryName: product.categoryName || '',
+      quantityInStock: product.quantityInStock ?? product.stock ?? 0,
+      pricePerSample: product.pricePerSample ?? product.pricePerMeter ?? 0,
       description: product.description || '',
+      image: product.image || '',
+      imageFile: null,
+      is_available: product.is_available ?? true,
+      is_promo: product.is_promo ?? false,
     });
     setIsProductModalOpen(true);
   };
@@ -224,46 +249,85 @@ const Stock = memo(() => {
   const handleSubmitProduct = async (e) => {
     e.preventDefault();
     try {
-      // S'assurer que categoryId est un entier
-      const productData = {
-        ...productForm,
-        categoryId: productForm.categoryId ? parseInt(productForm.categoryId, 10) : productForm.categoryId,
-        stock: parseFloat(productForm.stock) || 0,
-        pricePerMeter: parseFloat(productForm.pricePerMeter) || 0,
-      };
+      // Résoudre categoryId à partir de l'id ou du nom (categoryName)
+      const resolvedCategoryId = (() => {
+        if (productForm.categoryId) {
+          const parsed = parseInt(productForm.categoryId, 10);
+          return Number.isNaN(parsed) ? productForm.categoryId : parsed;
+        }
+        if (productForm.categoryName) {
+          const match = categories.find(c => c.name === productForm.categoryName);
+          return match ? match.id : productForm.categoryName;
+        }
+        return productForm.categoryId;
+      })();
+
+      // Build FormData
+      const formData = new FormData();
+      formData.append('name', productForm.name);
+      formData.append('categoryId', resolvedCategoryId);
+      formData.append('stock', parseFloat(productForm.quantityInStock) || 0);
+      formData.append('pricePerMeter', parseFloat(productForm.pricePerSample) || 0);
+      formData.append('description', productForm.description || '');
+      formData.append('is_available', productForm.is_available ? '1' : '0');
+      formData.append('is_promo', productForm.is_promo ? '1' : '0');
       
+      if (productForm.imageFile) {
+        formData.append('image', productForm.imageFile);
+      } else if (productForm.image) {
+         // Keep existing URL if no new file
+         // Note: Backend 'image' field is nullable. If we don't send it, it might keep old value or nullify?
+         // ProductController logic:
+         // if ($request->hasFile('image')) { ... }
+         // It doesn't explicitly look for 'image' string unless we put it in validated data.
+         // 'image' is in validated data.
+         // But we removed 'string' rule from validation. So string is accepted.
+         formData.append('image', productForm.image);
+      }
+
       let response;
       if (selectedProduct) {
-        response = await api.put(PRODUCT_ENDPOINTS.UPDATE(selectedProduct.id), productData);
+        formData.append('_method', 'PUT'); // Method spoofing for Laravel
+        response = await api.post(PRODUCT_ENDPOINTS.UPDATE(selectedProduct.id), formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toastService.showSuccess('Produit modifié avec succès');
       } else {
-        response = await api.post(PRODUCT_ENDPOINTS.CREATE, productData);
+        response = await api.post(PRODUCT_ENDPOINTS.CREATE, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
         toastService.showSuccess('Produit créé avec succès');
       }
       if (response && (response.status === 201 || response.status === 200)) {
         const updatedProduct = response.data?.product || response.data;
         
         if (updatedProduct) {
+          const mapped = { ...updatedProduct, quantityInStock: updatedProduct.stock ?? 0, pricePerSample: updatedProduct.pricePerMeter ?? 0 };
           if (selectedProduct) {
             // Mise à jour : remplacer le produit modifié dans la liste
             setProducts(prevProducts => 
               prevProducts.map(product => 
-                product.id === selectedProduct.id ? updatedProduct : product
+                product.id === selectedProduct.id ? mapped : product
               )
             );
           } else {
             // Création : ajouter le nouveau produit à la liste
-            setProducts(prevProducts => [...prevProducts, updatedProduct]);
+            setProducts(prevProducts => [...prevProducts, mapped]);
           }
         }
         
         setIsProductModalOpen(false);
         setProductForm({
           name: '',
-          categoryId: '',
-          stock: 0,
-          pricePerMeter: 0,
-          description: '',
+            categoryId: '',
+            categoryName: '',
+            quantityInStock: 0,
+            pricePerSample: 0,
+            description: '',
+            image: '',
+            imageFile: null,
+            is_available: true,
+            is_promo: false,
         });
         setSelectedProduct(null);
         // Rafraîchir pour s'assurer de la synchronisation complète
@@ -296,22 +360,21 @@ const Stock = memo(() => {
       label: 'Catégorie',
       render: (value, row) => {
         const category = categories.find((c) => c.id === row.categoryId);
-        return category?.name || 'N/A';
+        return category?.name || row.categoryName || 'N/A';
       },
     },
     {
-      key: 'stock',
-      label: 'Stock (m)',
-      render: (value) => (
-        <span className={value < LOW_STOCK_THRESHOLD ? 'text-red-600 font-bold' : ''}>
-          {value} m
-        </span>
-      ),
+      key: 'quantityInStock',
+      label: 'Quantité en Stock',
+      render: (value, row) => {
+        const val = value ?? row.stock ?? 0;
+        return <span className={val < LOW_STOCK_THRESHOLD ? 'text-red-600 font-bold' : ''}>{val}</span>;
+      },
     },
     {
-      key: 'pricePerMeter',
-      label: 'Prix/mètre',
-      render: (value) => formatCurrency(value),
+      key: 'pricePerSample',
+      label: 'Prix /Echantillon',
+      render: (value, row) => formatCurrency(value ?? row.pricePerMeter ?? 0),
     },
   ], [categories]);
 
@@ -366,7 +429,7 @@ const Stock = memo(() => {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion du Stock</h1>
       </div>
@@ -454,12 +517,32 @@ const Stock = memo(() => {
               Nom
             </label>
             <input
-              type="text"
+              list="category-suggestions"
               value={categoryForm.name}
               onChange={(e) => setCategoryForm({ ...categoryForm, name: e.target.value })}
+              placeholder="Tapez ou choisissez une catégorie"
               required
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
             />
+            <datalist id="category-suggestions">
+              {categories.map((cat) => (
+                <option key={`cat-s-${cat.id}`} value={cat.name} />
+              ))}
+              <option value="Wax" />
+              <option value="Vlisco" />
+              <option value="Ankara" />
+              <option value="Java" />
+              <option value="Hitarget" />
+              <option value="Chiganvy" />
+              <option value="Bogolan" />
+              <option value="Kente" />
+              <option value="Batik" />
+              <option value="Indigo" />
+              <option value="Adire" />
+              <option value="Aso Oke" />
+              <option value="Faso Dan Fani" />
+              <option value="Bazin" />
+            </datalist>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -518,34 +601,47 @@ const Stock = memo(() => {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
               Catégorie
             </label>
-            <select
-              value={productForm.categoryId}
-              onChange={(e) =>
-                setProductForm({ ...productForm, categoryId: e.target.value })
-              }
+            <input
+              list="category-list"
+              value={productForm.categoryName || ''}
+              onChange={(e) => setProductForm({ ...productForm, categoryName: e.target.value })}
+              placeholder="Tapez ou choisissez une catégorie"
               required
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
-            >
-              <option value="" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Sélectionner une catégorie</option>
+            />
+            <datalist id="category-list">
               {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                  {cat.name}
-                </option>
+                <option key={`cat-${cat.id}`} value={cat.name} />
               ))}
-            </select>
+              {/* Suggestions supplémentaires demandées */}
+              <option value="Wax" />
+              <option value="Vlisco" />
+              <option value="Ankara" />
+              <option value="Java" />
+              <option value="Hitarget" />
+              <option value="Chiganvy" />
+              <option value="Bogolan" />
+              <option value="Kente" />
+              <option value="Batik" />
+              <option value="Indigo" />
+              <option value="Adire" />
+              <option value="Aso Oke" />
+              <option value="Faso Dan Fani" />
+              <option value="Bazin" />
+            </datalist>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Stock (mètres)
+                Quantité en Stock
               </label>
               <input
                 type="number"
                 min="0"
                 step="0.1"
-                value={productForm.stock}
+                value={productForm.quantityInStock}
                 onChange={(e) =>
-                  setProductForm({ ...productForm, stock: parseFloat(e.target.value) })
+                  setProductForm({ ...productForm, quantityInStock: parseFloat(e.target.value) })
                 }
                 required
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
@@ -553,17 +649,17 @@ const Stock = memo(() => {
             </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                Prix au mètre (CFA)
+                Prix/ECHANTILLON (FCFA)
               </label>
               <input
                 type="number"
                 min="0"
                 step="100"
-                value={productForm.pricePerMeter}
+                value={productForm.pricePerSample}
                 onChange={(e) =>
                   setProductForm({
                     ...productForm,
-                    pricePerMeter: parseFloat(e.target.value),
+                    pricePerSample: parseFloat(e.target.value),
                   })
                 }
                 required
@@ -580,10 +676,69 @@ const Stock = memo(() => {
               onChange={(e) =>
                 setProductForm({ ...productForm, description: e.target.value })
               }
-              rows={3}
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500 resize-none"
+              rows="3"
+              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
             />
           </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Image du produit
+            </label>
+            <div className="space-y-2">
+                {productForm.image && !productForm.imageFile && (
+                    <div className="relative w-24 h-24 rounded-lg overflow-hidden border border-gray-200">
+                        <img src={productForm.image} alt="Aperçu" className="w-full h-full object-cover" />
+                    </div>
+                )}
+                {productForm.imageFile && (
+                   <div className="text-sm text-green-600 font-medium truncate">
+                      Fichier sélectionné : {productForm.imageFile.name}
+                   </div>
+                )}
+                <input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                        if (e.target.files && e.target.files[0]) {
+                            setProductForm({ ...productForm, imageFile: e.target.files[0] });
+                        }
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+                />
+                 <p className="text-xs text-gray-500">Ou collez une URL :</p>
+                 <input
+                    type="text"
+                    value={productForm.image}
+                    onChange={(e) => setProductForm({ ...productForm, image: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm"
+                    placeholder="https://..."
+                 />
+            </div>
+          </div>
+
+          <div className="flex space-x-6">
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={productForm.is_available}
+                onChange={(e) => setProductForm({ ...productForm, is_available: e.target.checked })}
+                className="w-5 h-5 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+              />
+              <span className="text-gray-700 dark:text-gray-300 font-medium">Disponible</span>
+            </label>
+
+            <label className="flex items-center space-x-3">
+              <input
+                type="checkbox"
+                checked={productForm.is_promo}
+                onChange={(e) => setProductForm({ ...productForm, is_promo: e.target.checked })}
+                className="w-5 h-5 text-orange-500 focus:ring-orange-500 border-gray-300 rounded"
+              />
+              <span className="text-gray-700 dark:text-gray-300 font-medium text-orange-600">En Promotion</span>
+            </label>
+          </div>
+
           <div className="flex justify-end space-x-3 pt-4 border-t border-gray-200 dark:border-gray-700">
             <button
               type="button"

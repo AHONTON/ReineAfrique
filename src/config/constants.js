@@ -19,12 +19,37 @@ export const ORDER_STATUS = {
   EN_PREPARATION: 'en_preparation',
   LIVREE: 'livree',
   ANNULEE: 'annulee',
+  EN_ATTENTE: 'en_attente',
+  VALIDE: 'valide',
+  REFUSE: 'refuse',
+};
+
+export const DELIVERY_STATUS = {
+  EN_COURS: 'en_cours',
+  LIVRE: 'livre',
+  NON_LIVRE: 'non_livre',
 };
 
 export const ORDER_STATUS_CONFIG = {
   [ORDER_STATUS.EN_DISCUSSION]: {
     label: 'En discussion',
     color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400',
+  },
+  [ORDER_STATUS.EN_ATTENTE]: {
+    label: 'En attente de validation',
+    color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400',
+  },
+  [ORDER_STATUS.VALIDE]: {
+    label: 'Validé',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
+  },
+  [ORDER_STATUS.REFUSE]: {
+    label: 'Refusé',
+    color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400',
+  },
+  [ORDER_STATUS.CONFIRMEE]: {
+    label: 'Confirmée',
+    color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400',
   },
   [ORDER_STATUS.CONFIRMEE]: {
     label: 'Confirmée',

@@ -53,7 +53,7 @@ const HeroBanner = memo(({ whatsappNumber = "+2290150035719", logoSrc = "/images
   }, [whatsappNumber]);
 
   return (
-    <div className="relative w-full h-[400px] xs:h-[450px] sm:h-[500px] md:h-[600px] lg:h-[700px] overflow-hidden">
+    <div className="relative w-full min-h-[60vh] xs:min-h-[65vh] sm:min-h-[70vh] md:min-h-screen lg:min-h-screen overflow-hidden">
       <AnimatePresence mode="wait">
         {slides.map((slide, index) => (
           index === currentSlide && (
@@ -68,9 +68,9 @@ const HeroBanner = memo(({ whatsappNumber = "+2290150035719", logoSrc = "/images
               <motion.img
                 src={slide.image}
                 alt={slide.title}
-                className="object-cover w-full h-full"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+                className="object-cover object-center w-full h-full"
+                animate={{ scale: [1, 1.04, 1], x: [0, -10, 0] }}
+                transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
               />
               <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
             </motion.div>

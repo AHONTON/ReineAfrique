@@ -17,7 +17,7 @@ const About = () => {
       transition={{ duration: 0.3 }}
     >
       <Header logoSrc="/images/logo2.png" />
-      <main className="pt-16">
+      <main className="pt-4">
         {/* AboutHeroBanner en full width */}
         <AboutHeroBanner whatsappNumber="2290150035719" />
         {/* Wrapper pour centrer et limiter les sections suivantes */}

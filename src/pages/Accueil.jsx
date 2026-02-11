@@ -18,7 +18,7 @@ const Accueil = () => {
       transition={{ duration: 0.3 }}
     >
       <Header logoSrc="/images/logo2.png" />
-      <main className="pt-16">
+      <main className="pt-4">
         {/* HeroBanner en full width */}
         <HeroBanner whatsappNumber="2290150035719" logoSrc="/images/logo2.png" />
 
@@ -29,8 +29,8 @@ const Accueil = () => {
           <NotreMission />
           <NotreVision />
           <Newsletter />
-          <Footer />
         </Wrapper>
+        <Footer />
       </main>
     </motion.div>
   );

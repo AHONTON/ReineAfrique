@@ -14,6 +14,14 @@ export const AUTH_ENDPOINTS = {
   ME: '/auth/me',
 };
 
+// Endpoints publics (Shop)
+export const SHOP_ENDPOINTS = {
+  PRODUCTS: '/shop/products',
+  GET_PRODUCT: (id) => `/shop/products/${id}`,
+  CATEGORIES: '/shop/categories',
+  ORDERS: '/shop/orders',
+};
+
 // Endpoints du dashboard
 export const DASHBOARD_ENDPOINTS = {
   STATS: '/admin/dashboard/stats',

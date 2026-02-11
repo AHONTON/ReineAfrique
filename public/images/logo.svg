@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#f97316"/>
+      <stop offset="1" stop-color="#ea580c"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="12" fill="#1f2933" />
+  <path d="M16 44c6-2 12-2 18 0 6-2 12-2 18 0V20c-6 2-12 2-18 0-6 2-12 2-18 0v24z" fill="url(#g)" opacity="0.98"/>
+  <text x="8" y="14" fill="#fff" font-family="Arial,Helvetica,sans-serif" font-size="8">Reine</text>
+</svg>

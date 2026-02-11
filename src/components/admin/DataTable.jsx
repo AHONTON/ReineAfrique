@@ -48,7 +48,7 @@ const DataTable = memo(({
   }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 min-w-0">
       {/* Search Bar */}
       {searchable && (
         <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700">
@@ -69,7 +69,7 @@ const DataTable = memo(({
       )}
 
       {/* Table */}
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <table className="min-w-full">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>

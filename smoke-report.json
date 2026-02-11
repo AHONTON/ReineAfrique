@@ -1,0 +1,213 @@
+{
+  "date": "2026-02-09T12:41:46.214Z",
+  "results": [
+    {
+      "route": "/",
+      "width": 375,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 375,
+        "innerWidth": 375,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke___375.png",
+      "status": 200
+    },
+    {
+      "route": "/",
+      "width": 768,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 768,
+        "innerWidth": 768,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke___768.png",
+      "status": 200
+    },
+    {
+      "route": "/",
+      "width": 1024,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1024,
+        "innerWidth": 1024,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke___1024.png",
+      "status": 200
+    },
+    {
+      "route": "/",
+      "width": 1440,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1440,
+        "innerWidth": 1440,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke___1440.png",
+      "status": 200
+    },
+    {
+      "route": "/admin",
+      "width": 375,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 375,
+        "innerWidth": 375,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_375.png",
+      "status": 200
+    },
+    {
+      "route": "/admin",
+      "width": 768,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 768,
+        "innerWidth": 768,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_768.png",
+      "status": 200
+    },
+    {
+      "route": "/admin",
+      "width": 1024,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1024,
+        "innerWidth": 1024,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_1024.png",
+      "status": 200
+    },
+    {
+      "route": "/admin",
+      "width": 1440,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1440,
+        "innerWidth": 1440,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_1440.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/clients",
+      "width": 375,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 375,
+        "innerWidth": 375,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_clients_375.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/clients",
+      "width": 768,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 768,
+        "innerWidth": 768,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_clients_768.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/clients",
+      "width": 1024,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1024,
+        "innerWidth": 1024,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_clients_1024.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/clients",
+      "width": 1440,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1440,
+        "innerWidth": 1440,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_clients_1440.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/commandes",
+      "width": 375,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 375,
+        "innerWidth": 375,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_commandes_375.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/commandes",
+      "width": 768,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 768,
+        "innerWidth": 768,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_commandes_768.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/commandes",
+      "width": 1024,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1024,
+        "innerWidth": 1024,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_commandes_1024.png",
+      "status": 200
+    },
+    {
+      "route": "/admin/commandes",
+      "width": 1440,
+      "ok": true,
+      "details": {
+        "hasHOverflow": false,
+        "scrollWidth": 1440,
+        "innerWidth": 1440,
+        "tooWide": []
+      },
+      "screenshot": "H:\\ReineAfrique\\ReineAfrique\\smoke-screenshots\\smoke__admin_commandes_1440.png",
+      "status": 200
+    }
+  ]
+}

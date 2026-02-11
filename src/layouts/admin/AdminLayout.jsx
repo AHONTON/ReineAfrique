@@ -4,7 +4,7 @@ import Header from './Header';
 
 const AdminLayout = () => {
   return (
-    <div className="admin-dashboard min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative transition-colors duration-300">
+    <div className="admin-dashboard min-h-screen min-w-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative transition-colors duration-300">
       {/* Subtil overlay dégradé pour éviter effets de carreaux */}
       <div
         className="fixed inset-0 pointer-events-none z-0"
@@ -14,7 +14,7 @@ const AdminLayout = () => {
       />
       
       <Sidebar />
-      <div className="lg:pl-64 w-full min-h-screen">
+      <div className="lg:pl-64 w-full min-h-screen min-w-0">
         <Header />
         <main className="p-3 sm:p-4 md:p-6">
           <Outlet />

@@ -14,7 +14,7 @@ const Contact = () => {
       transition={{ duration: 0.3 }}
     >
       <Header logoSrc="/images/logo2.png" />
-      <main className="pt-16">
+      <main className="pt-4">
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
           <ContactBaner />

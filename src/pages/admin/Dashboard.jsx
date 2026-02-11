@@ -9,6 +9,7 @@ import {
 import api from '../../api/axios';
 import StatCard from '../../components/admin/StatCard';
 import Loader from '../../components/admin/Loader';
+import '../../styles/dashboard.css';
 import {
   BarChart,
   Bar,
@@ -23,7 +24,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import toastService from '../../utils/toastService';
-import { DASHBOARD_ENDPOINTS } from '../../config/api';
+import { DASHBOARD_ENDPOINTS, ORDER_ENDPOINTS, PRODUCT_ENDPOINTS } from '../../config/api';
 import { CHART_COLORS, PERIODS } from '../../config/constants';
 import { formatCurrency } from '../../utils/formatters';
 
@@ -81,6 +82,10 @@ const Dashboard = memo(() => {
   const [stats, setStats] = useState(DEFAULT_STATS);
   const [salesData, setSalesData] = useState(DEFAULT_SALES_DATA);
   const [salesDistribution, setSalesDistribution] = useState(DEFAULT_SALES_DISTRIBUTION);
+  const [recentOrders, setRecentOrders] = useState([]);
+  const [lowStockItems, setLowStockItems] = useState([]);
+  const [ordersLoading, setOrdersLoading] = useState(false);
+  const [stockLoading, setStockLoading] = useState(false);
 
   // Calculer les dimensions des graphiques en fonction de la taille de l'écran
   const chartHeight = width < 640 ? 200 : width < 1024 ? 250 : 300;
@@ -97,6 +102,7 @@ const Dashboard = memo(() => {
         params.endDate = endDate;
       }
 
+      // Charger principaux widgets (stats & charts) en parallèle, commandes/stock séparément
       const [statsRes, salesRes, distributionRes] = await Promise.all([
         api.get(DASHBOARD_ENDPOINTS.STATS, { params }),
         api.get(DASHBOARD_ENDPOINTS.SALES, { params }),
@@ -126,6 +132,10 @@ const Dashboard = memo(() => {
         : DEFAULT_SALES_DISTRIBUTION;
       setSalesDistribution(distributionData);
       console.log('✅ Répartition des ventes chargée:', distributionData.length, 'catégories');
+
+      // Fire-and-forget: charger commandes et stock séparément pour ne pas bloquer charts
+      fetchRecentOrders();
+      fetchLowStock();
     } catch (error) {
       // Si l'API n'est pas disponible, utiliser des données par défaut pour l'affichage
       setStats(DEFAULT_STATS);
@@ -165,48 +175,153 @@ const Dashboard = memo(() => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  // Fetch recent orders separately (robust mapping)
+  const fetchRecentOrders = async () => {
+    try {
+      setOrdersLoading(true);
+      const res = await api.get(ORDER_ENDPOINTS.LIST, { params: { limit: 6, sort: 'created_at:desc' } });
+      const data = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
+      // Normalize minimal fields used by the UI
+      const normalized = data.map((o) => ({
+        id: o.id ?? o._id ?? o.order_id,
+        client: o.customer_name ?? o.customer?.name ?? o.client_name ?? (o.customer_email || '—'),
+        status: o.status ?? o.state ?? o.order_status ?? '—',
+        total: o.total ?? o.amount ?? o.grand_total ?? null,
+      }));
+      setRecentOrders(normalized.slice(0,5));
+    } catch (err) {
+      console.warn('Erreur commandes récentes', err?.response?.status || err.message);
+    } finally {
+      setOrdersLoading(false);
+    }
+  };
+
+  // Fetch low stock items separately
+  const fetchLowStock = async () => {
+    try {
+      setStockLoading(true);
+      const res = await api.get(PRODUCT_ENDPOINTS.LIST, { params: { low_stock: true, limit: 6 } });
+      const data = Array.isArray(res.data) ? res.data : Array.isArray(res.data?.data) ? res.data.data : [];
+      const normalized = data.map((p) => ({
+        id: p.id ?? p._id ?? p.sku ?? Math.random().toString(36).slice(2,9),
+        name: p.name ?? p.title ?? p.product_name ?? 'Produit',
+        qty: p.stock ?? p.qty ?? p.quantity ?? (p.available ? `${p.available}` : '—'),
+      }));
+      setLowStockItems(normalized.slice(0,5));
+    } catch (err) {
+      console.warn('Erreur low stock', err?.response?.status || err.message);
+    } finally {
+      setStockLoading(false);
+    }
+  };
+
+  // Expose manual refresh (header button)
+  const handleRefresh = async () => {
+    await fetchDashboardData();
+    await fetchRecentOrders();
+    await fetchLowStock();
+  };
+
 
   return (
-    <div className="space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 px-2 sm:px-4 md:px-6">
-      {/* Header avec filtres */}
+    <div className="relative dashboard-wave space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 px-4 sm:px-6 md:px-8 py-6">
+      {/* Header avec filtres (maquette: texte d'accueil + boutons période) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 md:gap-6">
         <div className="min-w-0 flex-1">
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 dark:from-white dark:via-gray-100 dark:to-white bg-clip-text text-transparent leading-tight">
-            Dashboard
-          </h1>
-          <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">Reine d'Afrique - Tableau de bord</p>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-gray-800 dark:text-white leading-tight">Bonjour, Admin!</h1>
+          <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">Bienvenue sur Reine d'Afrique — Tableau de bord</p>
         </div>
-        <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3">
-          <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 sm:p-2.5 md:p-3 w-full sm:w-auto">
+        <div className="flex items-center gap-3">
+          <div className="inline-flex bg-transparent rounded-md shadow-sm" role="group">
+            <button
+              onClick={() => setPeriod(PERIODS.DAY)}
+              className={`px-3 py-2 text-sm font-medium rounded-l-md border ${period === PERIODS.DAY ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700 shadow' : 'bg-transparent text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
+            >Jour</button>
+            <button
+              onClick={() => setPeriod(PERIODS.WEEK)}
+              className={`px-3 py-2 text-sm font-medium border ${period === PERIODS.WEEK ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700 shadow' : 'bg-transparent text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
+            >Semaine</button>
+            <button
+              onClick={() => setPeriod(PERIODS.MONTH)}
+              className={`px-3 py-2 text-sm font-medium rounded-r-md border ${period === PERIODS.MONTH ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700 shadow' : 'bg-transparent text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
+            >Mois</button>
+          </div>
+
+          <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-2 sm:p-2.5 md:p-3">
             <Calendar size={16} className="text-orange-500 dark:text-orange-400 sm:w-5 sm:h-5 md:w-6 md:h-6 flex-shrink-0" />
             <select
-              value={period}
-              onChange={(e) => setPeriod(e.target.value)}
-              className="border-none focus:ring-0 text-xs sm:text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-800 flex-1 sm:flex-initial cursor-pointer appearance-none min-w-[140px]"
+              value={period === PERIODS.CUSTOM ? 'custom' : 'preset'}
+              onChange={(e) => e.target.value === 'custom' ? setPeriod(PERIODS.CUSTOM) : setPeriod(PERIODS.MONTH)}
+              className="border-none focus:ring-0 text-xs sm:text-sm md:text-base font-medium text-gray-700 dark:text-gray-300 bg-transparent dark:bg-gray-800 cursor-pointer min-w-[160px]"
             >
-              <option value={PERIODS.DAY} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Jour</option>
-              <option value={PERIODS.WEEK} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Semaine</option>
-              <option value={PERIODS.MONTH} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Mois</option>
-              <option value={PERIODS.CUSTOM} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Période personnalisée</option>
+              <option value="preset">01/04/2024 - 30/04/2024</option>
+              <option value="custom">Période personnalisée</option>
             </select>
           </div>
-          {period === PERIODS.CUSTOM && (
-            <div className="flex items-center space-x-2 w-full sm:w-auto">
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                className="px-2 sm:px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-xs sm:text-sm md:text-base focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex-1 sm:flex-initial min-w-[140px]"
-              />
-              <span className="text-gray-500 dark:text-gray-400 text-sm md:text-base flex-shrink-0">-</span>
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                className="px-2 sm:px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg text-xs sm:text-sm md:text-base focus:ring-2 focus:ring-orange-500 focus:border-orange-500 flex-1 sm:flex-initial min-w-[140px]"
-              />
-            </div>
-          )}
+          <button onClick={handleRefresh} className="ml-3 btn-refresh inline-flex items-center">
+            Actualiser
+          </button>
+        </div>
+      </div>
+
+      {/* Bas: Commandes récentes + panneau droit (Stock Faible) */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Commandes Récentes</h3>
+          <div className="overflow-x-auto">
+            <table className="table-recent min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
+                  <th className="px-4 py-2"></th>
+                </tr>
+              </thead>
+              <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
+                {(recentOrders && recentOrders.length > 0 ? recentOrders : [
+                  { id: '1', client: 'Aminata Diallo', status: 'En préparation', amount: '85 000 CFA' },
+                  { id: '2', client: 'Ibrahima Koné', status: 'Livrée', amount: '120 000 CFA' },
+                  { id: '3', client: 'Fatou Traoré', status: 'En discussion', amount: '50 000 CFA' },
+                ]).map((row, idx) => (
+                  <tr key={row.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.client || row.customer_name || row.customer?.name}</td>
+                    <td className="px-4 py-3">
+                      <span className={`badge-status ${row.status === 'Livrée' || row.status === 'delivered' ? 'badge-green' : row.status === 'En préparation' || row.status === 'processing' ? 'badge-yellow' : 'badge-orange'}`}>
+                        {row.status || row.state}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.amount ?? (row.total ? formatCurrency(row.total) : (row.total == null ? '—' : formatCurrency(row.total)))}</td>
+                    <td className="px-4 py-3 text-right">
+                      <button onClick={() => console.log('Voir commande', row.id)} className="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded shadow">Voir</button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6">
+          <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Stock Faible</h3>
+          <ul className="space-y-3">
+            {(lowStockItems && lowStockItems.length > 0 ? lowStockItems : [
+              { id: 'p1', name: 'Wax Rouge', qty: '5 m' },
+              { id: 'p2', name: 'Soie Dorée', qty: '2 m' },
+              { id: 'p3', name: 'Bogolan Noir', qty: '3 m' },
+            ]).map((item) => (
+              <li key={item.id} className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-md bg-orange-100 flex items-center justify-center text-sm font-medium text-orange-700">{(item.name || item.title || '').split(' ').slice(0,1)}</div>
+                  <div>
+                    <div className="text-sm font-medium text-gray-800 dark:text-gray-100">{item.name || item.title}</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{item.qty ?? (item.stock ? `${item.stock} unités` : '')}</div>
+                  </div>
+                </div>
+                <div className="text-sm text-orange-600">-</div>
+              </li>
+            ))}
+          </ul>
         </div>
       </div>
 

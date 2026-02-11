@@ -12,6 +12,7 @@ import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Orders = memo(() => {
   const [orders, setOrders] = useState([]);
+  const [updatingOrders, setUpdatingOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -207,24 +208,23 @@ const Orders = memo(() => {
 
     if (confirmed) {
       try {
+        setUpdatingOrders(prev => [...prev, orderId]);
         const response = await api.put(ORDER_ENDPOINTS.UPDATE_STATUS(orderId), { status: newStatus });
         if (response && (response.status === 200 || response.status === 204)) {
           toastService.showSuccess('Statut mis à jour avec succès');
-          
-          const updatedOrder = response.data?.order || response.data;
-          if (updatedOrder) {
-            // Mettre à jour immédiatement le statut dans la liste
-            setOrders(prevOrders => 
-              prevOrders.map(order => 
-                order.id === orderId ? { ...order, status: newStatus } : order
-              )
-            );
-          }
-          
-          // Rafraîchir pour s'assurer de la synchronisation complète
+          // Mettre à jour immédiatement le statut dans la liste localement
+          setOrders(prevOrders => 
+            prevOrders.map(order => 
+              order.id === orderId ? { ...order, status: newStatus } : order
+            )
+          );
+
+          // Rafraîchir en arrière-plan pour s'assurer de la synchronisation complète
           fetchOrders();
         }
+        setUpdatingOrders(prev => prev.filter(id => id !== orderId));
       } catch (error) {
+        setUpdatingOrders(prev => prev.filter(id => id !== orderId));
         const errorMessage = 
           error.response?.data?.message ||
           error.response?.data?.error ||
@@ -233,6 +233,26 @@ const Orders = memo(() => {
       }
     }
   }, [fetchOrders]);
+
+  const handleDeliveryStatusChange = useCallback(async (orderId, newDeliveryStatus) => {
+    try {
+        setUpdatingOrders(prev => [...prev, orderId]);
+        const response = await api.put(ORDER_ENDPOINTS.UPDATE_STATUS(orderId), { delivery_status: newDeliveryStatus });
+        
+         if (response && (response.status === 200 || response.status === 204)) {
+          toastService.showSuccess('Livraison mise à jour avec succès');
+          setOrders(prevOrders => 
+            prevOrders.map(order => 
+              order.id === orderId ? { ...order, delivery_status: newDeliveryStatus } : order
+            )
+          );
+        }
+    } catch (error) {
+        toastService.showError('Erreur lors de la mise à jour de la livraison');
+    } finally {
+        setUpdatingOrders(prev => prev.filter(id => id !== orderId));
+    }
+  }, []);
 
   const getStatusBadge = useCallback((status) => {
     const config = ORDER_STATUS_CONFIG[status] || { label: status, color: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' };
@@ -248,7 +268,30 @@ const Orders = memo(() => {
     {
       key: 'client',
       label: 'Client',
-      render: (value, row) => row.client?.name || 'N/A',
+      render: (value, row) => {
+        const guestName = row.guest_info ? `${row.guest_info.nom} ${row.guest_info.prenom}` : '';
+        const clientName = row.client?.name || guestName || 'Client Inconnu';
+        const clientPhone = row.client?.phone || row.guest_info?.telephone || 'Pas de numéro';
+        return (
+          <div className="flex flex-col">
+            <span className="font-medium">{clientName}</span>
+            <span className="text-xs text-gray-500">{clientPhone}</span>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'quantities',
+      label: 'Quantités',
+      render: (value, row) => {
+        try {
+          const items = Array.isArray(row.items) ? row.items : [];
+          const totalQty = items.reduce((s, it) => s + (Number(it.quantity) || 0), 0);
+          return totalQty || 0;
+        } catch (err) {
+          return 0;
+        }
+      }
     },
     {
       key: 'date',
@@ -257,15 +300,38 @@ const Orders = memo(() => {
     },
     {
       key: 'status',
-      label: 'Statut',
+      label: 'État',
       render: (value) => getStatusBadge(value),
+    },
+    {
+      key: 'delivery',
+      label: 'Livraison',
+      render: (value, row) => {
+        // Mapping visual values
+        return (
+            <select
+                value={row.delivery_status || 'en_attente'}
+                onChange={(e) => handleDeliveryStatusChange(row.id, e.target.value)}
+                onClick={(e) => e.stopPropagation()}
+                disabled={updatingOrders.includes(row.id)}
+                className={`px-2 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 
+                    ${row.delivery_status === 'livre' ? 'text-green-600 font-medium' : ''}
+                `}
+            >
+                <option value="en_attente">En attente</option>
+                <option value="en_cours">En cours</option>
+                <option value="livre">Livré</option>
+                <option value="non_livre">Non Livré</option>
+            </select>
+        );
+      },
     },
     {
       key: 'amount',
       label: 'Montant',
       render: (value) => formatCurrency(value),
     },
-  ], [getStatusBadge]);
+  ], [getStatusBadge, handleDeliveryStatusChange, updatingOrders]);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
@@ -284,19 +350,26 @@ const Orders = memo(() => {
         value={row.status}
         onChange={(e) => handleStatusChange(row.id, e.target.value)}
         onClick={(e) => e.stopPropagation()}
+        disabled={updatingOrders.includes(row.id)}
         className="px-3 py-1 text-xs border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
       >
+        <option value={ORDER_STATUS.EN_ATTENTE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En attente</option>
+        <option value={ORDER_STATUS.VALIDE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Validé</option>
+        <option value={ORDER_STATUS.REFUSE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Refusé</option>
         <option value={ORDER_STATUS.EN_DISCUSSION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
         <option value={ORDER_STATUS.CONFIRMEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
         <option value={ORDER_STATUS.EN_PREPARATION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
         <option value={ORDER_STATUS.LIVREE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Livrée</option>
         <option value={ORDER_STATUS.ANNULEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Annulée</option>
       </select>
+      {updatingOrders.includes(row.id) && (
+        <div className="ml-2"><Loader size="sm" /></div>
+      )}
     </div>
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion des Commandes</h1>
         <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -313,6 +386,9 @@ const Orders = memo(() => {
             className="px-3 sm:px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 text-sm w-full sm:w-auto"
           >
             <option value="all" className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Tous les statuts</option>
+            <option value={ORDER_STATUS.EN_ATTENTE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En attente</option>
+            <option value={ORDER_STATUS.VALIDE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Validé</option>
+            <option value={ORDER_STATUS.REFUSE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Refusé</option>
             <option value={ORDER_STATUS.EN_DISCUSSION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En discussion</option>
             <option value={ORDER_STATUS.CONFIRMEE} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">Confirmée</option>
             <option value={ORDER_STATUS.EN_PREPARATION} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">En préparation</option>
@@ -342,7 +418,7 @@ const Orders = memo(() => {
       >
         {selectedOrder && (
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <p className="text-sm text-gray-500">ID Commande</p>
                 <p className="font-medium">{selectedOrder.id}</p>
@@ -355,11 +431,37 @@ const Orders = memo(() => {
               </div>
               <div>
                 <p className="text-sm text-gray-500">Client</p>
-                <p className="font-medium">{selectedOrder.client?.name || 'N/A'}</p>
+                <p className="font-medium">
+                    {selectedOrder.client?.name || (selectedOrder.guest_info ? `${selectedOrder.guest_info.nom} ${selectedOrder.guest_info.prenom}` : 'Inconnu')}
+                </p>
+                <p className="text-sm">{selectedOrder.client?.phone || selectedOrder.guest_info?.telephone || 'Pas de numéro'}</p>
+                {(selectedOrder.client?.email || selectedOrder.guest_info?.email) && (
+                  <p className="text-sm text-gray-400">{selectedOrder.client?.email || selectedOrder.guest_info?.email}</p>
+                )}
+              </div>
+              <div>
+                <p className="text-sm text-gray-500">Adresse de Livraison</p>
+                <p className="font-medium">{selectedOrder.client?.address || selectedOrder.guest_info?.address || 'Non renseignée'}</p>
+                <p className="text-sm">{selectedOrder.guest_info?.city || selectedOrder.client?.city}</p>
+                {selectedOrder.guest_info?.commentaire && (
+                    <div className="mt-2 text-xs italic bg-gray-50 p-2 rounded">
+                        Note: {selectedOrder.guest_info.commentaire}
+                    </div>
+                )}
               </div>
               <div>
                 <p className="text-sm text-gray-500">Statut</p>
                 {getStatusBadge(selectedOrder.status)}
+              </div>
+              <div>
+                 <p className="text-sm text-gray-500">Livraison</p>
+                 <div className="mt-1">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${selectedOrder.delivery_status === 'livre' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                        {selectedOrder.delivery_status === 'livre' ? 'Livré' : 
+                         selectedOrder.delivery_status === 'en_cours' ? 'En cours' : 
+                         selectedOrder.delivery_status === 'non_livre' ? 'Non livré' : 'En attente'}
+                    </span>
+                 </div>
               </div>
               <div>
                 <p className="text-sm text-gray-500">Montant Total</p>
@@ -485,8 +587,8 @@ const Orders = memo(() => {
             </div>
             <div className="space-y-3">
               {formData.items.map((item, index) => (
-                <div key={index} className="flex gap-2 items-end">
-                  <div className="flex-1">
+                <div key={index} className="flex flex-col sm:flex-row gap-2 items-end">
+                  <div className="flex-1 min-w-0">
                     <label className="block text-xs text-gray-500 mb-1">Produit</label>
                     <select
                       value={item.product_id}
@@ -502,7 +604,7 @@ const Orders = memo(() => {
                       ))}
                     </select>
                   </div>
-                  <div className="w-24">
+                  <div className="w-full sm:w-24">
                     <label className="block text-xs text-gray-500 mb-1">Quantité</label>
                     <input
                       type="number"
@@ -514,7 +616,7 @@ const Orders = memo(() => {
                       required
                     />
                   </div>
-                  <div className="w-32">
+                  <div className="w-full sm:w-32">
                     <label className="block text-xs text-gray-500 mb-1">Prix unitaire</label>
                     <input
                       type="number"

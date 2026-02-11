@@ -1,11 +1,12 @@
 import { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { Plus, Edit, Trash2, Eye } from 'lucide-react';
+import { Plus, Edit, Trash2, Eye, Phone } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
 import { showConfirm } from '../../utils/swal';
 import toastService from '../../utils/toastService';
-import { CLIENT_ENDPOINTS } from '../../config/api';
+import { CLIENT_ENDPOINTS, ORDER_ENDPOINTS } from '../../config/api';
+import { ORDER_STATUS, ORDER_STATUS_CONFIG } from '../../config/constants';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Clients = memo(() => {
@@ -15,7 +16,8 @@ const Clients = memo(() => {
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
   const [selectedClient, setSelectedClient] = useState(null);
   const [formData, setFormData] = useState({
-    name: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     address: '',
@@ -72,14 +74,16 @@ const Clients = memo(() => {
 
   const handleCreate = () => {
     setSelectedClient(null);
-    setFormData({ name: '', email: '', phone: '', address: '' });
+    setFormData({ firstName: '', lastName: '', email: '', phone: '', address: '' });
     setIsModalOpen(true);
   };
 
   const handleEdit = (client) => {
     setSelectedClient(client);
+    const parts = (client.name || '').split(' ');
     setFormData({
-      name: client.name || '',
+      firstName: parts.shift() || '',
+      lastName: parts.join(' ') || '',
       email: client.email || '',
       phone: client.phone || '',
       address: client.address || '',
@@ -115,11 +119,17 @@ const Clients = memo(() => {
     e.preventDefault();
     try {
       let response;
+      // Conserver compatibilité backend: envoyer `name` construit
+      const payload = {
+        ...formData,
+        name: `${formData.firstName || ''} ${formData.lastName || ''}`.trim(),
+      };
+
       if (selectedClient) {
-        response = await api.put(CLIENT_ENDPOINTS.UPDATE(selectedClient.id), formData);
+        response = await api.put(CLIENT_ENDPOINTS.UPDATE(selectedClient.id), payload);
         toastService.showSuccess('Client modifié avec succès');
       } else {
-        response = await api.post(CLIENT_ENDPOINTS.CREATE, formData);
+        response = await api.post(CLIENT_ENDPOINTS.CREATE, payload);
         toastService.showSuccess('Client créé avec succès');
       }
       
@@ -142,10 +152,26 @@ const Clients = memo(() => {
         }
         
         setIsModalOpen(false);
-        setFormData({ name: '', email: '', phone: '', address: '' });
+        setFormData({ firstName: '', lastName: '', email: '', phone: '', address: '' });
         setSelectedClient(null);
         
         // Rafraîchir la liste pour s'assurer de la synchronisation complète
+        // Essayer de détecter automatiquement si le numéro est sur WhatsApp
+        if (response && (response.status === 201 || response.status === 200)) {
+          const created = response.data?.client || response.data;
+          if (created && created.id) {
+            // Appel optionnel au backend pour vérifier WhatsApp; ignore les erreurs 404
+            try {
+              const checkRes = await api.get(CLIENT_ENDPOINTS.CHECK_WHATSAPP(created.id));
+              const hasWhatsApp = checkRes.data?.hasWhatsApp === true;
+              if (typeof hasWhatsApp === 'boolean') {
+                setClients(prev => prev.map(c => c.id === created.id ? { ...c, hasWhatsApp } : c));
+              }
+            } catch (err) {
+              // Backend may not implement this endpoint; c'est facultatif
+            }
+          }
+        }
         fetchClients();
       }
     } catch (error) {
@@ -166,6 +192,8 @@ const Clients = memo(() => {
     }
   };
 
+  // Aucune vérification WhatsApp côté client (logique supprimée).
+
   const handleViewDetails = async (client) => {
     try {
       const response = await api.get(CLIENT_ENDPOINTS.SHOW(client.id));
@@ -177,25 +205,123 @@ const Clients = memo(() => {
   };
 
 
+  const handleInlineOrderStatusChange = async (clientId, orderId, newStatus) => {
+    const { value: confirmed } = await showConfirm('Voulez-vous changer le statut de cette commande ?', 'Modifier le statut');
+    if (!confirmed) return;
+
+    // Visual inline loading state for this order
+    setClients(prev => prev.map(c => c.id === clientId ? { ...c, updatingOrderIds: [...(c.updatingOrderIds || []), orderId] } : c));
+
+    try {
+      await api.put(ORDER_ENDPOINTS.UPDATE_STATUS(orderId), { status: newStatus });
+      // Mettre à jour localement le client et ses commandes
+      setClients(prev => prev.map(c => {
+        if (c.id !== clientId) return c;
+        const updatedOrders = Array.isArray(c.orders) ? c.orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o) : c.orders;
+        return { ...c, orders: updatedOrders, updatingOrderIds: (c.updatingOrderIds || []).filter(id => id !== orderId) };
+      }));
+
+      // Si selectedClient correspond, mettre à jour aussi
+      setSelectedClient(prev => prev && prev.id === clientId ? { ...prev, orders: (prev.orders || []).map(o => o.id === orderId ? { ...o, status: newStatus } : o) } : prev);
+
+      toastService.showSuccess('Statut mis à jour avec succès');
+    } catch (err) {
+      // remove loading flag
+      setClients(prev => prev.map(c => c.id === clientId ? { ...c, updatingOrderIds: (c.updatingOrderIds || []).filter(id => id !== orderId) } : c));
+      const errorMessage = err.response?.data?.message || 'Erreur lors de la mise à jour du statut';
+      toastService.showError(errorMessage);
+    }
+  };
+
+  // Normalise le numéro pour appel téléphonique : retire les caractères non numériques
+  // et s'assure que le numéro commence par l'indicatif Bénin (+229).
+  const formatPhoneForCall = (phone) => {
+    if (!phone) return null;
+    try {
+      let s = String(phone).trim();
+      s = s.replace(/[^\d+]/g, '');
+      // Si commence par + garder
+      if (s.startsWith('+')) return s;
+      // Si commence par 00 -> remplacer par +
+      if (s.startsWith('00')) return `+${s.slice(2)}`;
+      // Si commence par 229 (sans +)
+      if (s.startsWith('229')) return `+${s}`;
+      // Sinon, présumer format local et préfixer +229
+      return `+229${s}`;
+    } catch (err) {
+      return null;
+    }
+  };
+
+  // Format pour affichage dans la table: affiche clairement l'indicatif +229
+  // puis la partie locale (ex: +22901xxxxxx). Si numéro absent, retourne '—'.
+  const formatPhoneForDisplay = (phone) => {
+    if (!phone) return '—';
+    try {
+      let s = String(phone).trim();
+      s = s.replace(/[^\d+]/g, '');
+      if (s.startsWith('+')) return s;
+      if (s.startsWith('00')) return `+${s.slice(2)}`;
+      if (s.startsWith('229')) return `+${s}`;
+      return `+229${s}`;
+    } catch (err) {
+      return phone;
+    }
+  };
+
+  const splitName = (name) => {
+    if (!name) return { first: '', last: '' };
+    const parts = name.split(' ');
+    return { first: parts.shift() || '', last: parts.join(' ') || '' };
+  };
+
+
   const columns = useMemo(() => [
     { key: 'id', label: 'ID' },
-    { key: 'name', label: 'Nom' },
-    { key: 'email', label: 'Email' },
-    { key: 'phone', label: 'Téléphone' },
+    { key: 'lastName', label: 'Nom', render: (value, row) => splitName(row.name).last || '—' },
+    { key: 'firstName', label: 'Prénom', render: (value, row) => splitName(row.name).first || '—' },
+    { key: 'email', label: 'Email (optionnel)' },
     {
-      key: 'totalOrders',
-      label: 'Commandes',
-      render: (value) => value || 0,
+      key: 'phone',
+      label: 'Téléphone',
+      render: (value) => {
+        const display = formatPhoneForDisplay(value);
+        if (display === '—') return display;
+        if (display.startsWith('+229')) {
+          return (
+            <span className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">+229</span>
+              <span className="font-medium">{display.slice(4)}</span>
+            </span>
+          );
+        }
+        return <span className="font-medium">{display}</span>;
+      }
     },
     {
-      key: 'totalSpent',
-      label: 'Total dépensé',
-      render: (value) => formatCurrency(value || 0),
+      key: 'address',
+      label: 'Adresse / Quartier',
+      render: (value, row) => row.address || '—',
     },
   ], []);
 
   const actions = (row) => (
     <div className="flex items-center justify-end space-x-2">
+      <button
+        onClick={(e) => {
+          e.stopPropagation();
+          const formatted = formatPhoneForCall(row.phone || '');
+          if (!formatted) {
+            toastService.showError('Numéro invalide');
+            return;
+          }
+          window.open(`tel:${formatted}`, '_self');
+        }}
+        className={`p-2 ${row.phone ? 'text-blue-600 hover:bg-blue-50' : 'text-gray-400 opacity-50 cursor-not-allowed'} rounded-lg transition-colors`}
+        title={row.phone ? `Appeler (+229)` : 'Pas de numéro'}
+      >
+        <Phone size={18} />
+      </button>
       <button
         onClick={(e) => {
           e.stopPropagation();
@@ -230,7 +356,7 @@ const Clients = memo(() => {
   );
 
   return (
-    <div className="space-y-4 sm:space-y-6">
+    <div className="space-y-4 sm:space-y-6 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion des Clients</h1>
         <button
@@ -250,6 +376,8 @@ const Clients = memo(() => {
         actions={actions}
       />
 
+      
+
       {/* Modal Création/Modification */}
       <Modal
         isOpen={isModalOpen}
@@ -260,28 +388,38 @@ const Clients = memo(() => {
         title={selectedClient ? 'Modifier le client' : 'Nouveau client'}
       >
         <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Nom *</label>
+                  <input
+                    type="text"
+                    value={formData.lastName}
+                    onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+                    placeholder="Nom de famille"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Prénom *</label>
+                  <input
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                    required
+                    className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
+                    placeholder="Prénom"
+                  />
+                </div>
+              </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Nom complet *
-            </label>
-            <input
-              type="text"
-              value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              required
-              className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
-              placeholder="Entrez le nom complet du client"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-              Email *
+              Email (optionnel)
             </label>
             <input
               type="email"
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-              required
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 dark:focus:border-orange-500"
               placeholder="exemple@email.com"
             />
@@ -316,7 +454,7 @@ const Clients = memo(() => {
               type="button"
               onClick={() => {
                 setIsModalOpen(false);
-                setFormData({ name: '', email: '', phone: '', address: '' });
+                setFormData({ firstName: '', lastName: '', email: '', phone: '', address: '' });
                 setSelectedClient(null);
               }}
               className="px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"

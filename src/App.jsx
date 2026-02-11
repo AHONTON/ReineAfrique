@@ -5,6 +5,7 @@ import { CookieProvider } from "./contexts/CookieContext";
 import { AuthProvider } from "./auth/AuthContext";
 import { ThemeProvider, useTheme } from "./contexts/ThemeContext";
 import { AlertProvider } from "./contexts/AlertContext";
+import { CartProvider } from "./contexts/CartContext";
 import LoadingScreen from "./components/Layout/LoadingScreen";
 import PageTransition from "./components/Layout/PageTransition";
 import ContactModal from "./components/ContactModal";
@@ -16,6 +17,10 @@ const Accueil = lazy(() => import("./pages/Accueil"));
 const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const Contact = lazy(() => import("./pages/Contact"));
+const Shop = lazy(() => import("./pages/Shop"));
+const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+const Cart = lazy(() => import("./pages/Cart"));
+const Checkout = lazy(() => import("./pages/Checkout"));
 
 // Pages Admin - Layout lazy loaded, mais pages internes non lazy pour éviter les flashes
 const Login = lazy(() => import("./pages/admin/Login"));
@@ -93,6 +98,10 @@ function AppContent() {
             <Routes location={location}>
                 {/* Routes publiques */}
                 <Route path="/" element={<Accueil />} />
+                <Route path="/shop" element={<Shop />} />
+                <Route path="/product/:id" element={<ProductDetail />} />
+                <Route path="/cart" element={<Cart />} />
+                <Route path="/checkout" element={<Checkout />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/contact" element={<Contact />} />
@@ -130,9 +139,11 @@ function App() {
       <LoadingProvider>
         <CookieProvider>
           <AuthProvider>
-            <AlertProvider>
-              <AppContent />
-            </AlertProvider>
+            <CartProvider>
+              <AlertProvider>
+                <AppContent />
+              </AlertProvider>
+            </CartProvider>
             <CookieConsent />
             <PrivacyPolicyModal />
           </AuthProvider>

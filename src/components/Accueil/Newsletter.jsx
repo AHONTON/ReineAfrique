@@ -44,10 +44,10 @@ export default function Newsletter() {
   };
 
   return (
-    <section className="relative px-4 py-16 overflow-hidden sm:px-6 lg:px-8">
-      {/* --- Fond animé --- */}
+    <section className="relative w-full py-16 overflow-hidden" aria-label="Rejoignez la communauté">
+      {/* --- Fond animé - pleine largeur --- */}
       <motion.div
-        className="absolute inset-0 z-0 w-full h-full bg-gradient-to-br from-orange-900 via-amber-900 to-red-900"
+        className="absolute inset-0 z-0 w-full min-h-full bg-gradient-to-br from-orange-900 via-amber-900 to-red-900"
         initial={{ scale: 1 }}
         animate={{ scale: 1.05 }}
         transition={{
@@ -75,8 +75,8 @@ export default function Newsletter() {
         />
       </motion.div>
 
-      {/* --- Contenu principal --- */}
-      <div className="relative z-10 flex flex-col max-w-6xl gap-8 mx-auto">
+      {/* --- Contenu principal - centré, même largeur que la plateforme --- */}
+      <div className="relative z-10 flex flex-col w-full max-w-7xl gap-8 mx-auto px-4 sm:px-6 md:px-8 lg:px-10">
         {/* --- Titre --- */}
         <motion.h2
           initial={{ opacity: 0, y: 20 }}

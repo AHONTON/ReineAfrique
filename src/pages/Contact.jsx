@@ -14,13 +14,13 @@ const Contact = () => {
       transition={{ duration: 0.3 }}
     >
       <Header logoSrc="/images/logo2.png" />
-      <main className="pt-4">
-        {/* Wrapper pour centrer et limiter les sections suivantes */}
+      <main className="pt-0 flex flex-col">
+        {/* Bannière hero pleine largeur */}
+        <ContactBaner />
         <Wrapper>
-          <ContactBaner />
           <ContactSection />
-          <Footer />
         </Wrapper>
+        <Footer />
       </main>
     </motion.div>
   );

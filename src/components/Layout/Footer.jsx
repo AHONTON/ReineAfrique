@@ -55,7 +55,7 @@ const Footer = () => {
       icon: WhatsAppIcon,
       href: "https://wa.me/+2290150035719",
       label: "WhatsApp",
-      color: "hover:bg-green-600",
+      color: "hover:bg-orange-500",
       isCustom: true,
     },
   ];
@@ -81,8 +81,9 @@ const Footer = () => {
         />
       </div>
 
-      {/* Contenu principal */}
-      <div className="relative w-full px-6 pt-10 pb-6 sm:pt-14 md:px-10 lg:px-20">
+      {/* Contenu principal - largeur max identique à tout le site */}
+      <div className="relative w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 lg:px-10 pt-10 pb-6 sm:pt-14">
         <motion.div
           variants={containerVariants}
           initial="hidden"
@@ -197,7 +198,7 @@ const Footer = () => {
           </div>
         </motion.div>
 
-        {/* Bas du footer */}
+        {/* Bas du footer - même largeur */}
         <motion.div
           variants={itemVariants}
           initial="hidden"
@@ -228,6 +229,7 @@ const Footer = () => {
             </a>
           </div>
         </motion.div>
+        </div>
       </div>
     </footer>
   );

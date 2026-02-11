@@ -38,7 +38,7 @@ const ContactBaner = () => {
   };
 
   return (
-    <div className="relative w-full overflow-hidden">
+    <section className="relative w-full min-h-[320px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[560px] overflow-hidden" aria-label="Bannière contact">
       {/* --- BACKGROUND IMAGES SLIDER --- */}
       {images.map((img, i) => (
         <img
@@ -176,7 +176,7 @@ const ContactBaner = () => {
 
       {/* Bordure décorative */}
       <div className="absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#3C7A55] via-[#F2B632] via-[#E56A0D] to-[#B42C1B] z-20"></div>
-    </div>
+    </section>
   );
 };
 

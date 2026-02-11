@@ -26,8 +26,8 @@ const About = () => {
           <HistoryImpactSection />
           <Choix />
           <Faq />
-          <Footer />
         </Wrapper>
+        <Footer />
       </main>
     </motion.div>
   );

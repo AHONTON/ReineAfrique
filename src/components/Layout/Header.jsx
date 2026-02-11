@@ -1,8 +1,9 @@
 import { useState, useEffect, memo } from "react";
-import { Menu, X, ShoppingCart, Search, Phone, MapPin, User, Heart } from "lucide-react";
+import { Menu, X, ShoppingCart, Search, Phone, MapPin, Heart } from "lucide-react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { useCart } from "../../contexts/CartContext";
+import toastService from "../../utils/toastService";
 
 const TopBar = () => (
   <div className="relative z-50 px-4 py-2 text-xs font-medium tracking-wide bg-amber-950 text-amber-50/90">
@@ -129,10 +130,16 @@ const Header = memo(({ logoSrc }) => {
                         />
                     </div>
 
-                     {/* Cart mapped to Shop/Cart */}
+                     {/* Cart : si vide → toast uniquement ; si non vide → aller au panier */}
                     <Link 
                       to="/cart" 
-                      onClick={() => dismissCartPopup()}
+                      onClick={(e) => {
+                        dismissCartPopup();
+                        if (cartCount === 0) {
+                          e.preventDefault();
+                          toastService.showWarning("Votre panier est vide.", "Panier", 3500);
+                        }
+                      }}
                       className="p-2.5 text-gray-600 hover:text-amber-900 hover:bg-amber-50 rounded-full transition-all duration-200 relative group"
                     >
                         <ShoppingCart size={20} strokeWidth={2} />
@@ -269,14 +276,20 @@ const Header = memo(({ logoSrc }) => {
                             ))}
                         </nav>
                         
-                        <div className="grid grid-cols-2 gap-4 px-4 mt-8">
-                           <Link to="/cart" onClick={() => setMenuOpen(false)} className="flex flex-col items-center justify-center p-4 transition-colors bg-amber-50 rounded-2xl text-amber-900 hover:bg-amber-100">
+                        <div className="px-4 mt-8">
+                           <Link
+                              to="/cart"
+                              onClick={(e) => {
+                                if (cartCount === 0) {
+                                  e.preventDefault();
+                                  toastService.showWarning("Votre panier est vide.", "Panier", 3500);
+                                }
+                                setMenuOpen(false);
+                              }}
+                              className="flex flex-col items-center justify-center p-4 transition-colors bg-amber-50 rounded-2xl text-amber-900 hover:bg-amber-100 w-full"
+                           >
                               <ShoppingCart size={24} className="mb-2 opacity-80" />
                               <span className="text-xs font-bold">Mon Panier ({cartCount})</span>
-                           </Link>
-                           <Link to="/profile" onClick={() => setMenuOpen(false)} className="flex flex-col items-center justify-center p-4 text-gray-700 transition-colors bg-gray-50 rounded-2xl hover:bg-gray-100">
-                              <User size={24} className="mb-2 opacity-80" />
-                              <span className="text-xs font-bold">Mon Compte</span>
                            </Link>
                         </div>
                     </div>
@@ -298,7 +311,7 @@ const Header = memo(({ logoSrc }) => {
                           rel="noopener noreferrer"
                           whileHover={{ scale: 1.02 }}
                           whileTap={{ scale: 0.98 }}
-                          className="w-full py-3.5 bg-[#25D366] text-white font-bold rounded-xl shadow-lg shadow-green-200 flex items-center justify-center gap-2"
+                          className="w-full py-3.5 bg-gradient-to-r from-orange-500 to-amber-500 text-white font-bold rounded-xl shadow-lg shadow-orange-200 flex items-center justify-center gap-2 hover:from-orange-600 hover:to-amber-600 transition-all"
                         >
                           <img src="https://upload.wikimedia.org/wikipedia/commons/6/6b/WhatsApp.svg" alt="WA" className="w-5 h-5 filter brightness-0 invert" />
                           Discuter sur WhatsApp

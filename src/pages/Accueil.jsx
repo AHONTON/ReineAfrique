@@ -28,8 +28,9 @@ const Accueil = () => {
           <ValeursSection />
           <NotreMission />
           <NotreVision />
-          <Newsletter />
         </Wrapper>
+        {/* Section communauté pleine largeur */}
+        <Newsletter />
         <Footer />
       </main>
     </motion.div>

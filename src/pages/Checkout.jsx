@@ -30,10 +30,11 @@ const Checkout = () => {
         commentaire: ''
     });
 
-    // Redirect if cart is empty
+    // Panier vide : toast visible puis redirection vers la page panier
     React.useEffect(() => {
         if (cartItems.length === 0) {
-            navigate('/shop');
+            toastService.showWarning("Votre panier est vide.", "Panier", 3500);
+            navigate('/cart');
         }
     }, [cartItems, navigate]);
 

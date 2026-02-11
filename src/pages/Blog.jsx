@@ -19,10 +19,9 @@ const Blog = () => {
         <BlogBanner whatsappNumber="+2290150035719" />
         {/* Wrapper pour centrer et limiter les sections suivantes */}
         <Wrapper>
-          {/* Sections du blog */}
           <CategoriesSection />
-          <Footer />
         </Wrapper>
+        <Footer />
       </main>
     </motion.div>
   );

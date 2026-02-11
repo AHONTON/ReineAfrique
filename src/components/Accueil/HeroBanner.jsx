@@ -53,7 +53,7 @@ const HeroBanner = memo(({ whatsappNumber = "+2290150035719", logoSrc = "/images
   }, [whatsappNumber]);
 
   return (
-    <div className="relative w-full min-h-[60vh] xs:min-h-[65vh] sm:min-h-[70vh] md:min-h-screen lg:min-h-screen overflow-hidden">
+    <section className="relative w-full min-h-[320px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[560px] overflow-hidden" aria-label="Bannière hero">
       <AnimatePresence mode="wait">
         {slides.map((slide, index) => (
           index === currentSlide && (
@@ -174,7 +174,7 @@ const HeroBanner = memo(({ whatsappNumber = "+2290150035719", logoSrc = "/images
           />
         ))}
       </div>
-    </div>
+    </section>
   );
 });
 

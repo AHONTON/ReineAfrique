@@ -73,21 +73,21 @@ const ContactModal = memo(({ phoneNumber = "+2290150035719" }) => {
 
               {/* Options */}
               <div className="p-4 space-y-3">
-                {/* Option WhatsApp */}
+                {/* Option WhatsApp - charte orange/ambre */}
                 <motion.button
                   onClick={handleWhatsApp}
                   whileHover={{ scale: 1.02, x: 5 }}
                   whileTap={{ scale: 0.98 }}
-                  className="w-full flex items-center gap-4 p-4 bg-green-50 hover:bg-green-100 border-2 border-green-200 hover:border-green-400 rounded-xl transition-all duration-300 group"
+                  className="w-full flex items-center gap-4 p-4 bg-orange-50 hover:bg-orange-100 border-2 border-orange-200 hover:border-orange-400 rounded-xl transition-all duration-300 group"
                 >
-                  <div className="flex items-center justify-center w-12 h-12 bg-green-500 rounded-full group-hover:bg-green-600 transition-colors">
+                  <div className="flex items-center justify-center w-12 h-12 bg-gradient-to-br from-orange-500 to-amber-500 rounded-full group-hover:from-orange-600 group-hover:to-amber-600 transition-colors">
                     <WhatsAppIcon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1 text-left">
                     <p className="font-semibold text-gray-800">Discuter sur WhatsApp</p>
                     <p className="text-sm text-gray-600">Chat en direct</p>
                   </div>
-                  <MessageCircle className="w-5 h-5 text-green-600" />
+                  <MessageCircle className="w-5 h-5 text-orange-600" />
                 </motion.button>
 
                 {/* Option Appel */}

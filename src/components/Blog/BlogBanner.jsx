@@ -20,7 +20,7 @@ const BlogBanner = () => {
   }, [images.length]);
 
   return (
-    <section className="relative overflow-hidden bg-neutral-950 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px]">
+    <section className="relative overflow-hidden bg-neutral-950 min-h-[320px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[560px]" aria-label="Bannière blog">
       {/* Images animées en arrière-plan */}
       <div className="absolute inset-0">
         {images.map((img, index) => (
@@ -43,7 +43,7 @@ const BlogBanner = () => {
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/40 to-black/60" />
 
       {/* Contenu principal */}
-      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[400px] sm:min-h-[500px] lg:min-h-[600px] flex items-center justify-center">
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 min-h-[320px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[560px] flex items-center justify-center">
         <div className="max-w-4xl text-center">
           {/* Titre principal */}
           <motion.h1

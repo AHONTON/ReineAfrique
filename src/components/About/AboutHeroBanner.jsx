@@ -50,7 +50,7 @@ const AboutHeroBanner = () => {
     setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
 
   return (
-    <div className="relative w-full h-[450px] md:h-[550px] lg:h-[600px] overflow-hidden">
+    <section className="relative w-full min-h-[320px] sm:min-h-[400px] md:min-h-[480px] lg:min-h-[560px] overflow-hidden" aria-label="Bannière à propos">
       {slides.map((slide, index) => (
         <div
           key={index}
@@ -163,7 +163,7 @@ const AboutHeroBanner = () => {
           animation: fade-in 0.8s ease-out;
         }
       `}</style>
-    </div>
+    </section>
   );
 };
 

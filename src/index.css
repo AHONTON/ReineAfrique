@@ -163,3 +163,12 @@ h1, h2, h3, h4, h5, h6 {
 .dark .swal2-timer-progress-bar {
     background-color: rgb(249 115 22) !important;
 }
+
+/* Masquer la scrollbar tout en gardant le défilement (mobile / filtres) */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}

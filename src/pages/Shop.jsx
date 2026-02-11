@@ -57,15 +57,17 @@ const Shop = () => {
     }, []);
 
     const ProductSkeleton = () => (
-      <div className="bg-white rounded-xl overflow-hidden shadow-sm animate-pulse border border-gray-100">
-          <div className="h-64 bg-gray-200"></div>
-          <div className="p-4 space-y-3">
-              <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-              <div className="flex justify-between items-center pt-2">
-                  <div className="h-6 bg-gray-200 rounded w-1/3"></div>
-                  <div className="h-8 bg-gray-200 rounded-full w-8"></div>
+      <div className="bg-white rounded-2xl overflow-hidden shadow-sm animate-pulse border border-gray-100 h-full flex flex-col">
+          <div className="aspect-square bg-gray-200" />
+          <div className="p-4 flex flex-col flex-1 min-h-[140px]">
+              <div className="flex justify-between mb-1">
+                  <div className="h-3 bg-gray-200 rounded w-1/3" />
+                  <div className="h-3 bg-gray-200 rounded w-14" />
               </div>
+              <div className="h-4 bg-gray-200 rounded w-full mb-1" />
+              <div className="h-4 bg-gray-200 rounded w-2/3 mb-2" />
+              <div className="h-4 bg-gray-200 rounded w-1/4 mt-auto" />
+              <div className="h-10 bg-gray-200 rounded-xl mt-3" />
           </div>
       </div>
     );
@@ -138,17 +140,17 @@ const Shop = () => {
                         </div>
                     </div>
 
-                    {/* Products Grid - Optimized for modern sizing (smaller cards, better density) */}
+                    {/* Grille produits - dimensions uniformes, responsive e-commerce */}
                     {isLoading ? (
-                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
-                            {[...Array(12)].map((_, i) => (
+                         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                            {[...Array(8)].map((_, i) => (
                                 <ProductSkeleton key={i} />
                             ))}
                          </div>
                     ) : filteredProducts.length > 0 ? (
-                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-6">
-                            {filteredProducts.map(product => (
-                                <ProductCard key={product.id} product={product} />
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6">
+                            {filteredProducts.map((product, index) => (
+                                <ProductCard key={product.id} product={product} index={index} />
                             ))}
                         </div>
                     ) : (

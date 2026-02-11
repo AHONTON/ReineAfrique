@@ -6,7 +6,6 @@ import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
 import { useCart } from '../contexts/CartContext';
-import { useLoading } from '../contexts/LoadingContext';
 import toastService from '../utils/toastService';
 import Swal from 'sweetalert2';
 import api from '../api/axios';
@@ -15,7 +14,6 @@ import { SHOP_ENDPOINTS } from '../config/api';
 const Checkout = () => {
     const { cartItems, getCartTotal, clearCart } = useCart();
     const navigate = useNavigate();
-    const { startLoading, stopLoading } = useLoading();
     
     // State to toggle the Modal Form
     const [isFormOpen, setIsFormOpen] = useState(false);
@@ -53,7 +51,6 @@ const Checkout = () => {
     const handleConfirmOrder = async () => {
         if (!validateForm()) return;
 
-        startLoading();
         try {
             const orderPayload = {
                 client_id: null,
@@ -78,7 +75,6 @@ const Checkout = () => {
 
             await api.post(SHOP_ENDPOINTS.ORDERS, orderPayload);
 
-            stopLoading();
             setIsFormOpen(false);
             
             Swal.fire({
@@ -93,7 +89,6 @@ const Checkout = () => {
             });
 
         } catch (error) {
-            stopLoading();
             console.error(error);
             const msg = error.response?.data?.message || "Une erreur est survenue lors de l'envoi de la commande.";
             toastService.showError(msg);

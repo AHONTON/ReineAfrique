@@ -91,27 +91,11 @@ export const LoadingProvider = ({ children }) => {
     }
   }, [isLoading]);
 
-  // Chargement lors des changements de page
+  // Ne plus afficher de loader entre les menus (plateforme ou dashboard).
+  // Le loading s'affiche uniquement : 1) premier chargement de la plateforme, 2) accès au dashboard (Suspense).
   useEffect(() => {
-    // Ne pas afficher le loader de page si on est déjà en train de charger initialement
-    if (isLoading) return;
-    
-    // Ne pas afficher le loader pour les routes admin (navigation interne)
-    const isAdminRoute = location.pathname.startsWith('/admin');
-    if (isAdminRoute) {
-      setIsPageLoading(false);
-      return;
-    }
-
-    setIsPageLoading(true);
-
-    // Simuler un chargement de page (plus rapide pour éviter les problèmes)
-    const timer = setTimeout(() => {
-      setIsPageLoading(false);
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [location.pathname, isLoading]);
+    setIsPageLoading(false);
+  }, [location.pathname]);
 
   // Réinitialiser le loader à chaque nouvel accès (F5, recherche, lien direct)
   useEffect(() => {

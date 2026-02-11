@@ -172,3 +172,44 @@ h1, h2, h3, h4, h5, h6 {
 .scrollbar-hide::-webkit-scrollbar {
     display: none;
 }
+
+/* ========== Neumorphism (Soft UI) — Loader & composants ========== */
+.neu-bg {
+    background-color: #e8e2dc;
+}
+.neu-raised {
+    background: #e8e2dc;
+    box-shadow: 8px 8px 20px rgba(180, 170, 160, 0.45), -8px -8px 20px rgba(255, 255, 255, 0.85);
+}
+.neu-raised-sm {
+    background: #e8e2dc;
+    box-shadow: 4px 4px 10px rgba(180, 170, 160, 0.4), -4px -4px 10px rgba(255, 255, 255, 0.8);
+}
+.neu-inset {
+    background: #e8e2dc;
+    box-shadow: inset 5px 5px 12px rgba(180, 170, 160, 0.4), inset -5px -5px 12px rgba(255, 255, 255, 0.7);
+}
+.neu-inset-sm {
+    background: #e0d9d2;
+    box-shadow: inset 3px 3px 8px rgba(160, 150, 140, 0.35), inset -3px -3px 8px rgba(255, 255, 255, 0.6);
+}
+.neu-pressed {
+    background: #ddd6ce;
+    box-shadow: inset 6px 6px 14px rgba(160, 150, 140, 0.45), inset -4px -4px 10px rgba(255, 255, 255, 0.5);
+}
+.neu-convex {
+    background: linear-gradient(145deg, #f0ebe5, #e0d9d2);
+    box-shadow: 8px 8px 18px rgba(180, 170, 160, 0.4), -8px -8px 18px rgba(255, 255, 255, 0.8);
+}
+.neu-convex-circle {
+    background: linear-gradient(145deg, #f2ede7, #e2dbd4);
+    box-shadow: 6px 6px 14px rgba(180, 170, 160, 0.45), -6px -6px 14px rgba(255, 255, 255, 0.85);
+}
+.neu-track {
+    background: #e0d9d2;
+    box-shadow: inset 4px 4px 10px rgba(160, 150, 140, 0.4), inset -4px -4px 10px rgba(255, 255, 255, 0.6);
+}
+.neu-fill {
+    background: linear-gradient(145deg, #f5a623, #e88b1a);
+    box-shadow: 3px 3px 8px rgba(200, 120, 30, 0.35), -2px -2px 6px rgba(255, 200, 150, 0.25);
+}

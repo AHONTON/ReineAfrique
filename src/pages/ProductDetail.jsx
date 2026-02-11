@@ -6,7 +6,6 @@ import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
 import { useCart } from '../contexts/CartContext';
-import { useLoading } from '../contexts/LoadingContext';
 import api from '../api/axios';
 import { SHOP_ENDPOINTS } from '../config/api';
 import toastService from '../utils/toastService';
@@ -16,7 +15,6 @@ const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
-    const { startLoading, stopLoading } = useLoading();
     
     const [product, setProduct] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -66,7 +64,6 @@ const ProductDetail = () => {
             return;
         }
 
-        startLoading();
         try {
             const orderPayload = {
                 client_id: null, // Guest checkout
@@ -86,7 +83,6 @@ const ProductDetail = () => {
 
             await api.post(SHOP_ENDPOINTS.ORDERS, orderPayload);
             setShowOrderModal(false);
-            stopLoading();
 
             // Success Popup as requested
             Swal.fire({
@@ -100,7 +96,6 @@ const ProductDetail = () => {
             });
 
         } catch (error) {
-            stopLoading();
             console.error("Order error:", error);
             toastService.error("Une erreur est survenue lors de la commande.");
         }

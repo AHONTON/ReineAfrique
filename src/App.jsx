@@ -46,13 +46,13 @@ function AppContent() {
   const isAdminRoute = location.pathname.startsWith('/admin');
   const isDark = resolvedTheme === 'dark';
 
-  // Fallback pour AdminLayout — spinner moderne aligné au dashboard
+  // Fallback pour AdminLayout — spinner type neumorphic
   const AdminLayoutFallback = (
     <div className={`admin-dashboard min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 fixed inset-0 flex items-center justify-center`}>
-      <div className="flex flex-col items-center gap-4">
-        <div className="relative w-14 h-14">
+      <div className="flex flex-col items-center gap-5">
+        <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center shadow-[inset_4px_4px_10px_rgba(0,0,0,0.06),inset_-4px_-4px_10px_rgba(255,255,255,0.8)] dark:shadow-[inset_4px_4px_12px_rgba(0,0,0,0.3),inset_-2px_-2px_8px_rgba(255,255,255,0.05)]">
           <motion.div
-            className="absolute inset-0 rounded-full border-2 border-transparent border-t-orange-500 border-r-amber-400"
+            className="w-10 h-10 rounded-full border-2 border-transparent border-t-orange-500 border-r-amber-400 dark:border-t-orange-400 dark:border-r-amber-300"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           />

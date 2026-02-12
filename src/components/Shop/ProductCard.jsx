@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiShoppingCart } from 'react-icons/fi';
+import { ShoppingCart } from 'lucide-react';
 import { useCart } from '../../contexts/CartContext';
 
 const ProductCard = ({ product, index = 0 }) => {
@@ -99,7 +99,7 @@ const ProductCard = ({ product, index = 0 }) => {
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
           >
-            <FiShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+            <ShoppingCart className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
             <span className="hidden sm:inline">Ajouter au panier</span>
             <span className="sm:hidden">Ajouter</span>
           </button>

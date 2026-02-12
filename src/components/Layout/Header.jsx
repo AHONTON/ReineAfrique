@@ -6,8 +6,8 @@ import { useCart } from "../../contexts/CartContext";
 import toastService from "../../utils/toastService";
 
 const TopBar = () => (
-  <div className="relative z-50 px-4 py-2 text-xs font-medium tracking-wide bg-amber-950 text-amber-50/90">
-    <div className="flex flex-col items-center justify-between gap-2 mx-auto max-w-7xl sm:flex-row">
+  <div className="relative z-50 px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-medium tracking-wide bg-amber-950 text-amber-50/90">
+    <div className="flex flex-col items-center justify-between gap-1 sm:gap-2 mx-auto max-w-7xl sm:flex-row text-center sm:text-left">
       <div className="flex items-center hidden gap-6 sm:flex">
         <span className="flex items-center gap-2 transition-colors cursor-default hover:text-white">
           <Phone size={14} className="text-amber-500"/> 
@@ -245,9 +245,10 @@ const Header = memo(({ logoSrc }) => {
                     animate={{ x: 0 }}
                     exit={{ x: '100%' }}
                     transition={{ type: 'spring', damping: 25, stiffness: 250 }}
-                    className="fixed top-0 right-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl z-[70] overflow-y-auto flex flex-col"
+                    className="fixed top-0 right-0 h-full w-[85%] max-w-[320px] bg-white shadow-2xl z-[70] overflow-y-auto flex flex-col rounded-l-2xl"
+                    style={{ paddingTop: 'env(safe-area-inset-top)', paddingRight: 'env(safe-area-inset-right)' }}
                 >
-                    <div className="flex items-center justify-between p-6 border-b border-gray-100 bg-gray-50/50">
+                    <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-100 bg-gray-50/50">
                          <img src={logoSrc} alt="Logo" className="object-contain w-auto h-10" />
                          <button 
                            onClick={() => setMenuOpen(false)} 

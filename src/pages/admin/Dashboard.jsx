@@ -203,11 +203,11 @@ const Dashboard = memo(() => {
       {/* Header avec filtres (maquette: texte d'accueil + boutons période) */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4 md:gap-6">
         <div className="min-w-0 flex-1">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-4xl font-bold text-gray-800 dark:text-white leading-tight">Bonjour, Admin!</h1>
+          <h1 className="text-xl sm:text-3xl md:text-4xl font-bold text-gray-800 dark:text-white leading-tight">Bonjour, Admin!</h1>
           <p className="text-xs sm:text-sm md:text-base text-gray-600 dark:text-gray-400 mt-1 sm:mt-2">Bienvenue sur Reine d'Afrique — Tableau de bord</p>
         </div>
-        <div className="flex items-center gap-3">
-          <div className="inline-flex bg-transparent rounded-md shadow-sm" role="group">
+        <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto pb-1 scrollbar-hide min-w-0">
+          <div className="inline-flex bg-transparent rounded-md shadow-sm flex-shrink-0" role="group">
             <button
               onClick={() => setPeriod(PERIODS.DAY)}
               className={`px-3 py-2 text-sm font-medium rounded-l-md border ${period === PERIODS.DAY ? 'bg-white dark:bg-gray-800 text-gray-800 dark:text-white border-gray-300 dark:border-gray-700 shadow' : 'bg-transparent text-gray-700 dark:text-gray-300 border-gray-200 dark:border-gray-700'}`}
@@ -233,7 +233,7 @@ const Dashboard = memo(() => {
               <option value="custom">Période personnalisée</option>
             </select>
           </div>
-          <button onClick={handleRefresh} className="ml-3 btn-refresh inline-flex items-center">
+          <button onClick={handleRefresh} className="ml-1 sm:ml-3 btn-refresh inline-flex items-center flex-shrink-0 text-xs sm:text-base px-2.5 py-1.5 sm:px-3 sm:py-2">
             Actualiser
           </button>
         </div>
@@ -241,37 +241,37 @@ const Dashboard = memo(() => {
 
       {/* Bas: Commandes récentes + panneau droit (Stock Faible) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6">
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-4 sm:p-5 md:p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-100 dark:border-gray-700 p-3 sm:p-5 md:p-6 min-w-0">
           <h3 className="text-base sm:text-lg md:text-xl font-bold text-gray-900 dark:text-white mb-3">Commandes Récentes</h3>
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto -webkit-overflow-scrolling-touch scrollbar-hide">
             <table className="table-recent min-w-full divide-y divide-gray-200 dark:divide-gray-700">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Montant</th>
-                  <th className="px-4 py-2"></th>
+                  <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Client</th>
+                  <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Statut</th>
+                  <th className="px-2 sm:px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase whitespace-nowrap">Montant</th>
+                  <th className="px-2 sm:px-4 py-2"></th>
                 </tr>
               </thead>
               <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700">
                 {recentOrders && recentOrders.length > 0 ? (
                   recentOrders.map((row, idx) => (
                     <tr key={row.id || idx} className="hover:bg-gray-50 dark:hover:bg-gray-700">
-                      <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.client || row.customer_name || row.customer?.name}</td>
-                      <td className="px-4 py-3">
-                        <span className={`badge-status ${row.status === 'Livrée' || row.status === 'delivered' ? 'badge-green' : row.status === 'En préparation' || row.status === 'processing' ? 'badge-yellow' : 'badge-orange'}`}>
+                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 dark:text-gray-100 max-w-[100px] xs:max-w-[140px] sm:max-w-none truncate sm:whitespace-normal">{row.client || row.customer_name || row.customer?.name}</td>
+                    <td className="px-2 sm:px-4 py-2 sm:py-3">
+                        <span className={`badge-status text-[10px] xs:text-xs ${row.status === 'Livrée' || row.status === 'delivered' ? 'badge-green' : row.status === 'En préparation' || row.status === 'processing' ? 'badge-yellow' : 'badge-orange'}`}>
                           {row.status || row.state}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm text-gray-800 dark:text-gray-100">{row.amount ?? (row.total ? formatCurrency(row.total) : (row.total == null ? '—' : formatCurrency(row.total)))}</td>
-                      <td className="px-4 py-3 text-right">
-                        <button type="button" onClick={() => navigate('/admin/commandes')} className="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm rounded shadow">Voir</button>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-gray-800 dark:text-gray-100 whitespace-nowrap">{row.amount ?? (row.total ? formatCurrency(row.total) : (row.total == null ? '—' : formatCurrency(row.total)))}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right">
+                        <button type="button" onClick={() => navigate('/admin/commandes')} className="inline-flex items-center px-2 py-1 sm:px-3 sm:py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs sm:text-sm rounded shadow">Voir</button>
                       </td>
                     </tr>
                   ))
                 ) : (
                   <tr>
-                    <td colSpan={4} className="px-4 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                    <td colSpan={4} className="px-2 sm:px-4 py-6 sm:py-8 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                       {ordersLoading ? 'Chargement…' : 'Aucune commande récente'}
                     </td>
                   </tr>

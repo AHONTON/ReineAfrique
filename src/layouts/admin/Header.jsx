@@ -67,8 +67,8 @@ const Header = memo(() => {
 
   return (
     <header className="bg-white/95 dark:bg-gray-900/95 backdrop-blur-md shadow-md border-b border-gray-200 dark:border-gray-700 sticky top-0 z-30 w-full">
-      <div className="px-3 sm:px-4 md:px-6 py-4 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 min-h-[73px] sm:min-h-[81px] md:min-h-[89px] min-w-0">
-        <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div className="px-2 sm:px-4 md:px-6 py-3 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-4 min-h-[64px] sm:min-h-[81px] md:min-h-[89px] min-w-0">
+        <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
           <motion.div
             animate={{
               y: [0, -5, 0],
@@ -119,7 +119,7 @@ const Header = memo(() => {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: -8, scale: 0.96 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-[320px] sm:w-[380px] max-h-[400px] overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col"
+                  className="absolute right-0 top-full mt-2 w-[min(320px,calc(100vw-2rem))] sm:w-[380px] max-h-[70vh] sm:max-h-[400px] overflow-hidden bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 z-50 flex flex-col"
                 >
                   <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700 flex items-center justify-between">
                     <h3 className="font-semibold text-gray-900 dark:text-white">

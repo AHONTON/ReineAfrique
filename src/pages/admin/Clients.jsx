@@ -1,5 +1,6 @@
-import { useState, useEffect, useCallback, useMemo, memo } from 'react';
-import { Plus, Edit, Trash2, Eye, Phone } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo, useRef, memo } from 'react';
+import { useLocation } from 'react-router-dom';
+import { Plus, Edit, Trash2, Eye, Phone, RefreshCw } from 'lucide-react';
 import api from '../../api/axios';
 import DataTable from '../../components/admin/DataTable';
 import Modal from '../../components/admin/Modal';
@@ -10,6 +11,7 @@ import { ORDER_STATUS, ORDER_STATUS_CONFIG } from '../../config/constants';
 import { formatCurrency, formatDate } from '../../utils/formatters';
 
 const Clients = memo(() => {
+  const location = useLocation();
   const [clients, setClients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,12 +25,39 @@ const Clients = memo(() => {
     address: '',
   });
 
-  const fetchClients = useCallback(async () => {
+  const fetchClients = useCallback(async (runSyncFirst = false) => {
     try {
       setLoading(true);
+      let syncResult = null;
+      if (runSyncFirst) {
+        try {
+          const syncRes = await api.post(CLIENT_ENDPOINTS.SYNC_FROM_ORDERS);
+          syncResult = syncRes.data;
+          if (syncResult?.synced > 0) {
+            toastService.showSuccess(
+              `${syncResult.synced} commande(s) rattachée(s) aux clients. Liste mise à jour.`,
+              'Synchronisation'
+            );
+          }
+        } catch {
+          // Ignorer les erreurs de sync (ex. API indisponible)
+        }
+      }
       const response = await api.get(CLIENT_ENDPOINTS.LIST);
-      // S'assurer que response.data est un tableau
-      const clientsData = Array.isArray(response.data) ? response.data : [];
+      const raw = response.data;
+      const totalFromHeader = response.headers?.['x-total-clients'];
+      if (totalFromHeader != null) {
+        console.log('📡 API X-Total-Clients:', totalFromHeader);
+      }
+      // Accepter tableau direct, wrapper { data: [...] }, ou un seul objet (toujours renvoyer un tableau)
+      let clientsData = [];
+      if (Array.isArray(raw)) {
+        clientsData = raw;
+      } else if (Array.isArray(raw?.data)) {
+        clientsData = raw.data;
+      } else if (raw && typeof raw === 'object' && raw.id != null) {
+        clientsData = [raw];
+      }
       setClients(clientsData);
       console.log('✅ Clients chargés:', clientsData.length);
       
@@ -68,9 +97,25 @@ const Clients = memo(() => {
     }
   }, []);
 
+  // Charger tous les clients (nouveaux + anciens) au montage et à chaque visite de l'onglet
   useEffect(() => {
-    fetchClients();
-  }, [fetchClients]);
+    if (location.pathname === '/admin/clients') {
+      fetchClients(true);
+    }
+  }, [location.pathname, fetchClients]);
+
+  // Recharger la liste quand l'utilisateur revient sur l'onglet navigateur (liste toujours à jour)
+  const fetchClientsRef = useRef(fetchClients);
+  fetchClientsRef.current = fetchClients;
+  useEffect(() => {
+    const onVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && location.pathname === '/admin/clients') {
+        fetchClientsRef.current(false);
+      }
+    };
+    document.addEventListener('visibilitychange', onVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', onVisibilityChange);
+  }, [location.pathname]);
 
   const handleCreate = () => {
     setSelectedClient(null);
@@ -373,14 +418,32 @@ const Clients = memo(() => {
     <div className="space-y-4 sm:space-y-6 min-w-0">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
         <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Gestion des Clients</h1>
-        <button
-          onClick={handleCreate}
-          className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-        >
-          <Plus size={20} />
-          <span>Nouveau Client</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => fetchClients(true)}
+            disabled={loading}
+            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors disabled:opacity-50"
+            title="Synchroniser et recharger la liste complète"
+          >
+            <RefreshCw size={18} className={loading ? 'animate-spin' : ''} />
+            <span>Rafraîchir la liste</span>
+          </button>
+          <button
+            onClick={handleCreate}
+            className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
+          >
+            <Plus size={20} />
+            <span>Nouveau Client</span>
+          </button>
+        </div>
       </div>
+
+      {!loading && (
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          Liste complète : <strong>{clients.length}</strong> client{clients.length !== 1 ? 's' : ''}
+        </p>
+      )}
 
       <DataTable
         columns={columns}
@@ -388,6 +451,7 @@ const Clients = memo(() => {
         loading={loading}
         searchable
         actions={actions}
+        pageSize={50}
       />
 
       

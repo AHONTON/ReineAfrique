@@ -73,7 +73,7 @@ const Sidebar = memo(() => {
       {/* Mobile Menu Button */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95"
+        className="lg:hidden fixed z-50 p-2.5 bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg shadow-lg hover:shadow-xl transition-all active:scale-95 top-4 left-4"
         aria-label="Ouvrir le menu"
       >
         <Menu size={24} />

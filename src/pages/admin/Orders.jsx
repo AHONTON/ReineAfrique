@@ -27,7 +27,9 @@ const Orders = memo(() => {
   const [clients, setClients] = useState([]);
   const [products, setProducts] = useState([]);
   const [formData, setFormData] = useState({
-    client_id: '',
+    nom: '',
+    prenom: '',
+    telephone: '',
     date: new Date().toISOString().split('T')[0],
     status: ORDER_STATUS.EN_DISCUSSION,
     source: 'dashboard',
@@ -109,7 +111,9 @@ const Orders = memo(() => {
 
   const handleCreate = () => {
     setFormData({
-      client_id: '',
+      nom: '',
+      prenom: '',
+      telephone: '',
       date: new Date().toISOString().split('T')[0],
       status: ORDER_STATUS.EN_DISCUSSION,
       source: 'dashboard',
@@ -153,8 +157,16 @@ const Orders = memo(() => {
     e.preventDefault();
     try {
       // Validation
-      if (!formData.client_id) {
-        toastService.showError('Veuillez sélectionner un client');
+      if (!formData.nom?.trim()) {
+        toastService.showError('Veuillez saisir le nom de famille');
+        return;
+      }
+      if (!formData.prenom?.trim()) {
+        toastService.showError('Veuillez saisir le prénom');
+        return;
+      }
+      if (!formData.telephone?.trim()) {
+        toastService.showError('Veuillez saisir le téléphone');
         return;
       }
       if (formData.items.some(item => !item.product_id || !item.quantity || !item.price)) {
@@ -163,8 +175,14 @@ const Orders = memo(() => {
       }
 
       const orderData = {
-        ...formData,
-        client_id: parseInt(formData.client_id),
+        date: formData.date,
+        status: formData.status,
+        source: formData.source || 'dashboard',
+        guest_info: {
+          nom: formData.nom.trim(),
+          prenom: formData.prenom.trim(),
+          telephone: formData.telephone.trim(),
+        },
         items: formData.items.map(item => ({
           product_id: parseInt(item.product_id),
           quantity: parseFloat(item.quantity),
@@ -184,7 +202,9 @@ const Orders = memo(() => {
         
         setIsCreateModalOpen(false);
         setFormData({
-          client_id: '',
+          nom: '',
+          prenom: '',
+          telephone: '',
           date: new Date().toISOString().split('T')[0],
           status: ORDER_STATUS.EN_DISCUSSION,
           source: 'dashboard',
@@ -269,21 +289,40 @@ const Orders = memo(() => {
     );
   }, []);
 
+  const getNomPrenom = (row) => {
+    if (row.guest_info) {
+      return { nom: row.guest_info.nom || '—', prenom: row.guest_info.prenom || '—' };
+    }
+    const parts = (row.client?.name || '').trim().split(/\s+/);
+    const prenom = parts[0] || '—';
+    const nom = parts.length > 1 ? parts.slice(1).join(' ') : '—';
+    return { nom, prenom };
+  };
+
   const columns = useMemo(() => [
     { key: 'id', label: 'ID' },
     {
-      key: 'client',
-      label: 'Client',
+      key: 'nom',
+      label: 'Nom',
       render: (value, row) => {
-        const guestName = row.guest_info ? `${row.guest_info.nom} ${row.guest_info.prenom}` : '';
-        const clientName = row.client?.name || guestName || 'Client Inconnu';
-        const clientPhone = row.client?.phone || row.guest_info?.telephone || 'Pas de numéro';
-        return (
-          <div className="flex flex-col">
-            <span className="font-medium">{clientName}</span>
-            <span className="text-xs text-gray-500">{clientPhone}</span>
-          </div>
-        );
+        const { nom } = getNomPrenom(row);
+        return <span className="font-medium">{nom}</span>;
+      },
+    },
+    {
+      key: 'prenom',
+      label: 'Prénom',
+      render: (value, row) => {
+        const { prenom } = getNomPrenom(row);
+        return <span>{prenom}</span>;
+      },
+    },
+    {
+      key: 'telephone',
+      label: 'Téléphone',
+      render: (value, row) => {
+        const phone = row.client?.phone || row.guest_info?.telephone || '—';
+        return <span className="text-xs text-gray-500">{phone}</span>;
       },
     },
     {
@@ -435,14 +474,29 @@ const Orders = memo(() => {
                   {formatDate(selectedOrder.date)}
                 </p>
               </div>
-              <div>
-                <p className="text-sm text-gray-500">Client</p>
-                <p className="font-medium">
-                    {selectedOrder.client?.name || (selectedOrder.guest_info ? `${selectedOrder.guest_info.nom} ${selectedOrder.guest_info.prenom}` : 'Inconnu')}
-                </p>
-                <p className="text-sm">{selectedOrder.client?.phone || selectedOrder.guest_info?.telephone || 'Pas de numéro'}</p>
-                <p className="text-sm text-gray-400">{displayEmail(selectedOrder.client?.email || selectedOrder.guest_info?.email)}</p>
-              </div>
+              {(() => {
+                const { nom, prenom } = getNomPrenom(selectedOrder);
+                return (
+                  <>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Nom</p>
+                      <p className="font-medium">{nom}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Prénom</p>
+                      <p className="font-medium">{prenom}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Téléphone</p>
+                      <p className="font-medium">{selectedOrder.client?.phone || selectedOrder.guest_info?.telephone || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
+                      <p className="font-medium">{displayEmail(selectedOrder.client?.email || selectedOrder.guest_info?.email)}</p>
+                    </div>
+                  </>
+                );
+              })()}
               <div>
                 <p className="text-sm text-gray-500">Adresse de Livraison</p>
                 <p className="font-medium">{selectedOrder.client?.address || selectedOrder.guest_info?.address || 'Non renseignée'}</p>
@@ -503,7 +557,9 @@ const Orders = memo(() => {
         onClose={() => {
           setIsCreateModalOpen(false);
           setFormData({
-            client_id: '',
+            nom: '',
+            prenom: '',
+            telephone: '',
             date: new Date().toISOString().split('T')[0],
             status: ORDER_STATUS.EN_DISCUSSION,
             source: 'dashboard',
@@ -514,25 +570,56 @@ const Orders = memo(() => {
         size="lg"
       >
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="space-y-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">Identité du client</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Nom de famille *
+                </label>
+                <input
+                  type="text"
+                  value={formData.nom}
+                  onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                  placeholder="Nom de famille"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Prénom *
+                </label>
+                <input
+                  type="text"
+                  value={formData.prenom}
+                  onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                  placeholder="Prénom"
+                  required
+                />
+              </div>
+            </div>
+            {(formData.nom || formData.prenom) && (
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                Nom complet : {[formData.prenom, formData.nom].filter(Boolean).join(' ')}
+              </p>
+            )}
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                Client *
+                Téléphone *
               </label>
-              <select
-                value={formData.client_id}
-                onChange={(e) => setFormData({ ...formData, client_id: e.target.value })}
+              <input
+                type="text"
+                value={formData.telephone}
+                onChange={(e) => setFormData({ ...formData, telephone: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-white rounded-lg focus:ring-2 focus:ring-orange-500"
+                placeholder="Ex. 97 00 00 00"
                 required
-              >
-                <option value="">Sélectionner un client</option>
-                {clients.map((client) => (
-                  <option key={client.id} value={client.id} className="bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300">
-                    {client.name}
-                  </option>
-                ))}
-              </select>
+              />
             </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Date *

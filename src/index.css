@@ -173,6 +173,13 @@ h1, h2, h3, h4, h5, h6 {
     display: none;
 }
 
+/* Défilement fluide tactile sur iOS */
+.touch-scroll,
+.overflow-x-auto {
+    -webkit-overflow-scrolling: touch;
+}
+
+
 /* ========== Neumorphism (Soft UI) — Loader & composants ========== */
 .neu-bg {
     background-color: #e8e2dc;

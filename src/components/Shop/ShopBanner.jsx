@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiArrowRight, FiShoppingBag, FiStar } from 'react-icons/fi';
+import { ArrowRight, ShoppingBag, Star } from 'lucide-react';
 
 const slides = [
   {
@@ -70,7 +70,7 @@ const ShopBanner = () => {
               >
                 <div className="flex text-amber-400 gap-0.5 sm:gap-1">
                   {[...Array(5)].map((_, i) => (
-                    <FiStar key={i} className="fill-current w-3 h-3 sm:w-4 sm:h-4" />
+                    <Star key={i} className="fill-current w-3 h-3 sm:w-4 sm:h-4" />
                   ))}
                 </div>
                 <div className="w-px h-3 sm:h-4 bg-white/30" />
@@ -106,9 +106,9 @@ const ShopBanner = () => {
                 onClick={() => navigate('/blog')}
                 className="flex items-center px-5 py-2.5 sm:px-8 sm:py-3 bg-white text-gray-900 rounded-full font-bold shadow-xl transition-all hover:bg-amber-50 gap-2 mt-2 sm:mt-4 text-sm sm:text-base"
               >
-                <FiArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
                 <span>Visiter notre Blog</span>
-                <FiArrowRight className="w-4 h-4 sm:w-5 sm:h-5 hidden sm:block" />
+                <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 hidden sm:block" />
               </motion.button>
             </div>
           </div>

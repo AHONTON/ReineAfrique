@@ -44,6 +44,8 @@ export const CLIENT_ENDPOINTS = {
   UPDATE: (clientId) => `/admin/clients/${clientId}`,
   DELETE: (clientId) => `/admin/clients/${clientId}`,
   /** Optionnel : vérification WhatsApp (backend peut ne pas l’implémenter) */
+  /** Synchronise les commandes invité vers les clients (rattrapage) */
+  SYNC_FROM_ORDERS: '/admin/clients/sync-from-orders',
   CHECK_WHATSAPP: (clientId) => `/admin/clients/${clientId}/check-whatsapp`,
 };
 

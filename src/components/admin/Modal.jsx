@@ -26,12 +26,12 @@ const Modal = memo(({ isOpen, onClose, title, children, size = 'md' }) => {
           />
 
           {/* Modal */}
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
             <motion.div
                 initial={{ opacity: 0, scale: 0.98, y: 12 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.98, y: 12 }}
-                className={`bg-white dark:bg-gray-800 rounded-lg shadow-xl ${sizeClasses[size]} w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700`}
+                className={`bg-white dark:bg-gray-800 shadow-xl ${sizeClasses[size]} w-full max-h-[92vh] overflow-hidden flex flex-col border border-gray-200 dark:border-gray-700 rounded-t-2xl sm:rounded-lg`}
                 onClick={(e) => e.stopPropagation()}
               >
               {/* Header */}

@@ -66,8 +66,8 @@ const DataTable = memo(({
         </div>
       )}
 
-      {/* Table */}
-      <div className="overflow-x-auto w-full">
+      {/* Table - défilement horizontal tactile sur mobile */}
+      <div className="overflow-x-auto w-full min-w-0 touch-pan-x scrollbar-hide">
         <table className="min-w-full">
           <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
@@ -100,7 +100,7 @@ const DataTable = memo(({
                   className={`hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors ${onRowClick ? 'cursor-pointer' : ''}`}
                 >
                   {columns.map((col, colIndex) => (
-                    <td key={col.key || colIndex} className="px-3 sm:px-4 md:px-6 py-3 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 align-top break-words max-w-[220px] sm:max-w-none">
+                    <td key={col.key || colIndex} className="px-2 sm:px-4 md:px-6 py-2.5 sm:py-4 text-xs sm:text-sm text-gray-900 dark:text-gray-100 align-top break-words min-w-0 max-w-[180px] xs:max-w-[220px] sm:max-w-none">
                       <div className="whitespace-normal break-words">{col.render ? col.render(row[col.key], row) : row[col.key]}</div>
                     </td>
                   ))}

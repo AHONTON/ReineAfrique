@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { FiCheck, FiArrowLeft, FiUser, FiMapPin, FiPhone, FiMail } from 'react-icons/fi';
+import { Check, User, MapPin, Phone, Mail } from 'lucide-react';
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
@@ -82,10 +82,10 @@ const Checkout = () => {
                 text: 'Nous avons bien reçu votre commande. Un de nos agents vous contactera dans quelques instants pour la finaliser.',
                 icon: 'success',
                 confirmButtonColor: '#f97316',
-                confirmButtonText: 'Retour à l\'accueil'
+                confirmButtonText: 'Retour à la boutique'
             }).then(() => {
                 clearCart();
-                navigate('/');
+                navigate('/shop');
             });
 
         } catch (error) {
@@ -152,7 +152,7 @@ const Checkout = () => {
                                     onClick={() => setIsFormOpen(true)}
                                     className="bg-orange-500 text-white px-8 py-3 rounded-lg font-bold hover:bg-orange-600 shadow-lg shadow-orange-200 transition-all flex items-center gap-2"
                                 >
-                                    Valider la commande <FiCheck />
+                                    Valider la commande <Check />
                                 </button>
                             </div>
                         </motion.div>
@@ -174,9 +174,9 @@ const Checkout = () => {
                                     initial={{ scale: 0.9, opacity: 0, y: 20 }}
                                     animate={{ scale: 1, opacity: 1, y: 0 }}
                                     exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                                    className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto"
+                                    className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl relative z-10 max-h-[90vh] overflow-y-auto mx-2 sm:mx-4"
                                 >
-                                    <div className="p-6 md:p-8">
+                                    <div className="p-4 sm:p-6 md:p-8">
                                         <h2 className="text-2xl font-bold text-gray-900 mb-6 font-playfair border-b pb-4">
                                             Vos Coordonnées
                                         </h2>
@@ -188,7 +188,7 @@ const Checkout = () => {
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-gray-700">Nom de famille *</label>
                                                 <div className="relative">
-                                                    <FiUser className="absolute left-3 top-3.5 text-gray-400" />
+                                                    <User className="absolute left-3 top-3.5 text-gray-400" />
                                                     <input 
                                                         type="text" 
                                                         name="nom"
@@ -202,7 +202,7 @@ const Checkout = () => {
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-gray-700">Prénom *</label>
                                                 <div className="relative">
-                                                    <FiUser className="absolute left-3 top-3.5 text-gray-400" />
+                                                    <User className="absolute left-3 top-3.5 text-gray-400" />
                                                     <input 
                                                         type="text" 
                                                         name="prenom"
@@ -223,7 +223,7 @@ const Checkout = () => {
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-gray-700">Téléphone *</label>
                                                 <div className="relative">
-                                                    <FiPhone className="absolute left-3 top-3.5 text-gray-400" />
+                                                    <Phone className="absolute left-3 top-3.5 text-gray-400" />
                                                     <input 
                                                         type="tel" 
                                                         name="telephone"
@@ -238,7 +238,7 @@ const Checkout = () => {
                                             <div className="space-y-2">
                                                 <label className="text-sm font-medium text-gray-700">Email</label>
                                                 <div className="relative">
-                                                    <FiMail className="absolute left-3 top-3.5 text-gray-400" />
+                                                    <Mail className="absolute left-3 top-3.5 text-gray-400" />
                                                     <input 
                                                         type="email" 
                                                         name="email"
@@ -253,7 +253,7 @@ const Checkout = () => {
                                             <div className="space-y-2 md:col-span-2">
                                                 <label className="text-sm font-medium text-gray-700">Adresse de livraison *</label>
                                                 <div className="relative">
-                                                    <FiMapPin className="absolute left-3 top-3.5 text-gray-400" />
+                                                    <MapPin className="absolute left-3 top-3.5 text-gray-400" />
                                                     <input 
                                                         type="text" 
                                                         name="adresse"
@@ -301,7 +301,7 @@ const Checkout = () => {
                                                 onClick={handleConfirmOrder}
                                                 className="bg-green-600 text-white px-8 py-3 rounded-lg font-bold hover:bg-green-700 shadow-lg shadow-green-200 transition-all flex items-center gap-2"
                                             >
-                                                <FiCheck /> Confirmer
+                                                <Check /> Confirmer
                                             </button>
                                         </div>
                                     </div>

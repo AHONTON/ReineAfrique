@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FiShoppingCart, FiArrowLeft, FiCheck, FiTruck, FiShield, FiPhone, FiX } from 'react-icons/fi';
+import { ShoppingCart, Check, Truck, Shield, X } from 'lucide-react';
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
@@ -164,7 +164,7 @@ const ProductDetail = () => {
                                         </span>
                                         {product.is_available ? (
                                             <span className="flex items-center gap-1 px-3 py-1 text-xs font-bold text-green-700 bg-green-100 rounded-full">
-                                                <FiCheck size={14} /> En stock
+                                                <Check size={14} /> En stock
                                             </span>
                                         ) : (
                                             <span className="px-3 py-1 text-xs font-bold text-red-700 bg-red-100 rounded-full">
@@ -181,7 +181,7 @@ const ProductDetail = () => {
                                     <div className="grid grid-cols-2 gap-4 mb-8">
                                         <div className="flex items-center gap-3 p-3 rounded-lg bg-orange-50">
                                             <div className="p-2 text-orange-500 bg-white rounded-full shadow-sm">
-                                                <FiTruck size={20} />
+                                                <Truck size={20} />
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-gray-900">Livraison Rapide</p>
@@ -190,7 +190,7 @@ const ProductDetail = () => {
                                         </div>
                                         <div className="flex items-center gap-3 p-3 rounded-lg bg-blue-50">
                                             <div className="p-2 text-blue-500 bg-white rounded-full shadow-sm">
-                                                <FiShield size={20} />
+                                                <Shield size={20} />
                                             </div>
                                             <div>
                                                 <p className="text-xs font-bold text-gray-900">Qualité Garantie</p>
@@ -219,7 +219,7 @@ const ProductDetail = () => {
                                         disabled={!product.is_available}
                                         className="flex items-center justify-center w-full gap-2 px-6 py-3 font-bold text-gray-700 transition-colors bg-white border-2 border-gray-200 rounded-xl hover:border-orange-500 hover:text-orange-500"
                                     >
-                                        <FiShoppingCart size={20} />
+                                        <ShoppingCart size={20} />
                                         Ajouter au panier
                                     </button>
                                 </div>
@@ -233,7 +233,7 @@ const ProductDetail = () => {
             {/* Modal de Commande Rapide */}
             <AnimatePresence>
                 {showOrderModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
                         <motion.div 
                             initial={{ opacity: 0 }} 
                             animate={{ opacity: 1 }} 
@@ -245,7 +245,7 @@ const ProductDetail = () => {
                             initial={{ scale: 0.9, opacity: 0, y: 20 }} 
                             animate={{ scale: 1, opacity: 1, y: 0 }} 
                             exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            className="relative z-10 w-full max-w-md overflow-hidden bg-white shadow-2xl rounded-2xl"
+                            className="relative z-10 w-full max-w-md max-h-[92vh] overflow-y-auto overflow-x-hidden bg-white shadow-2xl rounded-t-2xl sm:rounded-2xl mx-0 sm:mx-4"
                         >
                             <div className="p-6 border-b border-orange-100 bg-orange-50">
                                 <h3 className="text-xl font-bold text-gray-800">Finaliser votre commande</h3>
@@ -254,11 +254,11 @@ const ProductDetail = () => {
                                     onClick={() => setShowOrderModal(false)}
                                     className="absolute p-1 text-gray-400 bg-white rounded-full top-4 right-4 hover:text-gray-600"
                                 >
-                                    <FiX size={20} />
+                                    <X size={20} />
                                 </button>
                             </div>
 
-                            <form onSubmit={handleDirectOrder} className="p-6 space-y-4">
+                            <form onSubmit={handleDirectOrder} className="p-4 sm:p-6 space-y-4">
                                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Identité</p>
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
@@ -326,7 +326,7 @@ const ProductDetail = () => {
                                         className="flex items-center justify-center w-full gap-2 py-3 font-bold text-white transition-all bg-orange-600 shadow-lg hover:bg-orange-700 rounded-xl shadow-orange-200 active:scale-95"
                                     >
                                         <span>Confirmer la commande</span>
-                                        <FiCheck />
+                                        <Check />
                                     </button>
                                 </div>
                             </form>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { FiSearch, FiFilter } from 'react-icons/fi';
+import { Search, Filter } from 'lucide-react';
 import Header from "../components/Layout/Header";
 import Footer from "../components/Layout/Footer";
 import Wrapper from "../components/Layout/Wrapper";
@@ -99,7 +99,7 @@ const Shop = () => {
                         {/* Search Bar */}
                         <div className="relative w-full max-w-xl group">
                             <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <FiSearch className="text-gray-400 group-focus-within:text-orange-500 transition-colors" size={20} />
+                                <Search className="text-gray-400 group-focus-within:text-orange-500 transition-colors" size={20} />
                             </div>
                             <input 
                                 type="text" 
@@ -156,7 +156,7 @@ const Shop = () => {
                     ) : (
                         <div className="text-center py-12 sm:py-20 px-4 bg-white rounded-xl sm:rounded-2xl shadow-sm border border-dashed border-gray-200">
                             <div className="mx-auto h-16 w-16 sm:h-24 sm:w-24 text-gray-200 mb-3 sm:mb-4">
-                                <FiSearch className="h-full w-full" />
+                                <Search className="h-full w-full" />
                             </div>
                             <h3 className="text-lg sm:text-xl font-medium text-gray-900">Aucun article trouvé</h3>
                             <p className="text-gray-500 mt-2 text-sm sm:text-base">Essayez de modifier vos filtres ou votre recherche.</p>
